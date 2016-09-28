@@ -48,9 +48,19 @@ export default class RouteHandler {
                 Log.trace('RouteHandler::postDataset(..) on end; total length: ' + req.body.length);
 
                 let controller = RouteHandler.datasetController;
+
                 controller.process(id, req.body).then(function (result) {
-                    Log.trace('RouteHandler::postDataset(..) - processed');
-                    res.json(200, {success: result});
+
+
+                    if (controller.getDataset(id) == {}|| controller.getDataset(id) == null){
+                        res.json(204, {success: result});
+
+                } else {
+                    res.json(201, {success:result})
+                Log.trace("dataset with this ID already exists!")
+                }
+
+
                 }).catch(function (err: Error) {
                     Log.trace('RouteHandler::postDataset(..) - ERROR: ' + err.message);
                     res.json(400, {err: err.message});
@@ -83,5 +93,27 @@ export default class RouteHandler {
             res.send(403);
         }
         return next();
+    }
+
+    public static deleteQuery(req: restify.Request, res: restify.Response, next: restify.Next) {
+        Log.trace('RouteHandler::deleteQuery(..) - params: ' + JSON.stringify(req.params));
+        /*try {
+
+            var id: string = req.params.id;
+
+            //  check if dataset is empty in memory
+
+            delete RouteHandler.datasetController.getDataset(id)
+
+            Log.trace('RouteHandler::deleteQuery(..) - successful')
+
+            res.send(204)
+
+            // produce error if not found in both memory or disk
+
+        } catch (err) {
+            Log.error('RouteHandler::deleteQuery(..) - ERROR: dataset with given not found' + err);
+            res.send(404);
+        }*/
     }
 }

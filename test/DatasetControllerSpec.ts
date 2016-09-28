@@ -35,4 +35,14 @@ describe("DatasetController", function () {
 
     });
 
+    //should be able to process dataset?
+
+    //getDatasets()
+
+    //getdataset(id:string)
+
+    //processdataset
+
+
+
 });

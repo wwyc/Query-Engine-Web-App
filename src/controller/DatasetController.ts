@@ -1,4 +1,3 @@
-
 /**
  * Created by rtholmes on 2016-09-03.
  */
@@ -37,25 +36,31 @@ export default class DatasetController {
         // TODO: this should check if the dataset is on disk in ./data if it is not already in memory.
         //wc:  check if dataset is in memory
 
-        if (this.datasets !== {}){       // check if dataset/memory is empty
+        if (this.datasets !== {} && this.datasets !== undefined){       // check if dataset/memory is empty
 
-            var keys = Object.keys(this.datasets);  // check if dataset is in memory
+        var keys = Object.keys(this.datasets);  // check if dataset is in memory
             //     can we use containsKey(key: string): bool?
             for (var id1 of keys) {
-                console.log(id1);
-                if (id == id1){
-                    return this.datasets[id];
-                }
-            }}
+            console.log(id1);
+            if (id == id1){
+                return this.datasets[id];
+            }
+        }}else {
 
         var fs = require('fs');             //check if dataset is in disk
-        fs.readFile("data/"+id+".json", function(err: string, data: any):any {
+
+        var data = fs.readFileSync("data/"+id+".json")
+
+        this.datasets[id] = JSON.parse(data);
+
+        Log.trace("inside getdataset method" + JSON.stringify(this.datasets[id]))}
+
+        /*fs.readFile("data/"+id+".json", function(err: string, data: any):any {
             // ...check if dataset on disk has same id as given id
             if (err)
                 return null;
             this.datasets[id] = JSON.parse(data);
-
-        });
+        });*/
 
         return this.datasets[id];           //return the dataset with the given id and it is now in memory
     }
@@ -109,21 +114,24 @@ export default class DatasetController {
                     var stringPromise : any
 
                     myZip.forEach(function (Path: string, file: JSZipObject){
-                        console.log("iterating over", Path);
+                    //Log.trace("iterating over" + Path)
 
                         stringPromise = file.async("string")
 
                     })
-                    Log.trace("just before saving dataset");
+                    //Log.trace("just before saving dataset");
 
                     stringPromise.then(function(endResult :string) {
-                        Log.trace(endResult)
+                        //Log.trace(endResult)
 
                         // if id == "courses"
 
-                        processedDataset = JSON.parse(endResult)
+                        try{ processedDataset = JSON.parse(endResult)
+                        } catch (e){
+                            Log.trace('DatasetController::process(..) - INVALID JSON ERROR:  ')}
 
                         var myJSONArray :any = processedDataset
+
 
                         var sessions: any = []
 
@@ -137,29 +145,22 @@ export default class DatasetController {
 
                                 var myKey = Object.keys(myJSONObject)[j]
 
-                                if (myKey.toString() == "Subject"){
-                                    session.courses_dept = myJSONObject.Subject}
-
-                                if (myKey.toString() == "id"){
-                                    session.courses_id = myJSONObject.Course}
-
-                                if (myKey.toString() == "Avg"){
-                                    session.courses_avg = myJSONObject.Avg}
-
-                                if (myKey.toString() == "Professor"){
-                                    session.courses_instructor = myJSONObject.Professor}
-
-                                if (myKey.toString() == "Title"){
-                                    session.courses_title = myJSONObject.Title}
-
-                                if (myKey.toString() == "Pass"){
-                                    session.courses_pass = myJSONObject.Pass}
-
-                                if (myKey.toString() == "Fail"){
-                                    session.courses_fail = myJSONObject.Fail}
-
-                                if (myKey.toString() == "Audit"){
-                                    session.courses_audit = myJSONObject.Audit}
+                                    if (myKey.toString() == "Subject"){
+                                        session.courses_dept = myJSONObject.Subject}
+                                    if (myKey.toString() == "id"){
+                                        session.courses_id = myJSONObject.Course}
+                                    if (myKey.toString() == "Avg"){
+                                        session.courses_avg = myJSONObject.Avg}
+                                    if (myKey.toString() == "Professor"){
+                                        session.courses_instructor = myJSONObject.Professor}
+                                    if (myKey.toString() == "Title"){
+                                        session.courses_title = myJSONObject.Title}
+                                    if (myKey.toString() == "Pass"){
+                                        session.courses_pass = myJSONObject.Pass}
+                                    if (myKey.toString() == "Fail"){
+                                        session.courses_fail = myJSONObject.Fail}
+                                    if (myKey.toString() == "Audit"){
+                                        session.courses_audit = myJSONObject.Audit}
                             }
                             sessions[i] = session
                         }
