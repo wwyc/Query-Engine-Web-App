@@ -35,4 +35,5 @@ export default class QueryController {
         // TODO: implement this
         return {status: 'received', ts: new Date().getTime()};
     }
+
 }
