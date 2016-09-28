@@ -35,14 +35,15 @@ describe("QueryController", function () {
         expect(isValid).to.equal(false);
     });
 
-    it("Should be able to query, although the answer will be empty", function () {
-        // NOTE: this is not actually a valid query for D1, nor is the result correct.
-        let query: QueryRequest = {GET: 'food', WHERE: {IS: 'apple'}, ORDER: 'food', AS: 'table'};
-        let dataset: Datasets = {};
-        let controller = new QueryController(dataset);
-        let ret = controller.query(query);
-        Log.test('In: ' + JSON.stringify(query) + ', out: ' + JSON.stringify(ret));
-        expect(ret).not.to.be.equal(null);
-        // should check that the value is meaningful
-    });
-});
+    /*it("Should be able to query, although the answer will be empty", function () {
+     // NOTE: this is not actually a valid query for D1, nor is the result correct.
+     let query: QueryRequest = {GET: 'food', WHERE: {IS: 'apple'}, ORDER: 'food', AS: 'table'};
+     let dataset: Datasets = {};
+     let controller = new QueryController(dataset);
+     let ret = controller.query(query);
+     Log.test('In: ' + JSON.stringify(query) + ', out: ' + JSON.stringify(ret));
+     expect(ret).not.to.be.equal(null);
+     // should check that the value is meaningful
+     });*/
+     });
+
