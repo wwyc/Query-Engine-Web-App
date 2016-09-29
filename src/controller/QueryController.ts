@@ -5,6 +5,7 @@
 import {Datasets, default as DatasetController} from "./DatasetController";
 import Log from "../Util";
 import {bodyParser} from "restify";
+import {stringify} from "querystring";
 
 
 
@@ -55,7 +56,11 @@ export default class QueryController {
         //json object or json array
         let order: string = query.ORDER;
         let format: string = query.AS;
-        let intermediate:Array<any>=this.dealWithWhere(where,get);
+        let intermediate:Array<any>;
+        if(typeof get==='string')
+        intermediate=this.dealWithWhere(where,get);
+        else
+            intermediate=this.dealWithWhere(where,get[0]) ;
         let result:Array<any>;
         if(order!=null)
         { let values: Array<number>;
@@ -75,7 +80,7 @@ export default class QueryController {
         //JSON.parse
         //return back to JSON object
         return {result:result};
-       // return {status: 'received', ts: new Date().getTime()};
+       //return {status: 'received', ts: new Date().getTime()};
     }
 
 
@@ -83,7 +88,7 @@ export default class QueryController {
 
 
 //deal with where
-    private  dealWithWhere(where:any,get:string):Array<any> {
+    public  dealWithWhere(where:any,get:string):Array<any> {
 
         let arr:Array<any>;//dictionary
         let file:any=this.datasets[this.stringPrefix(get)];
@@ -91,65 +96,71 @@ export default class QueryController {
         for (var i=0;i<file.length;i++)
         { for (var j=0;j<file[i].length;j++)
         { if (this.parserEBNF(where,file[i][j]))
-        { arr+=file[i][j];
+        { arr=arr+file[i][j];
         } }}
 
         return arr;
     }
 
 
-    private stringPrefix(get:string):string{
+    public stringPrefix(get:string):string{
         let prefix:string;
-        prefix=prefix.split("_")[0];
+        prefix=get.split("_")[0];
         return prefix;
     }
-
-    private parserEBNF(where:any,dataset:any):Boolean {
+//NOT WORKING !
+    public parserEBNF(where:any,dataset:Array<any>):boolean {
         //GT= > EQ= LT<
         //AND OR NOT
         // parse where
         //implemenntion of EBNF
         // and or follow array，
         // for loop
-        let valid:Boolean=true;
+        let valid:boolean=true;
 
-        if (where.key === "AND"||"OR")
-        {           for(var i=0;i<where.key.value.length-1;i++)
-        {
-            if (where.key === "AND")
-            {valid= valid&&(this.parserEBNF(where.key[i],dataset)
-                &&this.parserEBNF( where.key[i+1],dataset));}
-            if (where.key==="OR")
-            {valid=valid&& (this.parserEBNF(where.key[i],dataset)
-                ||this.parserEBNF( where.key[i+1],dataset));}
-        }
 
-        }
 
-        if (where.key==="GT" || "EQ" || "LT") {
-            var key1:any=where.key.value.key;
-            if (where.key === "GT") {
-                valid = valid&&(dataset.key1.value > key1.value);
+      if (typeof where.AND!=='undefined'||typeof where.OR!=='undefined')//can;t evaluate it
+
+      {
+          if (typeof where.AND !== 'undefined')
+
+              for (var i = 0; i < where.AND.length - 1; i++) {
+                  valid = valid && this.parserEBNF(where.AND[i], dataset) &&
+                      this.parserEBNF(where.AND[i + 1], dataset);
+              }
+          if (typeof where.OR !== 'undefined')
+              for (var i = 0; i < where.OR.length - 1; i++){
+              valid = valid && this.parserEBNF(where.ORDER[i], dataset)
+                  || this.parserEBNF(where.ORDER[i + 1], dataset);
+          }
+
+      }
+
+        if (typeof where.GT ||typeof where. EQ || typeof where.LT!=='undefined') {
+
+            if (typeof where.GT!=='undefined') {
+                valid = valid&&(dataset[where.GT.key] > where.GT.value);
             }
 
-            if (where.key === "EQ") {
-                valid = valid&&(dataset.key1.value === key1.value);
+            if (typeof where.EQ!=='undefined') {
+                valid = valid&&(dataset[where.EQ.key] === where.EQ.value);
             }
 
-            if (where.key === "LT") {
-                valid =valid&&(dataset.key1.value < key1.value);
-            }
-        }
-
-        if (where.key==="IS")
-
-        {valid= valid&&(dataset.key1.value
-            === where.key.value.key.value);}
-        if(where.key==="NOT") {
-            for (var j = 0; j < where.key.length; j++) {
-                valid =valid&&(!this.parserEBNF(where.key.value, dataset));
+            if (typeof where.LT!=='undefined') {
+                valid =valid&&(dataset[where.LT.key] < where.LT.value);
             }
         }
+
+        if (typeof where.IS!=='undefined')
+
+        {valid= valid&&(dataset[where.IS.key]
+            === where.IS.value);}
+        if(typeof where.NOT!=='undefined') {
+
+                valid =valid&&(!this.parserEBNF(where.NOT, dataset));
+            }
+
         return valid;
     }
 
@@ -159,7 +170,7 @@ export default class QueryController {
 //    sort according to key’s value
 
 
-    private   quickSortNumber(arr1: Array<any>,arr2:Array<any>,left: number,right: number):Array<any> {
+    public   quickSortNumber(arr1: Array<any>,arr2:Array<any>,left: number,right: number):Array<any> {
         let pivot:number;
         if(left< right)
         {
@@ -170,7 +181,7 @@ export default class QueryController {
         return arr2;
     }
 
-    private partitionNumber(arr1: Array<any>,arr2:Array<any>, left: number, right: number):number{
+    public partitionNumber(arr1: Array<any>,arr2:Array<any>, left: number, right: number):number{
         let middle:number=left + (right - left) / 2;
         let pivot = arr1[middle];
         this.swap(arr1[middle],arr1[left]);
@@ -196,14 +207,14 @@ export default class QueryController {
         return a - 1;
     }
 
-    private swap(left:any,right:any){
+    public swap(left:any,right:any){
         let temp:any=left;
         left=right;
         right=temp;
     }
 
     //sort words alphabetically
-    private quickSortLetter(arr1:Array<any>,arr2:Array<any>, left:number,right:number):Array<any>{
+    public quickSortLetter(arr1:Array<any>,arr2:Array<any>, left:number,right:number):Array<any>{
         let pivot:number;
 
         if(left< right)
@@ -215,7 +226,7 @@ export default class QueryController {
         return arr2;
     }
 
-    private partitionString(arr1: Array<any>,arr2:Array<any>, left: number, right: number):number{
+    public partitionString(arr1: Array<any>,arr2:Array<any>, left: number, right: number):number{
         let middle:number=left + (right - left) / 2;
         let pivot = arr1[middle];
         this.swap(arr1[middle],arr1[left]);
@@ -242,7 +253,7 @@ export default class QueryController {
         return a - 1;
     }
 
-    private represent(arr1:any, arr2:Array<any>):Array<any>{
+    public represent(arr1:any, arr2:Array<any>):Array<any>{
 
         let arr3: Array<any>;
         if (typeof arr1!=='string')
