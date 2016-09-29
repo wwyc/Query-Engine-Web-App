@@ -8,8 +8,6 @@ import {bodyParser} from "restify";
 import {stringify} from "querystring";
 
 
-
-
 export interface QueryRequest {
     GET: string|string[];
     WHERE: {};

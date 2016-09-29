@@ -85,7 +85,6 @@ export default class DatasetController {
                 }
             )
         }
-        //var json = Utilities.JSONLoader.loadFromFile("../docs/location_map.json");
 
         return this.datasets;
     }
@@ -136,7 +135,6 @@ export default class DatasetController {
 
                         for (var m = 0, abc = endResult.length; m < abc; m++){
 
-
                             var courseObj = JSON.parse(endResult[m]).catch(function (err: Error) {
                                 Log.trace('DatasetController::process(..) - INVALID JSON ERROR: ' + err.message);
                                 reject(err);
@@ -166,9 +164,6 @@ export default class DatasetController {
 
                         Log.trace("length of sessions FINAL  =  " + sessions.length.toString())
                         Log.trace("length of courseArray FINAL  =  " + courseArray.length.toString())
-
-
-                        //var myJSONArray :any = processedDataset
 
 
                         processedDataset = courseArray
