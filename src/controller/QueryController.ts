@@ -129,7 +129,7 @@ export default class QueryController {
                   valid = valid && this.parserEBNF(where.AND[i], dataset) &&
                       this.parserEBNF(where.AND[i + 1], dataset);
               }
-          if (typeof where.OR !== 'undefined')
+          else if (typeof where.OR !== 'undefined')
               for (var i = 0; i < where.OR.length - 1; i++){
               valid = valid && this.parserEBNF(where.OR[i], dataset)
                   || this.parserEBNF(where.OR[i + 1], dataset);
@@ -137,26 +137,26 @@ export default class QueryController {
 
       }
 
-        if (typeof where.GT ||typeof where. EQ || typeof where.LT!=='undefined') {
+      else  if (typeof where.GT ||typeof where. EQ || typeof where.LT!=='undefined') {
 
             if (typeof where.GT!=='undefined') {
                 valid = valid&&(dataset[where.GT.key] > where.GT.value);
             }
 
-            if (typeof where.EQ!=='undefined') {
+            else if (typeof where.EQ!=='undefined') {
                 valid = valid&&(dataset[where.EQ.key] === where.EQ.value);
             }
 
-            if (typeof where.LT!=='undefined') {
+            else if (typeof where.LT!=='undefined') {
                 valid =valid&&(dataset[where.LT.key] < where.LT.value);
             }
         }
 
-        if ('undefined' !== typeof where.IS) {
+      else  if ('undefined' !== typeof where.IS) {
     valid = valid && (dataset[where.IS.key]
         === where.IS.value);
 }
-        if(typeof where.NOT!=='undefined') {
+       else if(typeof where.NOT!=='undefined') {
 
                 valid =valid&&(!this.parserEBNF(where.NOT, dataset));
             }
@@ -264,13 +264,13 @@ export default class QueryController {
             }
             arr3[i]=arr3[i]+arr1[arr1.length-1] + ":" + arr2[i].arr1[arr1.length-1].value+"}" }
 
-            arr3[i] += "{"+arr1[arr1.length - 1] + ":" + arr2[i].arr1[arr1.length - 1].value+"}";
+            arr3[i] =arr3[i]+ "{"+arr1[arr1.length - 1] + ":" + arr2[i].arr1[arr1.length - 1].value+"}";
         }
         else
         { for ( var a=0;a<arr2.length-1;a++) {
             arr3[i] = "{"+arr1[j] + ":" + arr2[i].arr1[j].value + "}"+",";
         }
-            arr3[i] += "{"+arr1[arr1.length - 1] + ":" + arr2[i].arr1[arr1.length - 1].value+"}";
+            arr3[i] =arr3[i]+ "{"+arr1[arr1.length - 1] + ":" + arr2[i].arr1[arr1.length - 1].value+"}";
         }
         return arr3;
 

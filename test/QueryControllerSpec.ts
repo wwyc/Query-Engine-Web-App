@@ -40,7 +40,7 @@ describe("QueryController", function () {
     });
 
 
-    it ("correct EBNFparser",function(){
+ /*   it ("correct EBNFparser",function(){
         let dataset:any=[{"courses_dept":"epse","courses_avg":97.41},
             {"courses_dept":"cnps","courses_avg":97.47},{"courses_dept":"cnps","courses_avg":97.47},
             {"courses_dept":"math","courses_avg":97.48},{"courses_dept":"math","courses_avg":97.48},
@@ -60,16 +60,56 @@ describe("QueryController", function () {
         let controller = new QueryController(dataset);
      let valid:boolean=controller.parserEBNF(
          {"AND": [
+             {"IS": {"courses_dept": "epse"}},
              {"GT": {"courses_avg": 90}},
-             {"IS": {"courses_dept": "epse"}}
+
          ]},dataset[0]
-     )
-        expect(valid).to.equal(true)
+     );
+        expect(valid).to.equal(true);});  */
+
+/*
+    it ("correct sort",function(){
+        let dataset: Datasets = {};
+
+        let controller:QueryController=new QueryController(dataset);
+        let lalal:Array<any>=[15,3,7,4,9,10,6];
+        let lalal1:Array<any>=[0,1,2,3,4,5,6];
+        let expect1:Array<any>=[1,3,6,2,4,5,0];
+        let actual:Array<any>=controller.quickSortNumber(lalal,lalal1,0,6);
+        let valid:boolean=actual===expect1;
+        expect(valid).to.equal(true);
+
 
 
     });
+*/
+    it ("correct present",function(){
+        let dataset:any=[{"courses_dept":"epse","courses_avg":97.41},
+            {"courses_dept":"cnps","courses_avg":97.47},{"courses_dept":"cnps","courses_avg":97.47},
+            {"courses_dept":"math","courses_avg":97.48},{"courses_dept":"math","courses_avg":97.48},
+            {"courses_dept":"epse","courses_avg":97.69},{"courses_dept":"epse","courses_avg":97.78},
+            {"courses_dept":"crwr","courses_avg":98},{"courses_dept":"crwr","courses_avg":98},
+            {"courses_dept":"epse","courses_avg":98.08},{"courses_dept":"epse","courses_avg":98.36},
+            {"courses_dept":"epse","courses_avg":98.45},{"courses_dept":"epse","courses_avg":98.45},
+            {"courses_dept":"nurs","courses_avg":98.5},{"courses_dept":"nurs","courses_avg":98.5},
+            {"courses_dept":"epse","courses_avg":98.58},{"courses_dept":"nurs","courses_avg":98.58},
+            {"courses_dept":"epse","courses_avg":98.58},{"courses_dept":"nurs","courses_avg":98.58},
+            {"courses_dept":"epse","courses_avg":98.7},{"courses_dept":"nurs","courses_avg":98.71},
+            {"courses_dept":"nurs","courses_avg":98.71},{"courses_dept":"eece","courses_avg":98.75},
+            {"courses_dept":"eece","courses_avg":98.75},{"courses_dept":"epse","courses_avg":98.76},{
+                "courses_dept":"epse","courses_avg":98.76},{"courses_dept":"epse","courses_avg":98.8},
+            {"courses_dept":"cnps","courses_avg":99.19},{"courses_dept":"math","courses_avg":99.78},
+            {"courses_dept":"math","courses_avg":99.78}];
+        let controller = new QueryController(dataset);
+    
+        let valid:boolean=controller.parserEBNF(
+            {"AND": [
+                {"IS": {"courses_dept": "epse"}},
+                {"GT": {"courses_avg": 90}},
 
-
+            ]},dataset[0]
+        );
+        expect(valid).to.equal(true);});
 
     /*it("Should be able to query, although the answer will be empty", function () {
      // NOTE: this is not actually a valid query for D1, nor is the result correct.
