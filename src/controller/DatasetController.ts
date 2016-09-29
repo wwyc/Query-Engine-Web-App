@@ -9,8 +9,6 @@ import Session from '../DataStorage';
 import {getRelativePath} from "tslint/lib/configuration";
 import {error} from "util";
 
-
-
 /**
  * In memory representation of all datasets.
  */
