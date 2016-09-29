@@ -93,7 +93,7 @@ describe("QueryController", function () {
             "courses_dept" ,dataset
         );
 
-        let valid:boolean= dataset===[{"courses_dept":"epse"},
+        let valid:boolean= diu===[{"courses_dept":"epse"},
                 {"courses_dept":"cnps"},{"courses_dept":"cnps"},
                 {"courses_dept":"math"}]
         expect(valid).to.equal(true);});
