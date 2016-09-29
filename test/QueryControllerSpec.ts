@@ -101,14 +101,12 @@ describe("QueryController", function () {
             {"courses_dept":"cnps","courses_avg":99.19},{"courses_dept":"math","courses_avg":99.78},
             {"courses_dept":"math","courses_avg":99.78}];
         let controller = new QueryController(dataset);
-    
-        let valid:boolean=controller.parserEBNF(
-            {"AND": [
-                {"IS": {"courses_dept": "epse"}},
-                {"GT": {"courses_avg": 90}},
 
-            ]},dataset[0]
+        let diu:Array<any>=controller.present(
+            "courses_dept" ,dataset
         );
+
+        let valid:boolean= dataset===
         expect(valid).to.equal(true);});
 
     /*it("Should be able to query, although the answer will be empty", function () {

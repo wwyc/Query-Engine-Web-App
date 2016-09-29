@@ -260,17 +260,17 @@ export default class QueryController {
         { for ( var i=0;i<arr2.length-1;i++) {
             arr3[i]= "{";
             for (var j = 0; j < arr1.length-1; j++) {
-                arr3[i] =arr3[i] +arr1[j] + ":" + arr2[i].arr1[j].value+",";
+                arr3[i] =arr3[i] +arr1[j] + ":" + arr2[i].arr1[j]+",";
             }
-            arr3[i]=arr3[i]+arr1[arr1.length-1] + ":" + arr2[i].arr1[arr1.length-1].value+"}" }
+            arr3[i]=arr3[i]+arr1[arr1.length-1] + ":" + arr2[i].arr1[arr1.length-1]+"}" }
 
-            arr3[i] =arr3[i]+ "{"+arr1[arr1.length - 1] + ":" + arr2[i].arr1[arr1.length - 1].value+"}";
+            arr3[i] =arr3[i]+ "{"+arr1[arr1.length - 1] + ":" + arr2[i].arr1[arr1.length - 1]+"}";
         }
         else
         { for ( var a=0;a<arr2.length-1;a++) {
-            arr3[i] = "{"+arr1[j] + ":" + arr2[i].arr1[j].value + "}"+",";
+            arr3[a] = "{"+arr1 + ":" + arr2[a].arr1+ "}"+",";
         }
-            arr3[i] =arr3[i]+ "{"+arr1[arr1.length - 1] + ":" + arr2[i].arr1[arr1.length - 1].value+"}";
+            arr3[a] =arr3[a]+ "{"+arr1 + ":" + arr2[a].arr1.value+"}";
         }
         return arr3;
 
