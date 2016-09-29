@@ -271,7 +271,7 @@ export default class QueryController {
         { for ( var a=0;a<arr2.length-1;a++) {
             arr3[a] = "{"+arr1 + ":" + arr2[a].arr1+ "}"+",";
         }
-            arr3[a] =arr3[a]+ "{"+arr1 + ":" + arr2[a].arr1.value+"}";
+            arr3[a] =arr3[a]+ "{"+arr1 + ":" + arr2[a].arr1+"}";
         }
         return arr3;
     }
