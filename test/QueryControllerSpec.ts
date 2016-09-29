@@ -40,7 +40,7 @@ describe("QueryController", function () {
     });
 
 
-    it ("correct EBNFparser",function(){
+  /*  it ("correct EBNFparser",function(){
         let dataset:any=[{"courses_dept":"epse","courses_avg":97.41},
             {"courses_dept":"cnps","courses_avg":97.47},{"courses_dept":"cnps","courses_avg":97.47},
             {"courses_dept":"math","courses_avg":97.48},{"courses_dept":"math","courses_avg":97.48},
@@ -82,7 +82,7 @@ describe("QueryController", function () {
 
 
     });
-*/  /*
+*/
     it ("correct present",function(){
         let dataset:any=[{"courses_dept":"epse","courses_avg":97.41},
             {"courses_dept":"cnps","courses_avg":97.47},{"courses_dept":"cnps","courses_avg":97.47},
@@ -97,7 +97,7 @@ describe("QueryController", function () {
                 {"courses_dept":"cnps"},{"courses_dept":"cnps"},
                 {"courses_dept":"math"}]
         expect(valid).to.equal(true);});
-*/
+
     /*it("Should be able to query, although the answer will be empty", function () {
      // NOTE: this is not actually a valid query for D1, nor is the result correct.
      let query: QueryRequest = {GET: 'food', WHERE: {IS: 'apple'}, ORDER: 'food', AS: 'table'};
