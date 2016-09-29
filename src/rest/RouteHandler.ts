@@ -51,15 +51,13 @@ export default class RouteHandler {
 
                 controller.process(id, req.body).then(function (result) {
 
-
                     if (controller.getDataset(id) == {}|| controller.getDataset(id) == null){
                         res.json(204, {success: result});
-
-                } else {
+                        Log.trace("dataset with this ID is new")
+                    } else {
                     res.json(201, {success:result})
                 Log.trace("dataset with this ID already exists!")
                 }
-
 
                 }).catch(function (err: Error) {
                     Log.trace('RouteHandler::postDataset(..) - ERROR: ' + err.message);
@@ -97,13 +95,15 @@ export default class RouteHandler {
 
     public static deleteQuery(req: restify.Request, res: restify.Response, next: restify.Next) {
         Log.trace('RouteHandler::deleteQuery(..) - params: ' + JSON.stringify(req.params));
-        /*try {
+        try {
 
             var id: string = req.params.id;
 
             //  check if dataset is empty in memory
 
-            delete RouteHandler.datasetController.getDataset(id)
+            delete RouteHandler.datasetController.getDatasets()
+
+            fs.unlinkSync("../cpsc310project/data/" + id+".json")
 
             Log.trace('RouteHandler::deleteQuery(..) - successful')
 
@@ -112,8 +112,8 @@ export default class RouteHandler {
             // produce error if not found in both memory or disk
 
         } catch (err) {
-            Log.error('RouteHandler::deleteQuery(..) - ERROR: dataset with given not found' + err);
+            Log.error('RouteHandler::deleteQuery(..) - ERROR: dataset with given not found' + err.message);
             res.send(404);
-        }*/
+        }
     }
 }
