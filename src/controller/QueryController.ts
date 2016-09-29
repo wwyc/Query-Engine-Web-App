@@ -88,7 +88,7 @@ export default class QueryController {
 
 
 //deal with where
-    public  dealWithWhere(where:any,get:string):Array<any> {
+    private  dealWithWhere(where:any,get:string):Array<any> {
 
         let arr:Array<any>;//dictionary
         let file:any=this.datasets[this.stringPrefix(get)];
@@ -103,13 +103,13 @@ export default class QueryController {
     }
 
 
-    public stringPrefix(get:string):string{
+    private stringPrefix(get:string):string{
         let prefix:string;
         prefix=get.split("_")[0];
         return prefix;
     }
 //NOT WORKING !
-    public parserEBNF(where:any,dataset:Array<any>):boolean {
+    private parserEBNF(where:any,dataset:Array<any>):boolean {
         //GT= > EQ= LT<
         //AND OR NOT
         // parse where
@@ -170,7 +170,7 @@ export default class QueryController {
 //    sort according to key’s value
 
 
-    public   quickSortNumber(arr1: Array<any>,arr2:Array<any>,left: number,right: number):Array<any> {
+    private   quickSortNumber(arr1: Array<any>,arr2:Array<any>,left: number,right: number):Array<any> {
         let pivot:number;
         if(left< right)
         {
@@ -181,7 +181,7 @@ export default class QueryController {
         return arr2;
     }
 
-    public partitionNumber(arr1: Array<any>,arr2:Array<any>, left: number, right: number):number{
+    private partitionNumber(arr1: Array<any>,arr2:Array<any>, left: number, right: number):number{
         let middle:number=left + (right - left) / 2;
         let pivot = arr1[middle];
         this.swap(arr1[middle],arr1[left]);
@@ -207,14 +207,14 @@ export default class QueryController {
         return a - 1;
     }
 
-    public swap(left:any,right:any){
+    private swap(left:any,right:any){
         let temp:any=left;
         left=right;
         right=temp;
     }
 
     //sort words alphabetically
-    public quickSortLetter(arr1:Array<any>,arr2:Array<any>, left:number,right:number):Array<any>{
+    private quickSortLetter(arr1:Array<any>,arr2:Array<any>, left:number,right:number):Array<any>{
         let pivot:number;
 
         if(left< right)
@@ -226,7 +226,7 @@ export default class QueryController {
         return arr2;
     }
 
-    public partitionString(arr1: Array<any>,arr2:Array<any>, left: number, right: number):number{
+    private partitionString(arr1: Array<any>,arr2:Array<any>, left: number, right: number):number{
         let middle:number=left + (right - left) / 2;
         let pivot = arr1[middle];
         this.swap(arr1[middle],arr1[left]);
@@ -253,19 +253,20 @@ export default class QueryController {
         return a - 1;
     }
 
-    public represent(arr1:any, arr2:Array<any>):Array<any>{
+    private represent(arr1:any, arr2:Array<any>):Array<any>{
 
         let arr3: Array<any>=[];
 
-        if (typeof arr1!=='string')
-        { for ( var i=0;i<arr2.length-1;i++) {
-            arr3[i]= "{";
-            for (var j = 0; j < arr1.length-1; j++) {
-                arr3[i] =arr3[i] +arr1[j] + ":" + arr2[i].arr1[j]+",";
+        if (typeof arr1!=='string') {
+            for (var i = 0; i < arr2.length - 1; i++) {
+                arr3[i] = "{";
+                for (var j = 0; j < arr1.length - 1; j++) {
+                    arr3[i] = arr3[i] + arr1[j] + ":" + arr2[i].arr1[j] + ",";
+                }
+                arr3[i] = arr3[i] + arr1[arr1.length - 1] + ":" + arr2[i].arr1[arr1.length - 1] + "}"
             }
-            arr3[i]=arr3[i]+arr1[arr1.length-1] + ":" + arr2[i].arr1[arr1.length-1]+"}" }
 
-            arr3[i] =arr3[i]+ "{"+arr1[arr1.length - 1] + ":" + arr2[i].arr1[arr1.length - 1]+"}";
+            arr3[i] = arr3[i] + "{" + arr1[arr1.length - 1] + ":" + arr2[i].arr1[arr1.length - 1] + "}";
         }
         else
         { for ( var a=0;a<arr2.length-1;a++) {
