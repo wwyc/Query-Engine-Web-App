@@ -131,8 +131,8 @@ export default class QueryController {
               }
           if (typeof where.OR !== 'undefined')
               for (var i = 0; i < where.OR.length - 1; i++){
-              valid = valid && this.parserEBNF(where.ORDER[i], dataset)
-                  || this.parserEBNF(where.ORDER[i + 1], dataset);
+              valid = valid && this.parserEBNF(where.OR[i], dataset)
+                  || this.parserEBNF(where.OR[i + 1], dataset);
           }
 
       }
