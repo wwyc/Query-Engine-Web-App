@@ -256,6 +256,7 @@ export default class QueryController {
     public represent(arr1:any, arr2:Array<any>):Array<any>{
 
         let arr3: Array<any>;
+
         if (typeof arr1!=='string')
         { for ( var i=0;i<arr2.length-1;i++) {
             arr3[i]= "{";
