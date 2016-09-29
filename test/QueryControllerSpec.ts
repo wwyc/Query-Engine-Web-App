@@ -61,10 +61,10 @@ describe("QueryController", function () {
      let valid:boolean=controller.parserEBNF(
          {"AND": [
              {"GT": {"courses_avg": 90}},
-             {"IS": {"courses_dept": "adhe"}}
+             {"IS": {"courses_dept": "epse"}}
          ]},dataset[0]
      )
-        expect(valid).to.equal(false)
+        expect(valid).to.equal(true)
 
 
     });

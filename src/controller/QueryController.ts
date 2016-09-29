@@ -152,10 +152,10 @@ export default class QueryController {
             }
         }
 
-        if (typeof where.IS!=='undefined')
-
-        {valid= valid&&(dataset[where.IS.key]
-            === where.IS.value);}
+        if ('undefined' !== typeof where.IS) {
+    valid = valid && (dataset[where.IS.key]
+        === where.IS.value);
+}
         if(typeof where.NOT!=='undefined') {
 
                 valid =valid&&(!this.parserEBNF(where.NOT, dataset));
