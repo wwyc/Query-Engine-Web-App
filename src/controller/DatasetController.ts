@@ -118,7 +118,7 @@ export default class DatasetController {
 
                     zip.forEach(function (Path: string, file: JSZipObject){
                         if (!file.dir) {
-                            Log.trace("iterating over filepath   " + Path)
+                            //Log.trace("iterating over filepath   " + Path)
                             stringPromise = file.async("string") // string from JSZipObject?
                             promiseArray.push(stringPromise)
                         }
@@ -134,7 +134,7 @@ export default class DatasetController {
                         for (var m = 0, abc = endResult.length; m < abc; m++){
 
                             var courseObj = JSON.parse(endResult[m]).catch(function (err: Error) {
-                                Log.trace('DatasetController::process(..) - INVALID JSON ERROR: ' + err.message);
+                                Log.error('DatasetController::process(..) - INVALID JSON ERROR: ' + err.message);
                                 reject(err);
                             })
 
