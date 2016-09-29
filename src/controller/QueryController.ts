@@ -273,7 +273,6 @@ export default class QueryController {
             arr3[a] =arr3[a]+ "{"+arr1 + ":" + arr2[a].arr1.value+"}";
         }
         return arr3;
-
     }
 
 }

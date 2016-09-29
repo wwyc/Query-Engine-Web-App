@@ -86,27 +86,16 @@ describe("QueryController", function () {
     it ("correct present",function(){
         let dataset:any=[{"courses_dept":"epse","courses_avg":97.41},
             {"courses_dept":"cnps","courses_avg":97.47},{"courses_dept":"cnps","courses_avg":97.47},
-            {"courses_dept":"math","courses_avg":97.48},{"courses_dept":"math","courses_avg":97.48},
-            {"courses_dept":"epse","courses_avg":97.69},{"courses_dept":"epse","courses_avg":97.78},
-            {"courses_dept":"crwr","courses_avg":98},{"courses_dept":"crwr","courses_avg":98},
-            {"courses_dept":"epse","courses_avg":98.08},{"courses_dept":"epse","courses_avg":98.36},
-            {"courses_dept":"epse","courses_avg":98.45},{"courses_dept":"epse","courses_avg":98.45},
-            {"courses_dept":"nurs","courses_avg":98.5},{"courses_dept":"nurs","courses_avg":98.5},
-            {"courses_dept":"epse","courses_avg":98.58},{"courses_dept":"nurs","courses_avg":98.58},
-            {"courses_dept":"epse","courses_avg":98.58},{"courses_dept":"nurs","courses_avg":98.58},
-            {"courses_dept":"epse","courses_avg":98.7},{"courses_dept":"nurs","courses_avg":98.71},
-            {"courses_dept":"nurs","courses_avg":98.71},{"courses_dept":"eece","courses_avg":98.75},
-            {"courses_dept":"eece","courses_avg":98.75},{"courses_dept":"epse","courses_avg":98.76},{
-                "courses_dept":"epse","courses_avg":98.76},{"courses_dept":"epse","courses_avg":98.8},
-            {"courses_dept":"cnps","courses_avg":99.19},{"courses_dept":"math","courses_avg":99.78},
-            {"courses_dept":"math","courses_avg":99.78}];
+            {"courses_dept":"math","courses_avg":97.48}];
         let controller = new QueryController(dataset);
 
-        let diu:Array<any>=controller.present(
+        let diu:Array<any>=controller.represent(
             "courses_dept" ,dataset
         );
 
-        let valid:boolean= dataset===
+        let valid:boolean= dataset===[{"courses_dept":"epse"},
+                {"courses_dept":"cnps"},{"courses_dept":"cnps"},
+                {"courses_dept":"math"}]
         expect(valid).to.equal(true);});
 
     /*it("Should be able to query, although the answer will be empty", function () {
