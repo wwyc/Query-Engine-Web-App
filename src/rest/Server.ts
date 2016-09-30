@@ -72,7 +72,7 @@ export default class Server {
                 that.rest.post('/query', restify.bodyParser(), RouteHandler.postQuery);
 
                 //Deletes a dataset with provided id
-                that.rest.del('/dataset/:id', RouteHandler.deleteQuery);
+                //that.rest.del('/dataset/:id', RouteHandler.deleteQuery);
 
                 that.rest.listen(that.port, function () {
                     Log.info('Server::start() - restify listening: ' + that.rest.url);
