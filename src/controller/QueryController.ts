@@ -56,6 +56,7 @@ export default class QueryController {
         //json object or json array
         let order: string = query.ORDER;
         let format: string = query.AS;
+
         let intermediate:Array<any>;
         if(typeof get==='string')
         intermediate=this.dealWithWhere(where,get);
