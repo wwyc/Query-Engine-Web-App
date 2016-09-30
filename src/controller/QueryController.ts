@@ -152,9 +152,10 @@ export default class QueryController {
             }
         }
 
-      else  if ( typeof where.IS!=='undefined') {
-    valid = valid && (dataset[where.IS.key]
-        === where.IS.value);
+      else  if ( typeof where["IS"]!=='undefined') {
+          Log.trace(where.toString());
+    valid = valid && (dataset[where["IS"].key]
+        === where["IS"].value);
 }
        else if(typeof where.NOT!=='undefined') {
 
@@ -254,7 +255,7 @@ export default class QueryController {
     }
 
     public represent(arr1:any, arr2:Array<any>):Array<any>{
-        let arr3:Array<any>;
+        var arr3: any = [];
         if (typeof arr1!=='string') {
             for (var i = 0; i < arr2.length - 1; i++) {
 

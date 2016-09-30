@@ -40,7 +40,7 @@ describe("QueryController", function () {
     });
 
 
-  /*  it ("correct EBNFparser",function(){
+  /* it ("correct EBNFparser",function(){
         let dataset:any=[{"courses_dept":"epse","courses_avg":97.41},
             {"courses_dept":"cnps","courses_avg":97.47},{"courses_dept":"cnps","courses_avg":97.47},
             {"courses_dept":"math","courses_avg":97.48},{"courses_dept":"math","courses_avg":97.48},
@@ -67,8 +67,7 @@ describe("QueryController", function () {
      );
         expect(valid).to.equal(false);});
 
-/*
-    it ("correct sort",function(){
+ /*   it ("correct sort",function(){
         let dataset: Datasets = {};
 
         let controller:QueryController=new QueryController(dataset);
@@ -81,9 +80,9 @@ describe("QueryController", function () {
 
 
 
-    });
-*/
-    it ("correct present",function(){
+    });*/
+
+ /* it ("correct present",function(){
         let dataset:any=[{"courses_dept":"epse","courses_avg":97.41},
             {"courses_dept":"cnps","courses_avg":97.47},{"courses_dept":"cnps","courses_avg":97.47},
             {"courses_dept":"math","courses_avg":97.48}];
