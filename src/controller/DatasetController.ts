@@ -136,9 +136,9 @@ export default class DatasetController {
 
                             var courseObj = JSON.parse(endResult[m])
 
-                            if (courseObj.result == undefined) {
-                                Log.trace("course.Obj is NOT defined")
-                            }
+                            //if (courseObj.result == undefined) {
+                            //    Log.trace("course.Obj is NOT defined")
+                            //}
 
 
                             var sessions: any = []
