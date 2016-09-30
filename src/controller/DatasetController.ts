@@ -126,7 +126,7 @@ export default class DatasetController {
                     })
                     Promise.all(promiseArray).then(function(endResult :any) {
 
-                        if (id == "courses") {
+                        /*if (id == "courses") {
 
                         var courseArray: any = []
 
@@ -167,7 +167,7 @@ export default class DatasetController {
 
                         processedDataset = courseArray
 
-                        }
+                        }*/
                             that.save(id, processedDataset)
 
                     })
