@@ -185,11 +185,11 @@ export default class DatasetController {
 
         // TODO: actually write to disk in the ./data directory
 
-        var fs = require('fs');
+        /*var fs = require('fs');
         var datasetToSave = JSON.stringify(processedDataset);
         fs.writeFile('data/'+id+'.json', datasetToSave, (err: string) => {
             // The file is created (if it does not exist) or truncated (if it exists).
 
-        });
+        })*/
     }
 }
