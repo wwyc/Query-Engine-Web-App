@@ -104,7 +104,7 @@ export default class DatasetController {
                     // You can depend on 'id' to differentiate how the zip should be handled,
                     // although you should still be tolerant to errors.
 
-                     var stringPromise : any
+                     /*var stringPromise : any
 
                     var promiseArray:any = []
 
@@ -153,12 +153,12 @@ export default class DatasetController {
                      //Log.trace("length of sessions FINAL  =  " + sessions.length)
                      //Log.trace("length of courseMap FINAL  =  " + courseMap.length)
 
-                     processedDataset = courseMap
+                     processedDataset = courseMap*/
 
                      //}
                     that.save(id, processedDataset)
 
-                    })
+                    //})
 
                     fulfill(true);
                 }).catch(function (err) {
