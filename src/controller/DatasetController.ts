@@ -9,8 +9,6 @@ import Session from '../DataStorage';
 import {getRelativePath} from "tslint/lib/configuration";
 import {error} from "util";
 
-
-
 /**
  * In memory representation of all datasets.
  */
@@ -40,33 +38,33 @@ export default class DatasetController {
 
         if (this.datasets !== {} && this.datasets !== undefined){       // check if dataset/memory is empty
 
-        var keys = Object.keys(this.datasets);  // check if dataset is in memory
+            var keys = Object.keys(this.datasets);  // check if dataset is in memory
             //     can we use containsKey(key: string): bool?
             for (var id1 of keys) {
-            console.log(id1);
-            if (id == id1){
-                return this.datasets[id];
+                console.log(id1);
+                if (id == id1){
+                    return this.datasets[id];
+                }
+            }}else {
+
+            var fs = require('fs');             //check if dataset is in disk
+
+            try {var data = fs.readFileSync("data/"+id+".json")}
+            catch (err){
+                Log.trace("File with given id Not Found")
+                return null;
             }
-        }}else {
 
-        var fs = require('fs');             //check if dataset is in disk
+            this.datasets[id] = JSON.parse(data);
 
-        try {var data = fs.readFileSync("data/"+id+".json")}
-        catch (err){
-            Log.trace("File with given id Not Found")
-            return null;
-        }
-
-        this.datasets[id] = JSON.parse(data);
-
-        Log.trace("inside getdataset method" + JSON.stringify(this.datasets[id]))}
+            Log.trace("inside getdataset method" + JSON.stringify(this.datasets[id]))}
 
         /*fs.readFile("data/"+id+".json", function(err: string, data: any):any {
-            // ...check if dataset on disk has same id as given id
-            if (err)
-                return null;
-            this.datasets[id] = JSON.parse(data);
-        });*/
+         // ...check if dataset on disk has same id as given id
+         if (err)
+         return null;
+         this.datasets[id] = JSON.parse(data);
+         });*/
 
         return this.datasets[id];           //return the dataset with the given id and it is now in memory
     }
@@ -85,7 +83,6 @@ export default class DatasetController {
                 }
             )
         }
-        //var json = Utilities.JSONLoader.loadFromFile("../docs/location_map.json");
 
         return this.datasets;
     }
@@ -121,7 +118,7 @@ export default class DatasetController {
 
                     zip.forEach(function (Path: string, file: JSZipObject){
                         if (!file.dir) {
-                            Log.trace("iterating over filepath   " + Path)
+                            //Log.trace("iterating over filepath   " + Path)
                             stringPromise = file.async("string") // string from JSZipObject?
                             promiseArray.push(stringPromise)
                         }
@@ -136,9 +133,8 @@ export default class DatasetController {
 
                         for (var m = 0, abc = endResult.length; m < abc; m++){
 
-
                             var courseObj = JSON.parse(endResult[m]).catch(function (err: Error) {
-                                Log.trace('DatasetController::process(..) - INVALID JSON ERROR: ' + err.message);
+                                Log.error('DatasetController::process(..) - INVALID JSON ERROR: ' + err.message);
                                 reject(err);
                             })
 
@@ -162,19 +158,16 @@ export default class DatasetController {
                                 sessions[i] = session
                             }
                             courseArray[m] = sessions
-                            }
+                        }
 
                         Log.trace("length of sessions FINAL  =  " + sessions.length.toString())
                         Log.trace("length of courseArray FINAL  =  " + courseArray.length.toString())
 
 
-                        //var myJSONArray :any = processedDataset
-
-
                         processedDataset = courseArray
 
                         //}
-                            that.save(id, processedDataset)
+                        that.save(id, processedDataset)
 
                     })
 
