@@ -59,12 +59,6 @@ export default class DatasetController {
 
             Log.trace("inside getdataset method" + JSON.stringify(this.datasets[id]))}
 
-        /*fs.readFile("data/"+id+".json", function(err: string, data: any):any {
-         // ...check if dataset on disk has same id as given id
-         if (err)
-         return null;
-         this.datasets[id] = JSON.parse(data);
-         });*/
 
         return this.datasets[id];           //return the dataset with the given id and it is now in memory
     }
@@ -75,10 +69,8 @@ export default class DatasetController {
         if (this.datasets = {}) {                                  //check if datasets in memory is empty
             var fs = require('fs')
             fs.readdir("/data", (err: string, files: any) => {                       //read directory and return files (array of file names)
-
                     for (var file of files) {                               //iterate through array of file names and get all?
                         this.datasets[file.substring(0,(file.length() - 5))] = this.getDataset(file)
-                        //.JSON is always 5 characters
                     }
                 }
             )
@@ -126,9 +118,9 @@ export default class DatasetController {
                      })
                     Promise.all(promiseArray).then(function(endResult :any) {
 
-                    if (id == "courses") {
+                    //if (id == "courses") {
 
-                     var courseArray: any = []
+                     var courseMap: any = {}
 
                      for (var m = 0, abc = endResult.length; m < abc; m++){
 
@@ -138,36 +130,32 @@ export default class DatasetController {
                      //    Log.trace("course.Obj is NOT defined")
                      //}
 
-
                      var sessions: any = []
 
-                     for (var i = 0, len = courseObj.result.length; i < len; i++) {
-
-                     var myJSONObject = courseObj.result[i]
+                     for (var obj of  courseObj.result) {
 
                      var session = new Session()
 
-                     session.courses_dept = myJSONObject["Subject"]
-                     session.courses_id = myJSONObject["Course"]
-                     session.courses_avg = myJSONObject["Avg"]
-                     session.courses_instructor = myJSONObject["Professor"]
-                     session.courses_title = myJSONObject["Title"]
-                     session.courses_pass = myJSONObject["Pass"]
-                     session.courses_fail = myJSONObject["Fail"]
-                     session.courses_audit = myJSONObject["Audit"]
+                     session.courses_dept = obj["Subject"]
+                     session.courses_id = obj["Course"]
+                     session.courses_avg = obj["Avg"]
+                     session.courses_instructor = obj["Professor"]
+                     session.courses_title = obj["Title"]
+                     session.courses_pass = obj["Pass"]
+                     session.courses_fail = obj["Fail"]
+                     session.courses_audit = obj["Audit"]
 
-                     sessions[i] = session
+                     sessions.push(session)
+                         }
                      }
-                     courseArray[m] = sessions
-                     }
+                        courseMap[session.courses_dept + session.courses_id] = sessions
 
-                     //Log.trace("length of sessions FINAL  =  " + sessions.length.toString())
-                     //Log.trace("length of courseArray FINAL  =  " + courseArray.length.toString())
+                     //Log.trace("length of sessions FINAL  =  " + sessions.length)
+                     //Log.trace("length of courseMap FINAL  =  " + courseMap.length)
 
+                     processedDataset = courseMap
 
-                     processedDataset = courseArray
-
-                     }
+                     //}
                     that.save(id, processedDataset)
 
                     })
