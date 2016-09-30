@@ -4,6 +4,8 @@
 
 import Log from "../Util";
 import JSZip = require('jszip');
+import forEach = require("core-js/fn/array/for-each");
+import Session from '../DataStorage';
 
 /**
  * In memory representation of all datasets.
@@ -18,6 +20,8 @@ export default class DatasetController {
     private datasets: Datasets = {};
 
     constructor() {
+        Log.trace('DatasetController::init()');
+
     }
     /**
      * Returns the referenced dataset. If the dataset is not in memory, it should be
@@ -29,20 +33,45 @@ export default class DatasetController {
      */
     public getDataset(id: string): any {
         // TODO: this should check if the dataset is on disk in ./data if it is not already in memory.
-        //wc:  check if dataset is in memory
-        //wc:  if not in memory, check if datatset is on disk in ./data
-        //wc:  if dataset is not on disk, return null
 
+        if (this.datasets !== {} && this.datasets !== undefined){       // check if dataset/memory is empty
+
+            var keys = Object.keys(this.datasets);  // check if dataset is in memory
+            //     can we use containsKey(key: string): bool?
+            for (var id1 of keys) {
+                console.log(id1);
+                if (id == id1){
+                    return this.datasets[id];
+                }
+            }}else {
+
+            var fs = require('fs');             //check if dataset is in disk
+
+            try {var data = fs.readFileSync("data/"+id+".json")}
+            catch (err){
+                Log.trace("File with given id Not Found")
+                return null;
+            }
+
+            this.datasets[id] = JSON.parse(data);
+
+            Log.trace("inside getdataset method" + JSON.stringify(this.datasets[id]))}
 
         return this.datasets[id];
     }
 
     public getDatasets(): Datasets {
         // TODO: if datasets is empty, load all dataset files in ./data from disk
-        // check if datasets is empty (true/false)
-        // if not empty, then load dataset files from ./data from disk
-        // this.datasets = ./ from disk
 
+        if (this.datasets = {}) {                                  //check if datasets in memory is empty
+            var fs = require('fs')
+            fs.readdir("/data", (err: string, files: any) => {                       //read directory and return files (array of file names)
+                    for (var file of files) {                               //iterate through array of file names and get all?
+                        this.datasets[file.substring(0,(file.length() - 5))] = this.getDataset(file)
+                    }
+                }
+            )
+        }
 
         return this.datasets;
     }
@@ -71,7 +100,68 @@ export default class DatasetController {
                     // You can depend on 'id' to differentiate how the zip should be handled,
                     // although you should still be tolerant to errors.
 
-                    that.save(id, processedDataset);
+                    var stringPromise : any
+
+                    var promiseArray:any = []
+
+                    zip.forEach(function (Path: string, file: JSZipObject){
+                        if (!file.dir) {
+                            //Log.trace("iterating over filepath   " + Path)
+
+                            stringPromise = file.async("string") // string from JSZipObject?
+                            promiseArray.push(stringPromise)
+
+                            Log.trace("String Promise:  "+ stringPromise);
+                        }
+                    })
+
+                    Log.trace("PromiseArray length:  "+ promiseArray.length);
+
+                    Promise.all(promiseArray).then(function(endResult :any) {
+
+                        Log.trace("endResult:  "+ endResult.length);
+
+
+                        //if (id == "courses") {
+
+                        var courseMap: any = {}
+
+                        for (var i = 0, abc = endResult.length; i < abc; i++){
+
+                            var courseObj = JSON.parse(endResult[i])
+
+                            if (courseObj.result !== undefined) {
+                                Log.trace("course.Obj is NOT defined")
+
+                            var sessions: any = []
+
+                            for (var obj of  courseObj.result) {
+
+                                var session = new Session()
+
+                                session.courses_dept = obj["Subject"]
+                                session.courses_id = obj["Course"]
+                                session.courses_avg = obj["Avg"]
+                                session.courses_instructor = obj["Professor"]
+                                session.courses_title = obj["Title"]
+                                session.courses_pass = obj["Pass"]
+                                session.courses_fail = obj["Fail"]
+                                session.courses_audit = obj["Audit"]
+
+                                sessions.push(session)
+                            }}
+                        }
+                        courseMap[session.courses_dept + session.courses_id] = sessions
+
+                        //Log.trace("length of sessions FINAL  =  " + sessions.length)
+                        //Log.trace("length of courseMap FINAL  =  " + courseMap.length)
+
+                        processedDataset = courseMap
+
+                        //}
+                        that.save(id, processedDataset)
+
+                    })
 
                     fulfill(true);
                 }).catch(function (err) {
@@ -97,5 +187,12 @@ export default class DatasetController {
         this.datasets[id] = processedDataset;
 
         // TODO: actually write to disk in the ./data directory
+
+        var fs = require('fs');
+        var datasetToSave = JSON.stringify(processedDataset);
+        fs.writeFile('data/'+id+'.json', datasetToSave, (err: string) => {
+            // The file is created (if it does not exist) or truncated (if it exists).
+
+        });
     }
 }
