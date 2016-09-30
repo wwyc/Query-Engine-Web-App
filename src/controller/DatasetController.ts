@@ -124,7 +124,7 @@ export default class DatasetController {
                             promiseArray.push(stringPromise)
                         }
                     })*/
-                    Promise.all(promiseArray).then(function(endResult :any) {
+                    //Promise.all(promiseArray).then(function(endResult :any) {
 
                         /*if (id == "courses") {
 
@@ -170,7 +170,7 @@ export default class DatasetController {
                         }*/
                             that.save(id, processedDataset)
 
-                    })
+                    //})
 
                     fulfill(true);
                 }).catch(function (err) {
