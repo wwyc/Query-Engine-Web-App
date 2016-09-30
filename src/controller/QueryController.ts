@@ -7,6 +7,9 @@ import Log from "../Util";
 import {bodyParser} from "restify";
 import {stringify} from "querystring";
 
+
+
+
 export interface QueryRequest {
     GET: string|string[];
     WHERE: {};
@@ -105,7 +108,7 @@ export default class QueryController {
         prefix=get.split("_")[0];
         return prefix;
     }
-//NOT WORKING !
+//IS NOT WORKING !
     public parserEBNF(where:any,dataset:Array<any>):boolean {
         //GT= > EQ= LT<
         //AND OR NOT
@@ -149,7 +152,7 @@ export default class QueryController {
             }
         }
 
-        else  if ('undefined' !== typeof where.IS) {
+        else  if ( typeof where.IS!=='undefined') {
             valid = valid && (dataset[where.IS.key]
                 === where.IS.value);
         }
@@ -223,7 +226,7 @@ export default class QueryController {
         return arr2;
     }
 
-    public partitionString(arr1: Array<any>,arr2:Array<any>, left: number, right: number):number{
+    public  partitionString(arr1: Array<any>,arr2:Array<any>, left: number, right: number):number{
         let middle:number=left + (right - left) / 2;
         let pivot = arr1[middle];
         this.swap(arr1[middle],arr1[left]);
@@ -251,22 +254,21 @@ export default class QueryController {
     }
 
     public represent(arr1:any, arr2:Array<any>):Array<any>{
-
-        let arr3: Array<any>=[];
-
+        let arr3:Array<any>;
         if (typeof arr1!=='string') {
             for (var i = 0; i < arr2.length - 1; i++) {
+
                 arr3[i] = "{";
                 for (var j = 0; j < arr1.length - 1; j++) {
                     arr3[i] = arr3[i] + arr1[j] + ":" + arr2[i].arr1[j] + ",";
                 }
                 arr3[i] = arr3[i] + arr1[arr1.length - 1] + ":" + arr2[i].arr1[arr1.length - 1] + "}"
             }
-
             arr3[i] = arr3[i] + "{" + arr1[arr1.length - 1] + ":" + arr2[i].arr1[arr1.length - 1] + "}";
         }
         else
         { for ( var a=0;a<arr2.length-1;a++) {
+
             arr3[a] = "{"+arr1 + ":" + arr2[a].arr1+ "}"+",";
         }
             arr3[a] =arr3[a]+ "{"+arr1 + ":" + arr2[a].arr1+"}";

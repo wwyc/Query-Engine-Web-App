@@ -119,24 +119,27 @@ export default class DatasetController {
                     zip.forEach(function (Path: string, file: JSZipObject){
                         if (!file.dir) {
                             //Log.trace("iterating over filepath   " + Path)
+
+
                             stringPromise = file.async("string") // string from JSZipObject?
+
                             promiseArray.push(stringPromise)
                         }
                     })
                     Promise.all(promiseArray).then(function(endResult :any) {
 
-                        //Log.trace("what is endResult?"  + endResult)
-                        //Log.trace("what is endResult?"  + JSON.parse(endResult))
                         //if (id == "courses") {
 
                         var courseArray: any = []
 
                         for (var m = 0, abc = endResult.length; m < abc; m++){
 
-                            var courseObj = JSON.parse(endResult[m]).catch(function (err: Error) {
-                                Log.error('DatasetController::process(..) - INVALID JSON ERROR: ' + err.message);
-                                reject(err);
-                            })
+                            var courseObj = JSON.parse(endResult[m])
+
+                            if (courseObj.result == undefined) {
+                                Log.trace("course.Obj is NOT defined")
+                            }
+
 
                             var sessions: any = []
 
