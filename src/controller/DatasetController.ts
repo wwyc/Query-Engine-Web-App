@@ -163,8 +163,8 @@ export default class DatasetController {
                             courseArray[m] = sessions
                             }
 
-                        Log.trace("length of sessions FINAL  =  " + sessions.length.toString())
-                        Log.trace("length of courseArray FINAL  =  " + courseArray.length.toString())
+                        //Log.trace("length of sessions FINAL  =  " + sessions.length.toString())
+                        //Log.trace("length of courseArray FINAL  =  " + courseArray.length.toString())
 
 
                         processedDataset = courseArray
