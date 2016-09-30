@@ -93,7 +93,7 @@ export default class RouteHandler {
         return next();
     }
 
-    /*public static deleteQuery(req: restify.Request, res: restify.Response, next: restify.Next) {
+    public static deleteQuery(req: restify.Request, res: restify.Response, next: restify.Next) {
         Log.trace('RouteHandler::deleteQuery(..) - params: ' + JSON.stringify(req.params));
         try {
 
@@ -115,5 +115,5 @@ export default class RouteHandler {
             Log.error('RouteHandler::deleteQuery(..) - ERROR: dataset with given not found' + err.message);
             res.send(404);
         }
-    }*/
+    }
 }

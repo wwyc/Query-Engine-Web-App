@@ -120,15 +120,13 @@ export default class DatasetController {
                         if (!file.dir) {
                             //Log.trace("iterating over filepath   " + Path)
 
-
                             stringPromise = file.async("string") // string from JSZipObject?
-
                             promiseArray.push(stringPromise)
                         }
                     })
                     Promise.all(promiseArray).then(function(endResult :any) {
 
-                        //if (id == "courses") {
+                        if (id == "courses") {
 
                         var courseArray: any = []
 
@@ -169,7 +167,7 @@ export default class DatasetController {
 
                         processedDataset = courseArray
 
-                        //}
+                        }
                             that.save(id, processedDataset)
 
                     })
