@@ -92,8 +92,40 @@ export default class QueryController {
 //deal with where
     public  dealWithWhere(where:any,get:string):Array<any>{
         var arr:Array<any>;
-        var file=this.datasets[this.stringPrefix(get)];
-        var doc=JSON.parse(JSON.stringify(file)).result;
+        var file:{[id:string]:any}=this.datasets[this.stringPrefix(get)];
+        /*var keys=Object.keys(file);
+
+        var doc=Object.values(file);
+    for (var i of keys){
+        for (var j=0; j< file[i].length;j++){
+            if (this.parserEBNF(where,file[i][j]))
+            {
+                arr.push(file[i][j]);
+            }
+
+        }
+
+    }*/
+
+        for(var key in file) {
+            var values = file[key];
+        }
+        for(var i in values){
+            if (this.parserEBNF(where,i))
+            {
+                arr.push(i);
+            }
+
+        }
+    return arr;
+    }
+
+
+
+
+
+
+/*
         for (var i=0;i<doc.length;i++)
         {
             for (var j=0;j<doc[i].length;j++)
@@ -105,7 +137,7 @@ export default class QueryController {
         }
         Log.trace(arr.toString());
         return arr;
-    }
+    }*/
 
 
     public stringPrefix(get:string):string{
@@ -113,10 +145,11 @@ export default class QueryController {
         prefix=get.split("_")[0];
         Log.trace(prefix);
         return prefix;
-
     }
+
+
 //IS NOT WORKING !
-    public parserEBNF(where:any,dataset:Array<any>):boolean {
+    public parserEBNF(where:any,dataset:any):boolean {
         //GT= > EQ= LT<
         //AND OR NOT
         // parse where
@@ -296,6 +329,7 @@ export default class QueryController {
 
 
  public represent (arr1:any, arr2:Array<any>):Array<any>{
+     var arr3=arr2;
      if(typeof arr1==='string'){
          var i:number=Object.keys(arr2[0]).indexOf(arr1);
          for (var a of arr2){
