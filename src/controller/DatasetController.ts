@@ -66,7 +66,7 @@ export default class DatasetController {
     public getDatasets(): Datasets {
         // TODO: if datasets is empty, load all dataset files in ./data from disk
 
-        if (this.datasets = {}) {                                  //check if datasets in memory is empty
+        /*if (this.datasets = {}) {                                  //check if datasets in memory is empty
             var fs = require('fs')
             fs.readdir("/data", (err: string, files: any) => {                       //read directory and return files (array of file names)
                     for (var file of files) {                               //iterate through array of file names and get all?
@@ -74,7 +74,7 @@ export default class DatasetController {
                     }
                 }
             )
-        }
+        }*/
 
         return this.datasets;
     }
