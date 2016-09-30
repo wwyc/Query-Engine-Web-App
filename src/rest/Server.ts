@@ -71,6 +71,7 @@ export default class Server {
                 // curl -is -X POST -d '{ "key": "value" }' http://localhost:4321/query
                 that.rest.post('/query', restify.bodyParser(), RouteHandler.postQuery);
 
+                //Deletes a dataset with provided id
                 that.rest.del('/dataset/:id', RouteHandler.deleteQuery);
 
                 that.rest.listen(that.port, function () {
