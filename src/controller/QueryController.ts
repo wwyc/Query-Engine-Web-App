@@ -58,9 +58,9 @@ export default class QueryController {
         let format: string = query.AS;
         let intermediate:Array<any>;
         if(typeof get==='string')
-        intermediate=this.dealWithWhere(where,get);
+        { intermediate=this.dealWithWhere(where,get);}
         else
-            intermediate=this.dealWithWhere(where,get[0]) ;
+        {    intermediate=this.dealWithWhere(where,get[0]) ;}
         let result:Array<any>;
         if(order!=null)
         { let values: Array<number>;
