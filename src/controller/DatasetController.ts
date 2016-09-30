@@ -36,7 +36,7 @@ export default class DatasetController {
         // TODO: this should check if the dataset is on disk in ./data if it is not already in memory.
         //wc:  check if dataset is in memory
 
-        if (this.datasets !== {} && this.datasets !== undefined){       // check if dataset/memory is empty
+        /*if (this.datasets !== {} && this.datasets !== undefined){       // check if dataset/memory is empty
 
             var keys = Object.keys(this.datasets);  // check if dataset is in memory
             //     can we use containsKey(key: string): bool?
@@ -57,7 +57,7 @@ export default class DatasetController {
 
             this.datasets[id] = JSON.parse(data);
 
-            Log.trace("inside getdataset method" + JSON.stringify(this.datasets[id]))}
+            Log.trace("inside getdataset method" + JSON.stringify(this.datasets[id]))}*/
 
 
         return this.datasets[id];           //return the dataset with the given id and it is now in memory
@@ -97,13 +97,68 @@ export default class DatasetController {
                     Log.trace('DatasetController::process(..) - unzipped');
 
                     let processedDataset = {};
+
                     // TODO: iterate through files in zip (zip.files)
                     // The contents of the file will depend on the id provided. e.g.,
                     // some zips will contain .html files, some will contain .json files.
                     // You can depend on 'id' to differentiate how the zip should be handled,
                     // although you should still be tolerant to errors.
 
-                    that.save(id, processedDataset);
+                     var stringPromise : any
+
+                    var promiseArray:any = []
+
+                    zip.forEach(function (Path: string, file: JSZipObject){
+                     if (!file.dir) {
+                     //Log.trace("iterating over filepath   " + Path)
+
+                     stringPromise = file.async("string") // string from JSZipObject?
+                     promiseArray.push(stringPromise)
+                     }
+                     })
+                    Promise.all(promiseArray).then(function(endResult :any) {
+
+                    //if (id == "courses") {
+
+                     var courseMap: any = {}
+
+                     for (var m = 0, abc = endResult.length; m < abc; m++){
+
+                     var courseObj = JSON.parse(endResult[m])
+
+                     //if (courseObj.result == undefined) {
+                     //    Log.trace("course.Obj is NOT defined")
+                     //}
+
+                     var sessions: any = []
+
+                     for (var obj of  courseObj.result) {
+
+                     var session = new Session()
+
+                     session.courses_dept = obj["Subject"]
+                     session.courses_id = obj["Course"]
+                     session.courses_avg = obj["Avg"]
+                     session.courses_instructor = obj["Professor"]
+                     session.courses_title = obj["Title"]
+                     session.courses_pass = obj["Pass"]
+                     session.courses_fail = obj["Fail"]
+                     session.courses_audit = obj["Audit"]
+
+                     sessions.push(session)
+                         }
+                     }
+                        courseMap[session.courses_dept + session.courses_id] = sessions
+
+                     //Log.trace("length of sessions FINAL  =  " + sessions.length)
+                     //Log.trace("length of courseMap FINAL  =  " + courseMap.length)
+
+                     processedDataset = courseMap
+
+                     //}
+                    that.save(id, processedDataset)
+
+                    })
 
                     fulfill(true);
                 }).catch(function (err) {
