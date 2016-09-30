@@ -62,7 +62,7 @@ export default class QueryController {
         intermediate=this.dealWithWhere(where,get);
         else
            intermediate=this.dealWithWhere(where,get[0]) ;
-        Log.trace(intermediate.toString());
+
         let result:Array<any>;
         if(order!=null)
         { let values: Array<number>;
@@ -119,26 +119,6 @@ export default class QueryController {
         }
     return arr;
     }
-
-
-
-
-
-
-/*
-        for (var i=0;i<doc.length;i++)
-        {
-            for (var j=0;j<doc[i].length;j++)
-        { if (this.parserEBNF(where,doc[i][j]))
-        {
-            arr.push(doc[i][j]);
-        }
-        }
-        }
-        Log.trace(arr.toString());
-        return arr;
-    }*/
-
 
     public stringPrefix(get:string):string{
         let prefix:string;
@@ -348,7 +328,7 @@ export default class QueryController {
                  Log.trace(b);
              }
          }
-     Log.trace(arr2.toString());
+
      return arr2;
 
  }
