@@ -116,14 +116,14 @@ export default class DatasetController {
 
                     var promiseArray:any = []
 
-                    zip.forEach(function (Path: string, file: JSZipObject){
+                    /*zip.forEach(function (Path: string, file: JSZipObject){
                         if (!file.dir) {
                             //Log.trace("iterating over filepath   " + Path)
 
                             stringPromise = file.async("string") // string from JSZipObject?
                             promiseArray.push(stringPromise)
                         }
-                    })
+                    })*/
                     Promise.all(promiseArray).then(function(endResult :any) {
 
                         /*if (id == "courses") {
