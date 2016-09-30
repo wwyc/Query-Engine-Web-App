@@ -61,6 +61,7 @@ export default class QueryController {
         intermediate=this.dealWithWhere(where,get);
         else
            intermediate=this.dealWithWhere(where,get[0]) ;
+        Log.trace(intermediate.toString());
         let result:Array<any>;
         if(order!=null)
         { let values: Array<number>;
@@ -88,17 +89,20 @@ export default class QueryController {
 
 
 //deal with where
-    public  dealWithWhere(where:any,get:string):Array<any> {
-
-        let arr:Array<any>;//dictionary
-        let file:any=this.datasets[this.stringPrefix(get)];
-
-        for (var i=0;i<file.length;i++)
-        { for (var j=0;j<file[i].length;j++)
-        { if (this.parserEBNF(where,file[i][j]))
-        { arr=arr+file[i][j];
-        } }}
-
+    public  dealWithWhere(where:any,get:string):Array<any>{
+        var arr:Array<any>;
+        var file=this.datasets[this.stringPrefix(get)];
+        var doc=JSON.parse(JSON.stringify(file)).result;
+        for (var i=0;i<doc.length;i++)
+        {
+            for (var j=0;j<doc[i].length;j++)
+        { if (this.parserEBNF(where,doc[i][j]))
+        {
+            arr.push(doc[i][j]);
+        }
+        }
+        }
+        Log.trace(arr.toString());
         return arr;
     }
 
@@ -106,7 +110,9 @@ export default class QueryController {
     public stringPrefix(get:string):string{
         let prefix:string;
         prefix=get.split("_")[0];
+        Log.trace(prefix);
         return prefix;
+
     }
 //IS NOT WORKING !
     public parserEBNF(where:any,dataset:Array<any>):boolean {
@@ -124,41 +130,44 @@ export default class QueryController {
 
       {
           if (typeof where.AND !== 'undefined')
-
+       Log.trace(where.AND);
               for (var i = 0; i < where.AND.length - 1; i++) {
                   valid = valid && this.parserEBNF(where.AND[i], dataset) &&
                       this.parserEBNF(where.AND[i + 1], dataset);
               }
-          else if (typeof where.OR !== 'undefined')
+         if (typeof where.OR !== 'undefined')
+             Log.trace(where.OR);
               for (var i = 0; i < where.OR.length - 1; i++){
               valid = valid && this.parserEBNF(where.OR[i], dataset)
                   || this.parserEBNF(where.OR[i + 1], dataset);
           }
 
       }
-
-      else  if (typeof where.GT ||typeof where. EQ || typeof where.LT!=='undefined') {
+        if (typeof where.GT ||typeof where. EQ || typeof where.LT!=='undefined') {
 
             if (typeof where.GT!=='undefined') {
+                Log.trace(where.GT);
                 valid = valid&&(dataset[where.GT.key] > where.GT.value);
             }
 
-            else if (typeof where.EQ!=='undefined') {
-                valid = valid&&(dataset[where.EQ.key] === where.EQ.value);
+             if (typeof where.EQ!=='undefined') {
+                 Log.trace(where.EQ);
+                valid = valid&&(dataset[where.EQ.key]===where.EQ.value);
             }
 
-            else if (typeof where.LT!=='undefined') {
+             if (typeof where.LT!=='undefined') {
+                 Log.trace(where.LT);
                 valid =valid&&(dataset[where.LT.key] < where.LT.value);
             }
         }
 
-      else  if ( typeof where["IS"]!=='undefined') {
-          Log.trace(where.toString());
-    valid = valid && (dataset[where["IS"].key]
-        === where["IS"].value);
+        if (typeof where.IS!=='undefined') {
+          Log.trace(where.IS);
+    valid = valid && (dataset[where.IS.key]
+        === where.IS.value);
 }
-       else if(typeof where.NOT!=='undefined') {
-
+        if(typeof where.NOT!=='undefined') {
+            Log.trace(where.LT);
                 valid =valid&&(!this.parserEBNF(where.NOT, dataset));
             }
 
@@ -175,11 +184,15 @@ export default class QueryController {
         let pivot:number;
         if(left< right)
         {
+
             pivot=this.partitionNumber(arr1,arr2,left,right);
+
             this.quickSortNumber(arr1,arr2,left,pivot-1);
             this.quickSortNumber(arr1,arr2,pivot+1,right);
         }
+        Log.trace(arr2.toString());
         return arr2;
+
     }
 
     public partitionNumber(arr1: Array<any>,arr2:Array<any>, left: number, right: number):number{
@@ -212,6 +225,7 @@ export default class QueryController {
         let temp:any=left;
         left=right;
         right=temp;
+        Log.trace("swap success")
     }
 
     //sort words alphabetically
@@ -254,11 +268,10 @@ export default class QueryController {
         return a - 1;
     }
 
-    public represent(arr1:any, arr2:Array<any>):Array<any>{
-        var arr3: any = [];
+ /*   public represent(arr1:any, arr2:Array<any>):Array<any>{
+        let arr3: Array<any> = arr2;
         if (typeof arr1!=='string') {
             for (var i = 0; i < arr2.length - 1; i++) {
-
                 arr3[i] = "{";
                 for (var j = 0; j < arr1.length - 1; j++) {
                     arr3[i] = arr3[i] + arr1[j] + ":" + arr2[i].arr1[j] + ",";
@@ -275,6 +288,34 @@ export default class QueryController {
             arr3[a] =arr3[a]+ "{"+arr1 + ":" + arr2[a].arr1+"}";
         }
         return arr3;
-    }
+    } */
+
+
+
+
+
+ public represent (arr1:any, arr2:Array<any>):Array<any>{
+     if(typeof arr1==='string'){
+         var i:number=Object.keys(arr2[0]).indexOf(arr1);
+         for (var a of arr2){
+             a=a[i];
+             Log.trace(a);
+         }
+
+     }
+     else if(typeof arr1==='Array')
+         for (var j=0;j<arr1.length;j++)
+         {
+             var k:number=Object.keys(arr2[0]).indexOf(arr1[j]);
+             for (var b of arr2){
+
+                 b+=b[k];
+                 Log.trace(b);
+             }
+         }
+     Log.trace(arr2.toString());
+     return arr2;
+
+ }
 
 }

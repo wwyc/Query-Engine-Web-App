@@ -22,7 +22,7 @@ describe("QueryController", function () {
 
     it("Should be able to validate a valid query", function () {
         // NOTE: this is not actually a valid query for D1
-        let query: QueryRequest = {GET: 'food', WHERE: {IS: 'apple'}, ORDER: 'food', AS: 'table'};
+        let query: QueryRequest = {GET: 'food', WHERE: {GT: 90}, ORDER: 'food', AS: 'table'};
         let dataset: Datasets = {};
         let controller = new QueryController(dataset);
         let isValid = controller.isValid(query);
@@ -39,8 +39,7 @@ describe("QueryController", function () {
         expect(isValid).to.equal(false);
     });
 
-
-  /* it ("correct EBNFparser",function(){
+   it ("correct EBNFparser",function(){
         let dataset:any=[{"courses_dept":"epse","courses_avg":97.41},
             {"courses_dept":"cnps","courses_avg":97.47},{"courses_dept":"cnps","courses_avg":97.47},
             {"courses_dept":"math","courses_avg":97.48},{"courses_dept":"math","courses_avg":97.48},
@@ -60,14 +59,14 @@ describe("QueryController", function () {
         let controller = new QueryController(dataset);
      let valid:boolean=controller.parserEBNF(
 
-             {"IS": {"courses_dept":"cpsc"}
+             {"EQ": {"courses_avg":91}
 
 
-         },dataset[0]
+         },dataset
      );
         expect(valid).to.equal(false);});
 
- /*   it ("correct sort",function(){
+/*  it ("correct sort",function(){
         let dataset: Datasets = {};
 
         let controller:QueryController=new QueryController(dataset);
@@ -82,7 +81,7 @@ describe("QueryController", function () {
 
     });*/
 
- /* it ("correct present",function(){
+  it ("correct present",function(){
         let dataset:any=[{"courses_dept":"epse","courses_avg":97.41},
             {"courses_dept":"cnps","courses_avg":97.47},{"courses_dept":"cnps","courses_avg":97.47},
             {"courses_dept":"math","courses_avg":97.48}];
