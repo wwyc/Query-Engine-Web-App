@@ -71,7 +71,7 @@ export default class RouteHandler {
         }
         return next();
     }
-
+//add 424(check if on memory)
     public static postQuery(req: restify.Request, res: restify.Response, next: restify.Next) {
         Log.trace('RouteHandler::postQuery(..) - params: ' + JSON.stringify(req.params));
         try {
