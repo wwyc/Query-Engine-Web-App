@@ -51,26 +51,30 @@ export default class QueryController {
 
 //parse the json querey to string
 
-        let get: any = query.GET;//string or array of string
-        let where:any= query.WHERE;
+        var get: any = query.GET;//string or array of string
+        var where:any= query.WHERE;
         //json object or json array
-        let order: string = query.ORDER;
-        let format: string = query.AS;
+        var order: string = query.ORDER;
+        var format: string = query.AS;
 
-        let intermediate:Array<any>;
+        var intermediate:Array<any>;
         if(typeof get==='string')
-        intermediate=this.dealWithWhere(where,get);
+            intermediate=this.dealWithWhere(where,get);
         else
-           intermediate=this.dealWithWhere(where,get[0]) ;
-
-        let result:Array<any>;
+            intermediate=this.dealWithWhere(where,get[0]) ;
+        Log.trace("intermediate success")
+        var result:Array<any>;
+        var values: Array<any>;
         if(order!=null)
-        { let values: Array<number>;
-            for( var i=0;i<intermediate.length;i++)
-            {
-                for( var j=0;j<intermediate[i].length;j++)
-                    if(intermediate[i][j].key===order)
-                        values+=intermediate[i][j].value;
+        {
+            for( var i of intermediate)
+            {       Log.trace("intermediate loop1")
+                    for( var j of i)
+                    Log.trace("intermediate loop2")
+                    Log.trace(j.key);
+                    Log.trace(j.value);
+                    if(j.key===order)   //maybe wrong
+                        values+=j.value;//maybe
             }
             if (typeof values[0]==='number')
                 intermediate=this.quickSortNumber(values,intermediate,0,values.length-1);
@@ -79,10 +83,9 @@ export default class QueryController {
         }
         result= this.represent(get,intermediate);
         result=JSON.parse('"render:"'+format+'","+"result"+":"'+result);
-        //JSON.parse
         //return back to JSON object
         return {result:result};
-       //return {status: 'received', ts: new Date().getTime()};
+
     }
 
 
@@ -93,19 +96,6 @@ export default class QueryController {
     public  dealWithWhere(where:any,get:string):Array<any>{
         var arr:Array<any>;
         var file:{[id:string]:any}=this.datasets[this.stringPrefix(get)];
-        /*var keys=Object.keys(file);
-
-        var doc=Object.values(file);
-    for (var i of keys){
-        for (var j=0; j< file[i].length;j++){
-            if (this.parserEBNF(where,file[i][j]))
-            {
-                arr.push(file[i][j]);
-            }
-
-        }
-
-    }*/
 
         for(var key in file) {
             var values = file[key];
@@ -113,11 +103,11 @@ export default class QueryController {
         for(var i in values){
             if (this.parserEBNF(where,i))
             {
-                arr.push(i);
+            arr.push(i);
             }
-
         }
-    return arr;
+        Log.trace("success where and arr")
+        return arr;
     }
 
     public stringPrefix(get:string):string{
@@ -129,7 +119,8 @@ export default class QueryController {
 
 
 //IS NOT WORKING !
-    public parserEBNF(where:any,dataset:any):boolean {
+    //try split!!!
+    public parserEBNF(where:{[id:string]:any},dataset:any):boolean {
         //GT= > EQ= LT<
         //AND OR NOT
         // parse where
@@ -137,53 +128,61 @@ export default class QueryController {
         // and or follow array，
         // for loop
         let valid:boolean=true;
+        Log.trace("VALID ")
 
 
+        if (typeof where['AND']!=='undefined'||typeof where['OR']!=='undefined')//can;t evaluate it
 
-      if (typeof where.AND!=='undefined'||typeof where.OR!=='undefined')//can;t evaluate it
+        {  Log.trace("into and")
+            if (typeof where['AND'] !== 'undefined')
 
-      {
-          if (typeof where.AND !== 'undefined')
-       Log.trace(where.AND);
-              for (var i = 0; i < where.AND.length - 1; i++) {
-                  valid = valid && this.parserEBNF(where.AND[i], dataset) &&
-                      this.parserEBNF(where.AND[i + 1], dataset);
-              }
-         if (typeof where.OR !== 'undefined')
-             Log.trace(where.OR);
-              for (var i = 0; i < where.OR.length - 1; i++){
-              valid = valid && this.parserEBNF(where.OR[i], dataset)
-                  || this.parserEBNF(where.OR[i + 1], dataset);
-          }
-
-      }
-        if (typeof where.GT ||typeof where. EQ || typeof where.LT!=='undefined') {
-
-            if (typeof where.GT!=='undefined') {
-                Log.trace(where.GT);
-                valid = valid&&(dataset[where.GT.key] > where.GT.value);
+            for (var i of where['AND']) {
+                valid = valid && this.parserEBNF(i, dataset);
+                Log.trace("AND success");
+            }
+            if (typeof where['OR'] !== 'undefined')
+            for (var j of where['OR']){
+                valid = valid || this.parserEBNF(i, dataset);
+                Log.trace("OR success");
             }
 
-             if (typeof where.EQ!=='undefined') {
-                 Log.trace(where.EQ);
-                valid = valid&&(dataset[where.EQ.key]===where.EQ.value);
+        }
+        if (typeof where['GT'] ||typeof where['EQ'] || typeof where['LT']!=='undefined') {
+
+            if (typeof where['GT']!=='undefined') {
+                Log.trace(where['GT']);
+                valid = valid&&(dataset[where['GT'].key] > where['GT'].value);
+                Log.trace(dataset[Object.keys(where['GT'])[0]]);
+                Log.trace(where['GT'].value);
+                Log.trace("GT success");
             }
 
-             if (typeof where.LT!=='undefined') {
-                 Log.trace(where.LT);
-                valid =valid&&(dataset[where.LT.key] < where.LT.value);
+            if (typeof where['EQ']!=='undefined') {
+
+                valid = valid&&(dataset[where['EQ'].key]===where['EQ'].value);
+                Log.trace(dataset[where['EQ'].key]);
+                Log.trace(where['EQ'].value);
+                Log.trace("EQ success");
+            }
+
+            if (typeof where['LT']!=='undefined') {
+                Log.trace(where['LT']);
+                valid =valid&&(dataset[where['LT'].key] < where['LT'].value);
+                Log.trace("LT success");
             }
         }
 
-        if (typeof where.IS!=='undefined') {
-          Log.trace(where.IS);
-    valid = valid && (dataset[where.IS.key]
-        === where.IS.value);
-}
-        if(typeof where.NOT!=='undefined') {
-            Log.trace(where.LT);
-                valid =valid&&(!this.parserEBNF(where.NOT, dataset));
-            }
+        if (typeof where['IS']!=='undefined') {
+
+            valid = valid && (dataset[where['IS'].key]
+                === where['IS'].value);
+            Log.trace("IS success");
+        }
+        if(typeof where['NOT']!=='undefined') {
+
+            valid =valid&&(!this.parserEBNF(where['NOT'], dataset));
+            Log.trace("NOT success");
+        }
 
         return valid;
     }
@@ -282,55 +281,54 @@ export default class QueryController {
         return a - 1;
     }
 
- /*   public represent(arr1:any, arr2:Array<any>):Array<any>{
-        let arr3: Array<any> = arr2;
-        if (typeof arr1!=='string') {
-            for (var i = 0; i < arr2.length - 1; i++) {
-                arr3[i] = "{";
-                for (var j = 0; j < arr1.length - 1; j++) {
-                    arr3[i] = arr3[i] + arr1[j] + ":" + arr2[i].arr1[j] + ",";
-                }
-                arr3[i] = arr3[i] + arr1[arr1.length - 1] + ":" + arr2[i].arr1[arr1.length - 1] + "}"
-            }
-            arr3[i] = arr3[i] + "{" + arr1[arr1.length - 1] + ":" + arr2[i].arr1[arr1.length - 1] + "}";
-        }
-        else
-        { for ( var a=0;a<arr2.length-1;a++) {
-
-            arr3[a] = "{"+arr1 + ":" + arr2[a].arr1+ "}"+",";
-        }
-            arr3[a] =arr3[a]+ "{"+arr1 + ":" + arr2[a].arr1+"}";
-        }
-        return arr3;
-    } */
-
-
-
-
-
- public represent (arr1:any, arr2:Array<any>):Array<any>{
-     var arr3=arr2;
-     if(typeof arr1==='string'){
-         var i:number=Object.keys(arr2[0]).indexOf(arr1);
-         for (var a of arr2){
-             a=a[i];
-             Log.trace(a);
-         }
-
+    /*   public represent(arr1:any, arr2:Array<any>):Array<any>{
+     let arr3: Array<any> = arr2;
+     if (typeof arr1!=='string') {
+     for (var i = 0; i < arr2.length - 1; i++) {
+     arr3[i] = "{";
+     for (var j = 0; j < arr1.length - 1; j++) {
+     arr3[i] = arr3[i] + arr1[j] + ":" + arr2[i].arr1[j] + ",";
      }
-     else if(typeof arr1==='Array')
-         for (var j=0;j<arr1.length;j++)
-         {
-             var k:number=Object.keys(arr2[0]).indexOf(arr1[j]);
-             for (var b of arr2){
+     arr3[i] = arr3[i] + arr1[arr1.length - 1] + ":" + arr2[i].arr1[arr1.length - 1] + "}"
+     }
+     arr3[i] = arr3[i] + "{" + arr1[arr1.length - 1] + ":" + arr2[i].arr1[arr1.length - 1] + "}";
+     }
+     else
+     { for ( var a=0;a<arr2.length-1;a++) {
+     arr3[a] = "{"+arr1 + ":" + arr2[a].arr1+ "}"+",";
+     }
+     arr3[a] =arr3[a]+ "{"+arr1 + ":" + arr2[a].arr1+"}";
+     }
+     return arr3;
+     } */
 
-                 b+=b[k];
-                 Log.trace(b);
-             }
-         }
 
-     return arr2;
 
- }
+
+
+    public represent (arr1:string|string[], arr2:Array<any>):Array<any>{
+        var arr3=arr2;
+        if(typeof arr1==='string'){
+            var i:number=Object.keys(arr2[0]).indexOf(arr1);
+            for (var a of arr2){
+                a=a[i];
+                Log.trace(a);
+            }
+
+        }
+        else if(typeof arr1==='Array')
+            for (var b of arr2)
+            { for (var j=0;j<arr1.length;j++)
+             var temp=b;
+                b=[];
+            { var k:number=Object.keys(arr2[0]).indexOf(arr1[j]);
+                b.push(temp[k]);
+                Log.trace(b);
+                }
+            }
+
+        return arr2;
+
+    }
 
 }

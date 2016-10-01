@@ -59,7 +59,8 @@ describe("QueryController", function () {
         let controller = new QueryController(dataset);
      let valid:boolean=controller.parserEBNF(
 
-             {"EQ": {"courses_avg":91}
+             {"GT"
+                 : {"courses_avg":99}
 
 
          },dataset
