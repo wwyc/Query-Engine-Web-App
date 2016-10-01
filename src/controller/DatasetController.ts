@@ -120,59 +120,59 @@ export default class DatasetController {
 
 
 
-                            Log.trace("endResult:  "+ endResult.length);
+                        Log.trace("endResult:  "+ endResult.length);
 
-                            //if (id == "courses") {
+                        //if (id == "courses") {
 
-                            var courseMap: any = {}
+                        var courseMap: any = {}
 
-                            for (var i = 0, abc = endResult.length; i < abc; i++){
+                        for (var i = 0, abc = endResult.length; i < abc; i++){
 
-                                var courseObj = JSON.parse(endResult[i])
+                            var courseObj = JSON.parse(endResult[i])
 
-                                if (courseObj.result !== undefined) {
-                                    //Log.trace("course.Obj is defined")
+                            if (courseObj.result !== undefined) {
+                                //Log.trace("course.Obj is defined")
 
-                                    var sessions: any = []
+                            var sessions: any = []
 
-                                    for (var obj of  courseObj.result) {
+                            for (var obj of  courseObj.result) {
 
-                                        var session = new Session()
+                                var session = new Session()
 
-                                        session.courses_dept = obj["Subject"]
-                                        session.courses_id = obj["Course"]
-                                        session.courses_avg = obj["Avg"]
-                                        session.courses_instructor = obj["Professor"]
-                                        session.courses_title = obj["Title"]
-                                        session.courses_pass = obj["Pass"]
-                                        session.courses_fail = obj["Fail"]
-                                        session.courses_audit = obj["Audit"]
+                                session.courses_dept = obj["Subject"]
+                                session.courses_id = obj["Course"]
+                                session.courses_avg = obj["Avg"]
+                                session.courses_instructor = obj["Professor"]
+                                session.courses_title = obj["Title"]
+                                session.courses_pass = obj["Pass"]
+                                session.courses_fail = obj["Fail"]
+                                session.courses_audit = obj["Audit"]
 
-                                        sessions.push(session)
-                                    }}
-                            }
-                            courseMap[session.courses_dept + session.courses_id] = sessions
-
-                            //Log.trace("length of sessions FINAL  =  " + sessions.length)
-                            //Log.trace("length of courseMap FINAL  =  " + courseMap.length)
-
-                            processedDataset = courseMap
-
-                            //}
-                            that.save(id, processedDataset)
-
-                            //reject(true);
-
+                                sessions.push(session)
+                            }}
                         }
+                        courseMap[session.courses_dept + session.courses_id] = sessions
+
+                        //Log.trace("length of sessions FINAL  =  " + sessions.length)
+                        //Log.trace("length of courseMap FINAL  =  " + courseMap.length)
+
+                        processedDataset = courseMap
+
+                        //}
+                        that.save(id, processedDataset)
+
+                        //reject(true);
+
+                    }
 
                     )
 
 
                     /*catch(function (err) {
-                     reject(err)
-                     reject(true)
-                     Log.trace("invalid dataset")
-                     })*/
+                        reject(err)
+                        reject(true)
+                        Log.trace("invalid dataset")
+                    })*/
                     reject(false)
                     fulfill(true);
                 }).catch(function (err) {
