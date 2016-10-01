@@ -39,33 +39,31 @@ export default class QueryController {
 
     public query(query: QueryRequest): QueryResponse {
         Log.trace('QueryController::query( ' + JSON.stringify(query) + ' )');//json string
-
         // TODO: implement this
-
         /*   1. parse the query(json format)
          2. transfer the key in datasets to what I want
          3. get ,where, order(chose a quick sort method), as ,
          4.check if the dataset in memory or disk
          5. return as which kind of data structure, */
 
-
-//parse the json querey to string
-
-        var get: any = query.GET;//string or array of string
+        //extract the "get","where","order","as"'s value
+        var get: any = query.GET;
         var where:any= query.WHERE;
-        //json object or json array
         var order: string = query.ORDER;
         var format: string = query.AS;
-
+        //get the array of the sections according to "where" requirement
         var intermediate:Array<any>;
         if(typeof get==='string')
             intermediate=this.dealWithWhere(where,get);
         else
-            intermediate=this.dealWithWhere(where,get[0]) ;
+            intermediate=this.dealWithWhere(where,get[0]);
+
         Log.trace("intermediate type: "+ typeof intermediate)
         Log.trace("intermediate success")
+
         var result:Array<any>;
         var values: Array<any>;
+        //order the array
         if(order!=null)
         {
             for( var i of intermediate)
@@ -74,9 +72,7 @@ export default class QueryController {
                     for( var j of i)
                         if (i.hasOwnProperty(j))
                     Log.trace("intermediate loop2")
-                    Log.trace(j.key);
                     Log.trace("j key is "+typeof j.key);
-                    Log.trace(j.value);
                     Log.trace("j value is"+typeof j.value);
                     if(j.key===order)   //maybe wrong
                         values+=j.value;//maybe
@@ -88,25 +84,27 @@ export default class QueryController {
                 intermediate=this.quickSortLetter(values,intermediate,0,values.length-1);
         }
         Log.trace("intermediate2 type: "+ typeof intermediate)
+        //represent according to the "get"
         result= this.represent(get,intermediate);
         Log.trace(result.toString())
         result=JSON.parse('"render:"'+format+'","+"result"+":"'+result);
-        Log.trace("result type"+ typeof result)
         //return back to JSON object
+        Log.trace("result type"+ typeof result)
         return {result:result};
-
     }
 
 
 
 
 
-//deal with where
+     //check each sections data to see if it satisfies "where" requirement
     public  dealWithWhere(where:{[id:string]:any},get:string):Array<any>{
         var arr:Array<any>;
-
+        //get whole dataset
         var file:{[id:string]:any}=this.datasets[this.stringPrefix(get)];
         Log.trace('file type : '+ typeof file)
+        //the file type is undefined!maybe fail to load data from dataset controller
+        //get array of sections
         var values:Array<any>;
         for(var key in file) {
             if(file.hasOwnProperty(key))
@@ -124,7 +122,7 @@ export default class QueryController {
         Log.trace("success where and arr")
         return arr;
     }
-
+    //take out the string prefix, which is the id of dataset
     public stringPrefix(get:string):string{
         let prefix:string;
         prefix=get.split("_")[0];
@@ -133,8 +131,9 @@ export default class QueryController {
     }
 
 
-//IS NOT WORKING !
-    //try split!!!
+
+    //parse the where part accordig to EBNF rule(try split later)
+    //4 types of filter, use keys to find it
     public parserEBNF(where:{[id:string]:any},dataset:any):boolean {
         //GT= > EQ= LT<
         //AND OR NOT
@@ -206,10 +205,8 @@ export default class QueryController {
 
 
 
-//list in order in matter of chose data structure: mergesort?quicksort?
+
 //    sort according to key’s value
-
-
     public   quickSortNumber(arr1: Array<any>,arr2:Array<any>,left: number,right: number):Array<any> {
         let pivot:number;
         if(left< right)
@@ -224,7 +221,7 @@ export default class QueryController {
         return arr2;
 
     }
-
+// helper function for quicksort
     public partitionNumber(arr1: Array<any>,arr2:Array<any>, left: number, right: number):number{
         let middle:number=left + (right - left) / 2;
         let pivot = arr1[middle];
@@ -250,7 +247,7 @@ export default class QueryController {
         this.swap(arr2[a - 1],arr2[left]);
         return a - 1;
     }
-
+//swap items, helper function for above one
     public swap(left:any,right:any){
         let temp:any=left;
         left=right;
@@ -270,7 +267,7 @@ export default class QueryController {
         }
         return arr2;
     }
-
+  //helper function for sorting the words
     public  partitionString(arr1: Array<any>,arr2:Array<any>, left: number, right: number):number{
         let middle:number=left + (right - left) / 2;
         let pivot = arr1[middle];
@@ -322,35 +319,33 @@ export default class QueryController {
 
 
 
-//have problems!, how to get key value pair
+//represent key value pairs according to get(arr1) from arr2(the array coming out from where parts)
+
     public represent (arr1:string|string[], arr2:Array<any>):Array<any>{
-         var arr3:Array<any>=arr2
+         var arr3:Array<any>=arr2;
         if(typeof arr1==='string'){
             var i:number=Object.keys(arr2[0]).indexOf(arr1);
             Log.trace("i type"+ typeof i)
             for (var a=0;a< arr2.length;a++){
-
                 arr3[a]=arr2[a][i];
                 Log.trace("arr3[a] type"+typeof arr3[a]);
         }
-
         }
-        else if(typeof arr1==='Array')
+        else if(typeof arr1==='Array') {
             for (var b of arr2)
-            if (arr2.hasOwnProperty(b))
-            { for (var j=0;j<arr1.length;j++)
-
-             var temp=b;
-                b=[];
-            { var k:number=Object.keys(arr2[0]).indexOf(arr1[j]);
-                b.push(temp[k]);
-                Log.trace("b"+b);
+                if (arr2.hasOwnProperty(b)) {
+                    for (var j = 0; j < arr1.length; j++)
+                         var temp = b;
+                    b = [];
+                    {
+                        var k: number = Object.keys(arr2[0]).indexOf(arr1[j]);
+                        b.push(temp[k]);
+                        Log.trace("b" + b);
+                    }
                 }
-            }
-            arr3=arr2;
-
-        return arr3;
-
+            arr3 = arr2;
+        }
+            return arr3;
     }
 
 }
