@@ -111,16 +111,17 @@ export default class DatasetController {
                             stringPromise = file.async("string") // string from JSZipObject?
                             promiseArray.push(stringPromise)
 
-                            Log.trace("String Promise:  "+ stringPromise);
+                            //Log.trace("String Promise:  "+ stringPromise);
                         }
                     })
 
                     Log.trace("PromiseArray length:  "+ promiseArray.length);
 
-                    Promise.all(promiseArray).then(function(endResult :any) {
+                    Promise.all(promiseArray).then(function(endResult: any) {
+
+
 
                         Log.trace("endResult:  "+ endResult.length);
-
 
                         //if (id == "courses") {
 
@@ -131,7 +132,7 @@ export default class DatasetController {
                             var courseObj = JSON.parse(endResult[i])
 
                             if (courseObj.result !== undefined) {
-                                Log.trace("course.Obj is NOT defined")
+                                //Log.trace("course.Obj is defined")
 
                             var sessions: any = []
 
@@ -161,8 +162,19 @@ export default class DatasetController {
                         //}
                         that.save(id, processedDataset)
 
-                    })
+                        //reject(true);
 
+                    }
+
+                    )
+
+
+                    /*catch(function (err) {
+                        reject(err)
+                        reject(true)
+                        Log.trace("invalid dataset")
+                    })*/
+                    reject(false)
                     fulfill(true);
                 }).catch(function (err) {
                     Log.trace('DatasetController::process(..) - unzip ERROR: ' + err.message);
