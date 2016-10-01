@@ -67,7 +67,7 @@ describe("QueryController", function () {
      );
         expect(valid).to.equal(false);});
 
-/*  it ("correct sort",function(){
+ it ("correct sort",function(){
         let dataset: Datasets = {};
 
         let controller:QueryController=new QueryController(dataset);
@@ -80,7 +80,7 @@ describe("QueryController", function () {
 
 
 
-    });*/
+    });
 
   it ("correct present",function(){
         let dataset:any=[{"courses_dept":"epse","courses_avg":97.41},
@@ -89,7 +89,7 @@ describe("QueryController", function () {
         let controller = new QueryController(dataset);
 
         let diu:Array<any>=controller.represent(
-            "courses_dept" ,dataset
+            "courses_avg" ,dataset
         );
 
         let valid:boolean= diu===[{"courses_dept":"epse"},

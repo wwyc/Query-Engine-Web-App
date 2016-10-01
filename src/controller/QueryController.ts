@@ -62,27 +62,36 @@ export default class QueryController {
             intermediate=this.dealWithWhere(where,get);
         else
             intermediate=this.dealWithWhere(where,get[0]) ;
+        Log.trace("intermediate type: "+ typeof intermediate)
         Log.trace("intermediate success")
         var result:Array<any>;
         var values: Array<any>;
         if(order!=null)
         {
             for( var i of intermediate)
+
             {       Log.trace("intermediate loop1")
                     for( var j of i)
+                        if (i.hasOwnProperty(j))
                     Log.trace("intermediate loop2")
                     Log.trace(j.key);
+                    Log.trace("j key is "+typeof j.key);
                     Log.trace(j.value);
+                    Log.trace("j value is"+typeof j.value);
                     if(j.key===order)   //maybe wrong
                         values+=j.value;//maybe
             }
+            Log.trace("values type"+ typeof values)
             if (typeof values[0]==='number')
                 intermediate=this.quickSortNumber(values,intermediate,0,values.length-1);
             if (typeof values[0]==='string')
                 intermediate=this.quickSortLetter(values,intermediate,0,values.length-1);
         }
+        Log.trace("intermediate2 type: "+ typeof intermediate)
         result= this.represent(get,intermediate);
+        Log.trace(result.toString())
         result=JSON.parse('"render:"'+format+'","+"result"+":"'+result);
+        Log.trace("result type"+ typeof result)
         //return back to JSON object
         return {result:result};
 
@@ -93,19 +102,25 @@ export default class QueryController {
 
 
 //deal with where
-    public  dealWithWhere(where:any,get:string):Array<any>{
+    public  dealWithWhere(where:{[id:string]:any},get:string):Array<any>{
         var arr:Array<any>;
-        var file:{[id:string]:any}=this.datasets[this.stringPrefix(get)];
 
+        var file:{[id:string]:any}=this.datasets[this.stringPrefix(get)];
+        Log.trace('file type : '+ typeof file)
+        var values:Array<any>;
         for(var key in file) {
-            var values = file[key];
+            if(file.hasOwnProperty(key))
+            values = file[key];
         }
+        Log.trace('values type '+ typeof values)
         for(var i in values){
+            if(values.hasOwnProperty(i))
             if (this.parserEBNF(where,i))
             {
             arr.push(i);
             }
         }
+        Log.trace("arr type"+ typeof arr)
         Log.trace("success where and arr")
         return arr;
     }
@@ -138,12 +153,14 @@ export default class QueryController {
 
             for (var i of where['AND']) {
                 valid = valid && this.parserEBNF(i, dataset);
-                Log.trace("AND success");
+                Log.trace("AND success,type"+ typeof where['AND']);
+
             }
             if (typeof where['OR'] !== 'undefined')
             for (var j of where['OR']){
+                if(where['OR'].hasOwnProperty(j))
                 valid = valid || this.parserEBNF(i, dataset);
-                Log.trace("OR success");
+                Log.trace("OR success,type"+typeof where['OR']);
             }
 
         }
@@ -203,7 +220,7 @@ export default class QueryController {
             this.quickSortNumber(arr1,arr2,left,pivot-1);
             this.quickSortNumber(arr1,arr2,pivot+1,right);
         }
-        Log.trace(arr2.toString());
+        Log.trace("arr2 type"+typeof arr2);
         return arr2;
 
     }
@@ -238,7 +255,7 @@ export default class QueryController {
         let temp:any=left;
         left=right;
         right=temp;
-        Log.trace("swap success")
+
     }
 
     //sort words alphabetically
@@ -305,29 +322,34 @@ export default class QueryController {
 
 
 
-
+//have problems!, how to get key value pair
     public represent (arr1:string|string[], arr2:Array<any>):Array<any>{
-        var arr3=arr2;
+         var arr3:Array<any>=arr2
         if(typeof arr1==='string'){
             var i:number=Object.keys(arr2[0]).indexOf(arr1);
-            for (var a of arr2){
-                a=a[i];
-                Log.trace(a);
-            }
+            Log.trace("i type"+ typeof i)
+            for (var a=0;a< arr2.length;a++){
+
+                arr3[a]=arr2[a][i];
+                Log.trace("arr3[a] type"+typeof arr3[a]);
+        }
 
         }
         else if(typeof arr1==='Array')
             for (var b of arr2)
+            if (arr2.hasOwnProperty(b))
             { for (var j=0;j<arr1.length;j++)
+
              var temp=b;
                 b=[];
             { var k:number=Object.keys(arr2[0]).indexOf(arr1[j]);
                 b.push(temp[k]);
-                Log.trace(b);
+                Log.trace("b"+b);
                 }
             }
+            arr3=arr2;
 
-        return arr2;
+        return arr3;
 
     }
 
