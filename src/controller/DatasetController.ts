@@ -121,12 +121,12 @@ export default class DatasetController {
 
                         Log.trace("endResult:  "+ endResult.length);
 
-
                         //if (id == "courses") {
 
                         var courseMap: any = {}
 
                         for (var objs of endResult){
+
 
                             var courseObj = JSON.parse(objs)
 
@@ -160,16 +160,14 @@ export default class DatasetController {
 
                         processedDataset = courseMap
 
-
                             //}
                         that.save(id, processedDataset)
 
                     }).catch(function(err){
                         reject(true)
+                        reject(err)
                         Log.trace("caught an error!!!  " + err.message)
                     })
-
-
 
                     fulfill(true)
 
@@ -205,6 +203,5 @@ export default class DatasetController {
 
         });
     }
-
 
 }
