@@ -6,6 +6,7 @@ import Log from "../Util";
 import JSZip = require('jszip');
 import forEach = require("core-js/fn/array/for-each");
 import Session from '../DataStorage';
+import {error} from "util";
 
 /**
  * In memory representation of all datasets.
@@ -118,65 +119,61 @@ export default class DatasetController {
 
                     Promise.all(promiseArray).then(function(endResult: any) {
 
-
-
                         Log.trace("endResult:  "+ endResult.length);
 
                         //if (id == "courses") {
 
                         var courseMap: any = {}
 
-                        for (var i = 0, abc = endResult.length; i < abc; i++){
+                        for (var objs of endResult){
 
-                            var courseObj = JSON.parse(endResult[i])
+
+                            var courseObj = JSON.parse(objs)
+
+                            //Log.trace("courseObj" + courseObj.toString())
 
                             if (courseObj.result !== undefined) {
                                 //Log.trace("course.Obj is defined")
 
-                            var sessions: any = []
+                                var sessions: any = []
 
-                            for (var obj of  courseObj.result) {
+                                for (var obj of  courseObj.result) {
 
-                                var session = new Session()
+                                    var session = new Session()
 
-                                session.courses_dept = obj["Subject"]
-                                session.courses_id = obj["Course"]
-                                session.courses_avg = obj["Avg"]
-                                session.courses_instructor = obj["Professor"]
-                                session.courses_title = obj["Title"]
-                                session.courses_pass = obj["Pass"]
-                                session.courses_fail = obj["Fail"]
-                                session.courses_audit = obj["Audit"]
+                                    session.courses_dept = obj["Subject"]
+                                    session.courses_id = obj["Course"]
+                                    session.courses_avg = obj["Avg"]
+                                    session.courses_instructor = obj["Professor"]
+                                    session.courses_title = obj["Title"]
+                                    session.courses_pass = obj["Pass"]
+                                    session.courses_fail = obj["Fail"]
+                                    session.courses_audit = obj["Audit"]
 
-                                sessions.push(session)
-                            }}
+                                    sessions.push(session)
+                                }}
+                            courseMap[session.courses_dept + session.courses_id] = sessions
                         }
-                        courseMap[session.courses_dept + session.courses_id] = sessions
 
-                        //Log.trace("length of sessions FINAL  =  " + sessions.length)
-                        //Log.trace("length of courseMap FINAL  =  " + courseMap.length)
+                        Log.trace("length of sessions FINAL  =  " + sessions.length);
+                        Log.trace("length of courseMap FINAL  =  " + Object.keys(courseMap).length);
 
                         processedDataset = courseMap
 
-                        //}
+                            //}
                         that.save(id, processedDataset)
 
-                        //reject(true);
-
-                    }
-
-                    )
-
-
-                    /*catch(function (err) {
-                        reject(err)
+                    }).catch(function(err){
                         reject(true)
-                        Log.trace("invalid dataset")
-                    })*/
-                    reject(false)
-                    fulfill(true);
+                        reject(err)
+                        Log.trace("caught an error!!!  " + err.message)
+                    })
+
+                    fulfill(true)
+
+
                 }).catch(function (err) {
-                    Log.trace('DatasetController::process(..) - unzip ERROR: ' + err.message);
+                    Log.error('DatasetController::process(..) - unzip ERROR: ' + err.message);
                     reject(err);
                 });
             } catch (err) {
@@ -206,4 +203,5 @@ export default class DatasetController {
 
         });
     }
+
 }
