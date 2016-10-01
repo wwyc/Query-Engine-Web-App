@@ -21,7 +21,6 @@ export default class DatasetController {
 
     constructor() {
         Log.trace('DatasetController::init()');
-
     }
     /**
      * Returns the referenced dataset. If the dataset is not in memory, it should be
