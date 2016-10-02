@@ -51,13 +51,15 @@ export default class RouteHandler {
 
                 controller.process(id, req.body).then(function (result) {
 
-                    if (controller.getDataset(id) == {}|| controller.getDataset(id) == null){
+                    //Log.trace(controller.getDataset(id).toString)
+
+                    if (controller.getDataset(id) === {}|| controller.getDataset(id) === null){
                         res.json(204, {success: result});
                         Log.trace("dataset with this ID is new")
                     } else {
-                    res.json(201, {success:result})
-                Log.trace("dataset with this ID already exists!")
-                }
+                        res.json(201, {success:result})
+                        Log.trace("dataset with this ID already exists!")
+                    }
 
                 }).catch(function (err: Error) {
                     Log.trace('RouteHandler::postDataset(..) - ERROR: ' + err.message);
@@ -76,9 +78,15 @@ export default class RouteHandler {
         Log.trace('RouteHandler::postQuery(..) - params: ' + JSON.stringify(req.params));
         try {
             let query: QueryRequest = req.params;
+
+
             let datasets: Datasets = RouteHandler.datasetController.getDatasets();
+
+            //Log.trace("RouteHandler - what is in Datasets?" + Object.keys(Datasets))
+
             let controller = new QueryController(datasets);
             let isValid = controller.isValid(query);
+
             if (isValid === true) {
                 let result = controller.query(query);
                 res.json(200, result);

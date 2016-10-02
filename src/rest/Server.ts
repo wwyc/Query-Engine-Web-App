@@ -45,6 +45,17 @@ export default class Server {
      */
     public start(): Promise<boolean> {
         let that = this;
+
+        var fs = require("fs")
+
+        fs.exists("./data", function(exists: any){
+            if (!exists){
+                Log.trace('data folder does not exists');
+                fs.mkdirSync("./data")
+            }
+        })
+
+
         return new Promise(function (fulfill, reject) {
             try {
                 Log.info('Server::start() - start');
@@ -53,14 +64,14 @@ export default class Server {
                     name: 'insightUBC'
                 });
 
-		// Serves static files for the UI.
-		that.rest.get("/public/.*", restify.serveStatic({
-		    directory: __dirname
-		}));
+                // Serves static files for the UI.
+                that.rest.get("/public/.*", restify.serveStatic({
+                    directory: __dirname
+                }));
 
                 // Loads the homepage.
                 // curl -is  http://localhost:4321/
-		that.rest.get('/', RouteHandler.getHomepage);
+                that.rest.get('/', RouteHandler.getHomepage);
 
                 // Sends a dataset. Is idempotent and can create or update a dataset id.
                 // curl localhost:4321/dataset/test --upload-file FNAME.zip
