@@ -6,6 +6,7 @@ import {Datasets, default as DatasetController} from "./DatasetController";
 import Log from "../Util";
 import {bodyParser} from "restify";
 import {stringify} from "querystring";
+import {type} from "os";
 
 export interface QueryRequest {
     GET: string|string[];
@@ -52,13 +53,13 @@ export default class QueryController {
 
         var intermediate: any = []
         if(typeof get==='string')
-
         // if GET is a string "courses_dept"
             intermediate=this.dealWithWhere(where,get);
         else
             intermediate=this.dealWithWhere(where,get[0]) ;
         //Log.trace("intermediate type: "+ typeof intermediate)
         Log.trace("intermediate success")
+        Log.trace(typeof intermediate);
         var result: any = []
         var values: any = []
 
@@ -98,34 +99,24 @@ export default class QueryController {
     }
 
 //deal with where
-    public  dealWithWhere(where:{[id:string]:any},get:string){
+    public  dealWithWhere(where:{[id:string]:any},get:string):Array<any>{
         var arr: any = []
 
         //Log.trace(JSON.parse(JSON.stringify(this.datasets)))
 
         var datasetsNew = JSON.parse(JSON.stringify(this.datasets))
-
         // Retrieve dataset from given GET
-        var datasetRetrived = datasetsNew["courses"];
-
-        var sections: any = []
-
+        var datasetRetrived = datasetsNew[this.stringPrefix(get)];
+        var sections: any = [];
         for (var key in datasetRetrived){
             //Log.trace(key.toString())
-            sections = datasetRetrived[key]
-            //Log.trace(sections.length)
-
-            for (var key in sections){
-                //Log.trace(key.toString())
-                var section = sections[key]
-                //Log.trace(section.toString())
-                //Log.trace(section["courses_instructor"])
-
-                if (this.parserEBNF(where,section)){
-                    arr.push(section)}
-
+            sections = datasetRetrived[key];
+            Log.trace("section"+typeof sections);
+            for (var section in sections){
+            if (this.parserEBNF(where,section)){
+                    arr.push(section);}
             }
-
+            Log.trace("arr type"+typeof arr);
         }
 
         //Log.trace('values type '+ typeof values)
@@ -141,8 +132,8 @@ export default class QueryController {
     }
 
     //helper function that returns prefix of string from GET
-    public stringPrefix(get:string){
-        let prefix: any
+    public stringPrefix(get:string):string{
+        let prefix: string
         prefix=get.split("_")[0];
         Log.trace(prefix);
         return prefix;
@@ -151,25 +142,25 @@ export default class QueryController {
 
 //IS NOT WORKING !
     //try split!!!
-    public parserEBNF(where:{[id:string]:any},section:any) {
+    public parserEBNF(where:any,section:any):boolean {
         //GT= > EQ= LT<
         //AND OR NOT
         // parse where
         //implemenntion of EBNF
         // and or follow array，
         // for loop
-        let valid = true;
-        //Log.trace("VALID ")
+        var valid = true;
+        Log.trace("VALID");
 
         if (where['AND']!==undefined||where['OR']!== undefined){//can;t evaluate it
-            //Log.trace("into and")
+            Log.trace("into and")
             if (where['AND'] !== undefined){
                 for (var i of where['AND']) {
                     valid = valid && this.parserEBNF(i, section);
                     //Log.trace("AND success,type"+ typeof where['AND']);
                 }}
 
-            if (where['OR'] !== undefined){
+                if (where['OR'] !== undefined){
                 for (var j of where['OR']){
                     if(where['OR'].hasOwnProperty(j))
                         valid = valid || this.parserEBNF(i, section);
@@ -177,8 +168,7 @@ export default class QueryController {
                 }}
         }
 
-
-        if (where['GT'] || where['EQ'] || where['LT']!== undefined) {
+        if (where['GT']!==undefined || where['EQ']!==undefined || where['LT']!== undefined) {
 
             if (where['GT']!== undefined) {
                 //Log.trace(where['GT']);
@@ -222,9 +212,7 @@ export default class QueryController {
         let pivot:number;
         if(left< right)
         {
-
             pivot=this.partitionNumber(arr1,arr2,left,right);
-
             this.quickSortNumber(arr1,arr2,left,pivot-1);
             this.quickSortNumber(arr1,arr2,pivot+1,right);
         }

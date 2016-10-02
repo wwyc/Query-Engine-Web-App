@@ -59,10 +59,8 @@ describe("QueryController", function () {
         let controller = new QueryController(dataset);
      let valid:boolean=controller.parserEBNF(
 
-             {"GT"
+             {"EQ"
                  : {"courses_avg":99}
-
-
          },dataset
      );
         expect(valid).to.equal(false);});
