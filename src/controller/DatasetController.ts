@@ -1,4 +1,3 @@
-
 /**
  * Created by rtholmes on 2016-09-03.
  */
@@ -86,14 +85,14 @@ export default class DatasetController {
                 }
             })
         }
-        /*fs.readdir('data/',['utf8'], function (err: string, files: any){                       //read directory and return files (array of file names)
-         for (var file of files) {                               //iterate through array of file names and get all?
-         this.datasets[file.substring(0,(file.length() - 5))] = this.getDataset(file.substring(0,(file.length() - 5)))
-         if (err){Log.trace("what is the error in readdir : " + err)}
-         }
-         }*/
+            /*fs.readdir('data/',['utf8'], function (err: string, files: any){                       //read directory and return files (array of file names)
+                    for (var file of files) {                               //iterate through array of file names and get all?
+                        this.datasets[file.substring(0,(file.length() - 5))] = this.getDataset(file.substring(0,(file.length() - 5)))
+                        if (err){Log.trace("what is the error in readdir : " + err)}
+                    }
+                }*/
 
-        //this.datasets = that.datasets
+            //this.datasets = that.datasets
 
         return this.datasets;
     }
@@ -175,11 +174,11 @@ export default class DatasetController {
                         that.save(id, processedDataset)
 
                     })
-                    /*.catch(function(err){
-                     Log.error("'DatasetController::process(..) - ERRORr!!!  " + err.message)
-                     //reject(err)
-                     //return reject(true)
-                     })*/
+                        /*.catch(function(err){
+                        Log.error("'DatasetController::process(..) - ERRORr!!!  " + err.message)
+                        //reject(err)
+                        //return reject(true)
+                    })*/
 
                     fulfill(true)
 
@@ -222,9 +221,10 @@ export default class DatasetController {
             Log.trace("save dataset error" + e.message)
         }
         /*fs2.writeFile('data/'+id+'.json', datasetToSave, (err: string) => {
-         // The file is created (if it does not exist) or truncated (if it exists).
-         Log.trace("save dataset error" + err)
-         })*/;
+            // The file is created (if it does not exist) or truncated (if it exists).
+            Log.trace("save dataset error" + err)
+
+        })*/;
     }
 
 
