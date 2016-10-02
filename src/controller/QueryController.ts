@@ -66,6 +66,7 @@ export default class QueryController {
         {
             for( var i of intermediate)
             {       Log.trace("intermediate loop1")
+                if (intermediate.hasOwnProperty(i))
                 for( var j of i)
                     if (i.hasOwnProperty(j))
                         Log.trace("intermediate loop2")
@@ -97,6 +98,7 @@ export default class QueryController {
     }
 
 //deal with where
+
         public  dealWithWhere(where:{[id:string]:any},get:string):Array<any>{
         var arr: any = [];
         //Log.trace(JSON.parse(JSON.stringify(this.datasets)))
@@ -147,52 +149,55 @@ export default class QueryController {
         var valid = true;
         Log.trace("VALID");
         if (typeof where['AND']!=='undefined'||typeof where['OR']!== 'undefined'){//can;t evaluate it
-            Log.trace("into and")
+            Log.trace("type1!!!")
             if (typeof where['AND']!=='undefined'){
                 for (var i of where['AND']) {
                     valid = valid && this.parserEBNF(i, section);
-                    //Log.trace("AND success,type"+ typeof where['AND']);
+                    Log.trace("AND success,type"+ typeof where['AND']);
                 }}
 
                 if (typeof where['OR']!=='undefined'){
                 for (var j of where['OR']){
                     if(where['OR'].hasOwnProperty(j))
                         valid = valid || this.parserEBNF(i, section);
-                    //Log.trace("OR success,type"+typeof where['OR']);
+                    Log.trace("OR success,type"+typeof where['OR']);
                 }}
         }
 
         if (typeof where['GT']!=='undefined'||typeof where['EQ']!=='undefined' || typeof where['LT']!=='undefined') {
-
+            Log.trace("type2!!!")
             if (typeof where['GT']!=='undefined') {
                 //Log.trace(where['GT']);
                 valid = valid&&(section[where['GT'].key] > where['GT'].value);
                 //Log.trace(dataset[Object.keys(where['GT'])[0]]);
-                //Log.trace(where['GT'].value);
+                Log.trace(where['GT'].value);
                 //Log.trace("GT success");
             }
 
             if (typeof where['EQ']!=='undefined') {
+
                 valid = valid&&(section[where['EQ'].key]===where['EQ'].value);
                 //Log.trace(dataset[where['EQ'].key]);
-                //Log.trace(where['EQ'].value);
+                Log.trace(where['EQ'].value);
                 //Log.trace("EQ success");
             }
 
             if (typeof where['LT']!=='undefined') {
                 //Log.trace(where['LT']);
                 valid =valid&&(section[where['LT'].key] < where['LT'].value);
-                //Log.trace("LT success");
+                Log.trace("LT success");
             }
         }
 
         if (typeof where['IS']!=='undefined') {
+            Log.trace("type3!!!")
             valid = valid && (section[where['IS'].key]=== where['IS'].value);
-            //Log.trace("IS success");
+             Log.trace("IS success");
         }
         if(typeof where['NOT']!=='undefined') {
+            Log.trace("type4!!!")
             valid =valid&&(!this.parserEBNF(where['NOT'], section));
-            //Log.trace("NOT success");
+             Log.trace("NOT success");
         }
         return valid;
     }
@@ -212,8 +217,8 @@ export default class QueryController {
         }
         Log.trace("arr2 type"+typeof arr2);
         return arr2;
-
     }
+
 
     public partitionNumber(arr1: Array<any>,arr2:Array<any>, left: number, right: number):number{
         let middle:number=left + (right - left) / 2;
