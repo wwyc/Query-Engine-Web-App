@@ -86,7 +86,6 @@ export default class QueryController {
         result= this.represent(get,intermediate);
         Log.trace("this is result:  "  + result.toString())
 
-
         //there is an error message here that requires fixing
         try{
         result=JSON.parse('"render:"'+format+'","+"result"+":"'+result)}catch(e)
