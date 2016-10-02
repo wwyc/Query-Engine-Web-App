@@ -45,6 +45,17 @@ export default class Server {
      */
     public start(): Promise<boolean> {
         let that = this;
+
+        var fs = require("fs")
+
+         fs.exists("./data", function(exists: any){
+            if (!exists){
+                Log.trace('data folder does not exists');
+                fs.mkdirSync("./data")
+            }
+        })
+
+
         return new Promise(function (fulfill, reject) {
             try {
                 Log.info('Server::start() - start');
