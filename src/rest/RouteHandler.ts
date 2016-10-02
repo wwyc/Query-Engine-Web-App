@@ -79,7 +79,6 @@ export default class RouteHandler {
             let datasets: Datasets = RouteHandler.datasetController.getDatasets();
             let controller = new QueryController(datasets);
             let isValid = controller.isValid(query);
-
             if (isValid === true) {
                 let result = controller.query(query);
                 res.json(200, result);
