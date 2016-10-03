@@ -46,91 +46,72 @@ export default class QueryController {
 
         var get = query.GET;//string or array of string
         var where = query.WHERE;
-        //json object or json array
         var order = query.ORDER;
+        Log.trace("order type"+ typeof order);
         var format = query.AS;
-
+        Log.trace("Format"+ typeof format)
         var intermediate: any = []
-        if(typeof get==='string')
-        // if GET is a string "courses_dept"
-            intermediate=this.dealWithWhere(where,get);
+        if (typeof get === 'string')
+            intermediate = this.dealWithWhere(where, get);
         else
-            intermediate=this.dealWithWhere(where,get[0]) ;
-        //Log.trace("intermediate type: "+ typeof intermediate)
-        Log.trace("intermediate success")
-        Log.trace(typeof intermediate);
-        var result: any = []
-        var values: any = []
-
-        if(order!=null)
-        {
-            for( var i of intermediate)
-            {       Log.trace("intermediate loop1")
-                if (intermediate.hasOwnProperty(i))
-                for( var j of i)
-                    if (i.hasOwnProperty(j))
-                        Log.trace("intermediate loop2")
-                Log.trace(j.key);
-                Log.trace("j key is "+typeof j.key);
-                Log.trace(j.value);
-                Log.trace("j value is"+typeof j.value);
-                if(j.key===order)   //maybe wrong
-                    values+=j.value;//maybe
-            }
-            Log.trace("values type"+ typeof values)
-            if (typeof values[0]==='number')
-                intermediate=this.quickSortNumber(values,intermediate,0,values.length-1);
-            if (typeof values[0]==='string')
-                intermediate=this.quickSortLetter(values,intermediate,0,values.length-1);
+            intermediate = this.dealWithWhere(where, get[0]);
+        Log.trace("intermediate success");
+        var isArr2 = Array.isArray(intermediate);
+        Log.trace("intermediate"+isArr2);
+        intermediate=this.sortArray(intermediate,order);
+        Log.trace("intermediate2 type: " + typeof intermediate);
+        var result: any = [];
+        result = this.represent(get, intermediate);
+        Log.trace("this is result:  " + result.toString());
+        var FinalResult:{};
+        FinalResult={
+            "render":format,"result":result
+        };
+        try {
+            FinalResult = JSON.parse(JSON.stringify(FinalResult));
+        } catch (e) {
+            Log.trace("Error msg parse 1" + e.message)
         }
-        Log.trace("intermediate2 type: "+ typeof intermediate)
-        result= this.represent(get,intermediate);
-        Log.trace("this is result:  "  + result.toString())
-
-        //there is an error message here that requires fixing
-        try{
-            result=JSON.parse('"render:"'+format+'","+"result"+":"'+result)}catch(e)
-        {Log.trace("Error msg parse 1" + e.message)}
-
-        Log.trace("result type"+ typeof result)
+        Log.trace("result type" +  FinalResult.toString());
         //return back to JSON object
-        return {result:result};
+        return {result: result};
+
     }
 
 //deal with where
 
-        public  dealWithWhere(where:{[id:string]:any},get:string):Array<any>{
-        var arr: any = [];
-        //Log.trace(JSON.parse(JSON.stringify(this.datasets)))
-        var datasetsNew = JSON.parse(JSON.stringify(this.datasets))
-        // Retrieve dataset from given GET
-        var datasetRetrived = datasetsNew[this.stringPrefix(get)];
-        var sections: any = [];
-        for (var key in datasetRetrived){
-            //Log.trace(key.toString())
-            sections = datasetRetrived[key];
-            Log.trace("section"+typeof sections);
-            for (var section in sections){
-          try{  if (this.parserEBNF(where,section)){
-                    arr.push(section);}
-            }
-            catch (e){
-                Log.trace("Error msg parse 1" + e.message)
-            }}
-            Log.trace("arr type"+typeof arr);
-        }
-        //Log.trace('values type '+ typeof values)
-        /*for(var section in sections){
-         if(sections.hasOwnProperty(section))
-         if (this.parserEBNF(where,section)){
-         arr.push(section);
-         }
-         }*/
-        //Log.trace("arr type"+ typeof arr)
-        //Log.trace("success where and arr")
-        return arr;
-    }
+        public  dealWithWhere(where:{[id:string]:any},get:string):Array<any> {
+            var arr: any = [];
+            //Log.trace(JSON.parse(JSON.stringify(this.datasets)))
+            var datasetNew = this.datasets[this.stringPrefix(get)];
+            Log.trace("ds1" + typeof datasetNew)
+            var datasetRetrived = JSON.parse(JSON.stringify(this.datasets[this.stringPrefix(get)]));
+            Log.trace("ds2" + typeof datasetRetrived)
+            var sections: any = [];
+            for (var key in datasetRetrived) {
+                Log.trace("key value1" + key)
+                sections = datasetRetrived[key];
+                Log.trace("sections" + typeof
+                        sections);
+                for (var section of sections) {
 
+                    section = section[Object.keys(section)[0]];
+                    Log.trace("section" +
+                        section);
+
+                    try {
+                        if (this.parserEBNF(where, section)) {
+                            arr.push(section);
+                        }
+                    }
+                    catch (e) {
+                        Log.trace("Error msg parse 1" + e.message)
+                    }
+                }
+                Log.trace("arr length" + arr.length);
+            }
+            return arr;
+        }
     //helper function that returns prefix of string from GET
     public stringPrefix(get:string):string{
         let prefix: string
@@ -139,31 +120,46 @@ export default class QueryController {
         return prefix;
     }
 
+    public sortArray(intermediate:Array<any>, order:any):Array<any>{
+        Log.trace("sorting!")
+        intermediate.sort(function (a: any, b: any) {
+            var value1 = a[order];
+            Log.trace("value1" + value1)
+            var value2 = b[order];
+            Log.trace("value2" + value2)
+            if (value1 < value2) {
+                return -1;
+            }
+            if (value1 > value2) {
+                return 1;
+            }
+
+            return 0;
+        });
+
+        return intermediate;
+    }
+
 
 //IS NOT WORKING !
     //try split!!!
     public parserEBNF(where:any,section:any):boolean {
-        //GT= > EQ= LT<
-        //AND OR NOT
-        // parse where
-        //implemenntion of EBNF
-        // and or follow array，
-        // for loop
         var valid = true;
         Log.trace("VALID");
-        if (typeof where['AND']!=='undefined'||typeof where['OR']!== 'undefined'){//can;t evaluate it
+        if (typeof where['AND']!=='undefined'||typeof where['OR']!== 'undefined'){
+
             Log.trace("type1!!!")
             if (typeof where['AND']!=='undefined'){
                 for (var i of where['AND']) {
                     if(where['AND'].hasOwnProperty(i))
                     valid = valid && this.parserEBNF(i, section);
-                    Log.trace("AND success,type"+ i);
+                    Log.trace("AND success,"+ i[Object.keys(i)[0]]);
                 }}
 
                 if (typeof where['OR']!=='undefined'){
                 for (var j of where['OR']){
                     if(where['OR'].hasOwnProperty(j))
-                        valid = valid || this.parserEBNF(i, section);
+                        valid =valid || this.parserEBNF(i, section);
                     Log.trace("OR success,type"+typeof where['OR']);
                 }}
         }
@@ -172,9 +168,9 @@ export default class QueryController {
             Log.trace("type2!!!")
             if (typeof where['GT']!=='undefined') {
                 var wg=where['GT'];
-                Log.trace("GT values"+ we[Object.keys(wg)[0]])
+                Log.trace("GT values"+ wg[Object.keys(wg)[0]])
                 {
-                    valid = valid&&(section[Object.keys(wg)[0]]=== wg[Object.keys(wg)[0]])
+                    valid = valid&&(section[Object.keys(wg)[0]]> wg[Object.keys(wg)[0]])
                 }
                     Log.trace(typeof where['GT']);
             }
@@ -187,12 +183,12 @@ export default class QueryController {
                     Log.trace(typeof where['EQ']);
                 }
             }
-                if (typeof where['LT'] !== 'undefined') {
+                    if (typeof where['LT'] !== 'undefined') {
                     var wl = where['LT'];
                     Log.trace("LT values" + wl[Object.keys(wl)[0]])
                     {
-                        valid = valid && (section[Object.keys(wl)[0]] === wl[Object.keys(wl)[0]])
-                        Log.trace(typeof where['EQ']);
+                        valid = valid && (section[Object.keys(wl)[0]] < wl[Object.keys(wl)[0]])
+                        Log.trace(typeof where['LT']);
                     }
                 }
             }
@@ -201,7 +197,7 @@ export default class QueryController {
             Log.trace("type3!!!");
             var wi=where['IS'];
             valid = valid && (section[Object.keys(wi)[0]] === wi[Object.keys(wi)[0]]);
-             Log.trace("IS success");
+             Log.trace("IS "+ wi[Object.keys(wi)[0]]);
         }
 
         if(typeof where['NOT']!=='undefined') {
@@ -213,11 +209,43 @@ export default class QueryController {
         return valid;
     }
 
+    public represent(arr1: string|string[], arr2: Array<any>): Array<any> {
+        var arr3: Array<any> = arr2;
+
+        if (typeof arr1 === 'string') {
+
+            for (var a = 0; a < arr2.length; a++) {
+                arr3[a]={};
+                arr3[a][arr1]=arr2[a][arr1];
+
+                /*  arr3[a] = arr1 + ":" + arr2[a][arr1];  */
+                Log.trace("arr3[a] " + typeof arr3[a]);
+            }
+        }
+        else {
+            for (var b = 0; b < arr2.length; b++) {
+                for (var j = 0; j < arr1.length; j++) {
+                    arr3[b]={};
+                    arr3[b][arr1[j]]=arr2[b][arr1[j]];
+
+                    /*   arr3[b] += arr1[j] + ":" + arr2[b][arr1[j]]; */
+                }
+
+            }
+        }
+        var isArr = Array.isArray(arr3);
+        Log.trace("arr3"+isArr);
+        return arr3;
+
+    }
+
+
+
 
 //list in order in matter of chose data structure: mergesort?quicksort?
 //    sort according to key’s value
 
-
+/*
     public   quickSortNumber(arr1: Array<any>,arr2:Array<any>,left: number,right: number):Array<any> {
         let pivot:number;
         if(left< right)
@@ -304,59 +332,37 @@ export default class QueryController {
         return a - 1;
     }
 
-    /*   public represent(arr1:any, arr2:Array<any>):Array<any>{
-     let arr3: Array<any> = arr2;
-     if (typeof arr1!=='string') {
-     for (var i = 0; i < arr2.length - 1; i++) {
-     arr3[i] = "{";
-     for (var j = 0; j < arr1.length - 1; j++) {
-     arr3[i] = arr3[i] + arr1[j] + ":" + arr2[i].arr1[j] + ",";
-     }
-     arr3[i] = arr3[i] + arr1[arr1.length - 1] + ":" + arr2[i].arr1[arr1.length - 1] + "}"
-     }
-     arr3[i] = arr3[i] + "{" + arr1[arr1.length - 1] + ":" + arr2[i].arr1[arr1.length - 1] + "}";
-     }
-     else
-     { for ( var a=0;a<arr2.length-1;a++) {
-     arr3[a] = "{"+arr1 + ":" + arr2[a].arr1+ "}"+",";
-     }
-     arr3[a] =arr3[a]+ "{"+arr1 + ":" + arr2[a].arr1+"}";
-     }
-     return arr3;
-     } */
 
+*/
 
-
-
-//have problems!, how to get key value pair
+/*
     public represent (arr1:string|string[], arr2:Array<any>):Array<any>{
-        var arr3:Array<any>=arr2
+        var arr3:Array<any>=arr2;
+
         if(typeof arr1==='string'){
-            var i:number=Object.keys(arr2[0]).indexOf(arr1);
-            Log.trace("i type"+ typeof i)
+
             for (var a=0;a< arr2.length;a++){
 
-                arr3[a]=arr2[a][i];
-                Log.trace("arr3[a] type"+typeof arr3[a]);
+
+           arr3[a]= arr1+":"+arr2[a][arr1];
+
+                Log.trace("arr3[a] "+ arr3[a]);
             }
 
         }
-        else if(typeof arr1==='Array')
-            for (var b of arr2)
-                if (arr2.hasOwnProperty(b))
+        else {
+            for (var b=0;b< arr2.length;b++)
                 { for (var j=0;j<arr1.length;j++)
+                { /* Object.keys(arr3[a])[j]=arr1[j];
+                    Object.values(arr3[a])[j]=arr2[b][arr1[j]];*/
+      /*         arr3[b]+=arr1[j]+":"+arr2[b][arr1[j]];  }
 
-                       var temp=b;
-                    b=[];
-                    { var k:number=Object.keys(arr2[0]).indexOf(arr1[j]);
-                        b.push(temp[k]);
-                        Log.trace("b"+b);
-                    }
-                }
-        arr3=arr2;
 
-        return arr3;
+       }}
+        Log.trace(JSON.parse(JSON.stringify(arr3)));
+        return JSON.parse(JSON.stringify(arr3));
 
     }
 
+*/
 }
