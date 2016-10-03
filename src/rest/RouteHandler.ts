@@ -52,7 +52,6 @@ export default class RouteHandler {
                 controller.process(id, req.body).then(function (result) {
 
                     //Log.trace(controller.getDataset(id).toString)
-
                     if (controller.getDataset(id) === {}|| controller.getDataset(id) === null){
                         res.json(204, {success: result});
                         Log.trace("dataset with this ID is new")
@@ -82,7 +81,7 @@ export default class RouteHandler {
 
             let datasets: Datasets = RouteHandler.datasetController.getDatasets();
 
-            //Log.trace("RouteHandler - what is in Datasets?" + Object.keys(Datasets))
+            Log.trace("RouteHandler - what is in Datasets?" + Object.keys(RouteHandler.datasetController.getDatasets()))
 
             let controller = new QueryController(datasets);
             let isValid = controller.isValid(query);
