@@ -59,15 +59,12 @@ describe("QueryController", function () {
         let controller = new QueryController(dataset);
      let valid:boolean=controller.parserEBNF(
 
-             {"GT"
-                 : {"courses_avg":99}
 
-
-         },dataset
+             {"IS": {"courses_dept": "adhe"}},dataset[0]
      );
         expect(valid).to.equal(false);});
 
- it ("correct sort",function(){
+ /*it ("correct sort",function(){
         let dataset: Datasets = {};
 
         let controller:QueryController=new QueryController(dataset);

@@ -57,9 +57,9 @@ export default class RouteHandler {
                         res.json(204, {success: result});
                         Log.trace("dataset with this ID is new")
                     } else {
-                    res.json(201, {success:result})
-                Log.trace("dataset with this ID already exists!")
-                }
+                        res.json(201, {success:result})
+                        Log.trace("dataset with this ID already exists!")
+                    }
 
                 }).catch(function (err: Error) {
                     Log.trace('RouteHandler::postDataset(..) - ERROR: ' + err.message);
