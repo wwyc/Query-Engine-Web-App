@@ -35,13 +35,24 @@ describe("DatasetController", function () {
 
     });
 
-
-
-    //should be able to process dataset?
-
     //getDatasets()
 
+    /*it("Should be able to load all Datasets from disk to memory", function () {
+        Log.test('Getting dataset');
+
+        var controller = new DatasetController()
+        var datasetsRetrieved = controller.getDatasets()
+
+        var fs = require("fs")
+
+        expect(typeof controller.getDataset("courses")).to.equal(typeof fs.readFileSync("../cpsc310project/data/courses.json"));
+
+
+    });*/
+
     //getdataset(id:string)
+
+    //should be able to process dataset?
 
     //processdataset
 

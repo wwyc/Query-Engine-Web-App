@@ -82,7 +82,7 @@ export default class RouteHandler {
 
             let datasets: Datasets = RouteHandler.datasetController.getDatasets();
 
-            //Log.trace("RouteHandler - what is in Datasets?" + Object.keys(Datasets))
+            Log.trace("RouteHandler - what is in Datasets?" + Object.keys(RouteHandler.datasetController.getDatasets()))
 
             let controller = new QueryController(datasets);
             let isValid = controller.isValid(query);
