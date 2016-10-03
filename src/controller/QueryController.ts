@@ -111,9 +111,12 @@ export default class QueryController {
             sections = datasetRetrived[key];
             Log.trace("section"+typeof sections);
             for (var section in sections){
-            if (this.parserEBNF(where,section)){
+          try{  if (this.parserEBNF(where,section)){
                     arr.push(section);}
             }
+            catch (e){
+                Log.trace("Error msg parse 1" + e.message)
+            }}
             Log.trace("arr type"+typeof arr);
         }
         //Log.trace('values type '+ typeof values)
@@ -152,8 +155,9 @@ export default class QueryController {
             Log.trace("type1!!!")
             if (typeof where['AND']!=='undefined'){
                 for (var i of where['AND']) {
+                    if(where['AND'].hasOwnProperty(i))
                     valid = valid && this.parserEBNF(i, section);
-                    Log.trace("AND success,type"+ typeof where['AND']);
+                    Log.trace("AND success,type"+ i);
                 }}
 
                 if (typeof where['OR']!=='undefined'){
@@ -167,38 +171,45 @@ export default class QueryController {
         if (typeof where['GT']!=='undefined'||typeof where['EQ']!=='undefined' || typeof where['LT']!=='undefined') {
             Log.trace("type2!!!")
             if (typeof where['GT']!=='undefined') {
-                //Log.trace(where['GT']);
-                valid = valid&&(section[where['GT'].key] > where['GT'].value);
-                //Log.trace(dataset[Object.keys(where['GT'])[0]]);
-                Log.trace(where['GT'].value);
-                //Log.trace("GT success");
+                var wg=where['GT'];
+                Log.trace("GT values"+ we[Object.keys(wg)[0]])
+                {
+                    valid = valid&&(section[Object.keys(wg)[0]]=== wg[Object.keys(wg)[0]])
+                }
+                    Log.trace(typeof where['GT']);
             }
 
             if (typeof where['EQ']!=='undefined') {
-
-                valid = valid&&(section[where['EQ'].key]===where['EQ'].value);
-                //Log.trace(dataset[where['EQ'].key]);
-                Log.trace(where['EQ'].value);
-                //Log.trace("EQ success");
+                var we = where['EQ'];
+                Log.trace("EQ values" + we[Object.keys(we)[0]])
+                {
+                    valid = valid && (section[Object.keys(we)[0]] === we[Object.keys(we)[0]])
+                    Log.trace(typeof where['EQ']);
+                }
             }
-
-            if (typeof where['LT']!=='undefined') {
-                //Log.trace(where['LT']);
-                valid =valid&&(section[where['LT'].key] < where['LT'].value);
-                Log.trace("LT success");
+                if (typeof where['LT'] !== 'undefined') {
+                    var wl = where['LT'];
+                    Log.trace("LT values" + wl[Object.keys(wl)[0]])
+                    {
+                        valid = valid && (section[Object.keys(wl)[0]] === wl[Object.keys(wl)[0]])
+                        Log.trace(typeof where['EQ']);
+                    }
+                }
             }
-        }
 
         if (typeof where['IS']!=='undefined') {
-            Log.trace("type3!!!")
-            valid = valid && (section[where['IS'].key]=== where['IS'].value);
+            Log.trace("type3!!!");
+            var wi=where['IS'];
+            valid = valid && (section[Object.keys(wi)[0]] === wi[Object.keys(wi)[0]]);
              Log.trace("IS success");
         }
+
         if(typeof where['NOT']!=='undefined') {
-            Log.trace("type4!!!")
-            valid =valid&&(!this.parserEBNF(where['NOT'], section));
-             Log.trace("NOT success");
+            Log.trace("type4!!!");
+            valid =valid&&(!this.parserEBNF(where['NOT'],section));
+            Log.trace("NOT success");
         }
+
         return valid;
     }
 
