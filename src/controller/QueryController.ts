@@ -161,7 +161,7 @@ export default class QueryController {
                 for (var j of where['OR']) {
                     if (where['OR'].hasOwnProperty(j))
                         Log.trace("or type" + typeof j);
-                    valid = valid && this.parserEBNF(j, section);
+                    valid = valid || this.parserEBNF(j, section);
                     Log.trace("OR success," + j[Object.keys(j)[0]]);
                 }
             }
