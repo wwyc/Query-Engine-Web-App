@@ -6,7 +6,7 @@ import {Datasets} from "../src/controller/DatasetController";
 import QueryController from "../src/controller/QueryController";
 import {QueryRequest} from "../src/controller/QueryController";
 import Log from "../src/Util";
-import QueryController1 from "../src/controller/QueryController1";
+import QueryController1 from "../src/controller/QueryController";
 import {expect} from 'chai';
 
 

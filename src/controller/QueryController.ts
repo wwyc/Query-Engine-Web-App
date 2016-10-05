@@ -130,8 +130,17 @@ export default class QueryController {
             if (typeof where['AND'] !== 'undefined') {
                 for (var i of where['AND']) {
                     //if (where['AND'].hasOwnProperty(i))
-                        //Log.trace("and type" + typeof i);
+                    //Log.trace("and type" + typeof i);
                     valid = valid && this.parserEBNF(i, section);
+                    //Log.trace("AND success," + i[Object.keys(i)[0]]);
+                }
+            }
+
+            if (typeof where['OR'] !== 'undefined') {
+                for (var i of where['OR']) {
+                    //if (where['AND'].hasOwnProperty(i))
+                    //Log.trace("and type" + typeof i);
+                    valid = valid || this.parserEBNF(i, section);
                     //Log.trace("AND success," + i[Object.keys(i)[0]]);
                 }
             }
@@ -193,7 +202,7 @@ export default class QueryController {
 
                 //Log.trace(dataset[Object.keys(where['GT'])[0]]);
                 //Log.trace(where['GT'].value);
-                Log.trace("LT success");
+                //Log.trace("LT success");
             }
         }
 
@@ -238,13 +247,13 @@ export default class QueryController {
             for (var eachSection of sectionArray){
                 var resultObj1 : any ={}
                 for (var j = 0; j<Object.keys(GETInput).length; j++){
-                        var key = GETInput[j]
-                        resultObj1[key] = eachSection[key];
-                    }
+                    var key = GETInput[j]
+                    resultObj1[key] = eachSection[key];
+                }
                 resultArray.push(resultObj1)
             }
-        return resultArray;
-    }}
+            return resultArray;
+        }}
 
     public sortArray(resultArray: any, order:any) {
         Log.trace("INSIDE sorting!")
