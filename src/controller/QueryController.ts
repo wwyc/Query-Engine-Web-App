@@ -79,7 +79,7 @@ export default class QueryController {
         var datasetsNew = JSON.parse(JSON.stringify(this.datasets))
 
         // Retrieve dataset from given GET
-        var datasetRetrived = datasetsNew[this.stringPrefix(get)];
+        var datasetRetrived = datasetsNew["courses"];
 
         var sections: any = []
 
@@ -176,7 +176,7 @@ export default class QueryController {
             /*  if(wistring.includes("*"))
              wistring = wistring.split('*').join('');  */
             valid = valid && (section[Object.keys(wi)[0]] === wistring);
-            Log.trace("IS reg :" + section[Object.keys(wi)[0]]);
+            // Log.trace("IS reg :" + section[Object.keys(wi)[0]]);
         }
 
         if(typeof where['NOT']!=='undefined') {
