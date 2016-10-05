@@ -48,27 +48,24 @@ export default class QueryController {
             intermediate = this.dealWithWhere(where,get)
         } else {intermediate=this.dealWithWhere(where,get[0])}
 
-        Log.trace("intermediate success")
-
-        //var result: any = {}
         var values: any = []
 
         var finalResultObjArray: any = this.represent(get,intermediate);
 
-        Log.trace("this is FINAL result:  "  + JSON.stringify(finalResultObjArray))
+        //Log.trace("this is FINAL result:  "  + JSON.stringify(finalResultObjArray))
 
         //Do this if order was requested
         if(order !== null){
-            Log.trace("INSIDE ORDER")
+            //Log.trace("INSIDE ORDER")
 
             finalResultObjArray=this.sortArray(finalResultObjArray,order);
 
-            Log.trace("this is FINAL result:  "  + JSON.stringify(finalResultObjArray))
+            //Log.trace("this is FINAL result:  "  + JSON.stringify(finalResultObjArray))
 
         }
 
 
-        Log.trace("result type"+ typeof finalResultObjArray)
+        //Log.trace("result type"+ typeof finalResultObjArray)
 
         return {render: format, result: finalResultObjArray};
 
@@ -87,15 +84,10 @@ export default class QueryController {
         var sections: any = []
 
         for (var key in datasetRetrived){
-            //Log.trace(key.toString())
             sections = datasetRetrived[key]
-            //Log.trace(sections.length)
 
             for (var key in sections){
-                //Log.trace(key.toString())
                 var section = sections[key]
-                //Log.trace(section.toString())
-                //Log.trace(section["courses_instructor"])
 
                 if (this.parserEBNF(where,section)){
                     //add section to list if it meets WHERE criteria in query
@@ -109,7 +101,7 @@ export default class QueryController {
     public stringPrefix(get:string){
         let prefix: any
         prefix=get.split("_")[0];
-        Log.trace(prefix);
+        //Log.trace(prefix);
         return prefix;
     }
 
@@ -150,23 +142,11 @@ export default class QueryController {
 
             if (where['GT']!== undefined) {
 
-                //Log.trace("type of where" + typeof where['GT']);
-
-                //Log.trace(Object.keys(where['GT']).toString());
-                //Log.trace(where['GT'][Object.keys(where['GT'])[0]].toString())
-
-
                 var whereKey = Object.keys(where['GT']).toString()
                 var whereValue = where['GT'][Object.keys(where['GT'])[0]]
 
-
-                //Log.trace(where['GT'].key.toString());
-
                 valid = valid&&(section[whereKey] > whereValue);
 
-                //Log.trace(dataset[Object.keys(where['GT'])[0]]);
-                //Log.trace(where['GT'].value);
-                //Log.trace("GT success");
             }
 
             if (where['EQ']!==undefined) {
@@ -174,34 +154,17 @@ export default class QueryController {
                 var whereKey = Object.keys(where['EQ']).toString()
                 var whereValue = where['EQ'][Object.keys(where['EQ'])[0]]
 
-                //valid = valid&&(section[where['EQ'].key]===where['EQ'].value);
-
                 valid = valid&&(Math.floor((section[whereKey])) == whereValue);
 
-                //Log.trace(dataset[where['EQ'].key]);
-                //Log.trace(where['EQ'].value);
-                //Log.trace("EQ SUCCESS");
             }
 
             if (where['LT']!== undefined) {
 
-                //Log.trace("type of where" + typeof where['GT']);
-
-                //Log.trace(Object.keys(where['GT']).toString());
-                //Log.trace(where['GT'][Object.keys(where['GT'])[0]].toString())
-
-
                 var whereKey1 = Object.keys(where['LT']).toString()
                 var whereValue1 = where['LT'][Object.keys(where['LT'])[0]]
 
-
-                //Log.trace(where['GT'].key.toString());
-
                 valid = valid&&(section[whereKey1] < whereValue1);
 
-                //Log.trace(dataset[Object.keys(where['GT'])[0]]);
-                //Log.trace(where['GT'].value);
-                Log.trace("LT success");
             }
         }
 
@@ -211,14 +174,10 @@ export default class QueryController {
             var whereValue2 = where['IS'][Object.keys(where['IS'])[0]]
 
             valid = valid&&(section[whereKey2] == whereValue2);
-
-            //Log.trace("IS success");
         }
 
         if(typeof where['NOT']!=='undefined') {
-            //Log.trace("type4!!!");
             valid =valid&&(!this.parserEBNF(where['NOT'],section));
-            //Log.trace("NOT success");
         }
 
         return valid;
@@ -255,12 +214,11 @@ export default class QueryController {
         }}
 
     public sortArray(resultArray: any, order:any) {
-        Log.trace("INSIDE sorting!")
+        //Log.trace("INSIDE sorting!")
         resultArray.sort(function (a: any, b: any) {
             var value1 = a[order];
             //Log.trace("value1  " + value1)
             var value2 = b[order];
-            //Log.trace("value2  " + value2)
             if (value1 < value2) {
                 return -1;
             }

@@ -67,26 +67,14 @@ export default class DatasetController {
 
         Log.trace("this.datasets - is it empty?:  " + this.isEmpty(this.datasets))
 
-        if (this.isEmpty(this.datasets)|| (typeof this.datasets == "undefined")) {                                  //check if datasets in memory is empty
+        if (this.isEmpty(this.datasets)|| (typeof this.datasets == "undefined")) {              //check if datasets in memory is empty
             var fs1 = require('fs');
-
-            var currentPath =  process.cwd()
-
-            //Log.trace("what is the currentPath" + currentPath)
-            //fs1.readdirSync(currentPath).forEach(function(file: any)
-            //{
-            //Log.trace("INSIDE readdirsync")
-            //Log.trace("what is the file    " + file)
 
             var data1 = fs1.readFileSync("../cpsc310project/data/courses.json")
 
             that.datasets["courses"] = JSON.parse(data1)
 
-            //})
-
-
         }
-
 
         return this.datasets;
     }
@@ -123,7 +111,6 @@ export default class DatasetController {
                     zip.forEach(function (Path: string, file: JSZipObject){
 
                         if (!file.dir) {
-                            //Log.trace("iterating over filepath   " + Path)
                             stringPromise = file.async("string") // string from JSZipObject?
                             promiseArray.push(stringPromise)
                         }
@@ -164,34 +151,19 @@ export default class DatasetController {
                                     sessions.push(session)
                                 }}
 
-                            //Log.trace("what is typeof sessions   " + typeof sessions)
-                            //Log.trace("what is typeof sessions !== undefined   " + (typeof sessions !== "undefined").toString())
-
-
                             if (typeof sessions !== "undefined") {
 
-                                //Log.trace(sessions.length.toString())
-                                //Log.trace(session.courses_id[0].toString())
                                 courseMap[session.courses_dept + session.courses_id] = sessions
 
-                                //Log.trace("inside courseMap" + Object.keys(courseMap).toString())
-
-                                //Log.trace("AFTER courseMap?")
                             }
                         }
 
                         processedDataset = courseMap
 
-                        //this.datasets = processedDataset
-
                         that.save(id, processedDataset)
 
                     })
-                    /*.catch(function(err){
-                     Log.error("'DatasetController::process(..) - ERRORr!!!  " + err.message)
-                     //reject(err)
-                     //return reject(true)
-                     })*/
+
 
                     fulfill(true)
 
@@ -230,16 +202,11 @@ export default class DatasetController {
         try {
             fs2.writeFileSync('data/' + id + '.json', datasetToSave, 'utf8')
 
-            //Log.trace("this is the directory saved" + process.cwd())
-
-            Log.trace("file writting success")
+            //Log.trace("file writting success")
         } catch(e){
             Log.trace("save dataset error" + e.message)
         }
-        /*fs2.writeFile('data/'+id+'.json', datasetToSave, (err: string) => {
-         // The file is created (if it does not exist) or truncated (if it exists).
-         Log.trace("save dataset error" + err)
-         })*/;
+
     }
 
 
