@@ -79,7 +79,7 @@ export default class QueryController {
         var datasetsNew = JSON.parse(JSON.stringify(this.datasets))
 
         // Retrieve dataset from given GET
-        var datasetRetrived = datasetsNew["courses"];
+        var datasetRetrived = datasetsNew[this.stringPrefix(get)];
 
         var sections: any = []
 
@@ -123,7 +123,7 @@ export default class QueryController {
                     //if (where['AND'].hasOwnProperty(i))
                     //Log.trace("and type" + typeof i);
                     valid = valid && this.parserEBNF(i, section);
-                    //Log.trace("AND success," + i[Object.keys(i)[0]]);
+
                 }
             }
 
@@ -176,7 +176,7 @@ export default class QueryController {
             /*  if(wistring.includes("*"))
              wistring = wistring.split('*').join('');  */
             valid = valid && (section[Object.keys(wi)[0]] === wistring);
-            // Log.trace("IS reg :" + section[Object.keys(wi)[0]]);
+
         }
 
         if(typeof where['NOT']!=='undefined') {
