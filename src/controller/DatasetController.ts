@@ -133,6 +133,8 @@ export default class DatasetController {
 
                     Promise.all(promiseArray).then(function(endResult: any) {
 
+                        Log.trace("INSIDE PROMISE ALL")
+
                         Log.trace("endResult:  "+ endResult.length);
 
                         //if (id == "courses") {
@@ -140,9 +142,10 @@ export default class DatasetController {
                         let courseMap: any = {}
 
                         for (var objs of endResult){
+
                             var courseObj = JSON.parse(objs)
 
-                            if (courseObj.result !== undefined) {
+                            if (courseObj.result.length !== 0) {
 
                                 var sessions: any = []
 
@@ -160,7 +163,21 @@ export default class DatasetController {
 
                                     sessions.push(session)
                                 }}
-                            courseMap[session.courses_dept + session.courses_id] = sessions
+
+                            //Log.trace("what is typeof sessions   " + typeof sessions)
+                            //Log.trace("what is typeof sessions !== undefined   " + (typeof sessions !== "undefined").toString())
+
+
+                            if (typeof sessions !== "undefined") {
+
+                                //Log.trace(sessions.length.toString())
+                                //Log.trace(session.courses_id[0].toString())
+                                courseMap[session.courses_dept + session.courses_id] = sessions
+
+                                //Log.trace("inside courseMap" + Object.keys(courseMap).toString())
+
+                                //Log.trace("AFTER courseMap?")
+                            }
                         }
 
                         processedDataset = courseMap
