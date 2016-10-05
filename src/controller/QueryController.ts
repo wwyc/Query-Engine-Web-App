@@ -125,7 +125,6 @@ export default class QueryController {
         //Log.trace("VALID ")
 
         if (typeof where['AND']!=='undefined'||typeof where['OR']!== 'undefined') {
-
             //Log.trace("type1!!!")
             if (typeof where['AND'] !== 'undefined') {
                 for (var i of where['AND']) {
@@ -202,7 +201,7 @@ export default class QueryController {
 
                 //Log.trace(dataset[Object.keys(where['GT'])[0]]);
                 //Log.trace(where['GT'].value);
-                //Log.trace("LT success");
+                Log.trace("LT success");
             }
         }
 
