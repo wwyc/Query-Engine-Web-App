@@ -200,10 +200,10 @@ export default class QueryController {
             Log.trace("type3!!!");
 
             var wi=where['IS'];
-
+            var wistring:string=wi[Object.keys(wi)[0]];
             Log.trace("IS "+ wi[Object.keys(wi)[0]]);
-
-            valid = valid && (section[Object.keys(wi)[0]]===wi[Object.keys(wi)[0]]);
+            wistring=wistring.split('*').join('');
+            valid = valid && (section[Object.keys(wi)[0]].includes(wistring));
              Log.trace("IS reg :"+section[Object.keys(wi)[0]]);
 
         }
