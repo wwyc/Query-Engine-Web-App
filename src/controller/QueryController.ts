@@ -52,20 +52,13 @@ export default class QueryController {
 
         var finalResultObjArray: any = this.represent(get,intermediate);
 
-        //Log.trace("this is FINAL result:  "  + JSON.stringify(finalResultObjArray))
 
         //Do this if order was requested
         if(order !== null){
-            //Log.trace("INSIDE ORDER")
-
             finalResultObjArray=this.sortArray(finalResultObjArray,order);
-
-            //Log.trace("this is FINAL result:  "  + JSON.stringify(finalResultObjArray))
-
         }
 
-
-        //Log.trace("result type"+ typeof finalResultObjArray)
+        Log.trace("this is FINAL result:  "  + JSON.stringify(finalResultObjArray))
 
         return {render: format, result: finalResultObjArray};
 
@@ -107,35 +100,56 @@ export default class QueryController {
 
 
     public parserEBNF(where:any,section:any) {
-        //GT= > EQ= LT<
-        //AND OR NOT
-        // parse where
-        //implemenntion of EBNF
-        // and or follow array，
-        // for loop
+
         let valid = true;
-        //Log.trace("VALID ")
+
+        /*//simple query to try AND/OR functionality
+        {
+            "GET": ["courses_dept", "courses_id", "courses_avg"],
+            "WHERE": {
+            "AND": [
+                {"GT": {"courses_avg": 70}},
+                {"IS": {"courses_dept": "adhe"}}
+            ]
+        },
+            "ORDER": "courses_avg",
+            "AS": "TABLE"
+        }
+        */
 
         if (typeof where['AND']!=='undefined'||typeof where['OR']!== 'undefined') {
             //Log.trace("type1!!!")
             if (typeof where['AND'] !== 'undefined') {
                 for (var i of where['AND']) {
-                    //if (where['AND'].hasOwnProperty(i))
-                    //Log.trace("and type" + typeof i);
-                    valid = valid && this.parserEBNF(i, section);
-                    //Log.trace("AND success," + i[Object.keys(i)[0]]);
+                    var validList1: any = []
+                    validList1.push(this.parserEBNF(i, section));
+                    for (var eachValid of validList1) {
+                        if (eachValid === false)
+                            valid = false;
+                    }
                 }
             }
 
             if (typeof where['OR'] !== 'undefined') {
-                for (var i of where['OR']) {
-                    //if (where['AND'].hasOwnProperty(i))
-                    //Log.trace("and type" + typeof i);
-                    valid = valid || this.parserEBNF(i, section);
-                    //Log.trace("AND success," + i[Object.keys(i)[0]]);
+
+                for (var j of where['OR']) {
+                    var validList2: any = [];
+                    validList2.push(this.parserEBNF(j, section));
+                    for (var eachValid of validList2) {
+                        if (eachValid === true) {
+                            valid = true
+                        } else {
+                            valid = false
+                        }
+                        //if (where['AND'].hasOwnProperty(i))
+                        //Log.trace("and type" + typeof i);
+                        //valid = valid || this.parserEBNF(i, section);
+                        //Log.trace("AND success," + i[Object.keys(i)[0]]);
+                    }
                 }
             }
         }
+
 
 
         if (where['GT'] || where['EQ'] || where['LT']!== undefined) {
