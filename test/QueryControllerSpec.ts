@@ -6,7 +6,7 @@ import {Datasets} from "../src/controller/DatasetController";
 import QueryController from "../src/controller/QueryController";
 import {QueryRequest} from "../src/controller/QueryController";
 import Log from "../src/Util";
-
+import QueryController1 from "../src/controller/QueryController1";
 import {expect} from 'chai';
 
 
@@ -38,8 +38,8 @@ describe("QueryController", function () {
 
         expect(isValid).to.equal(false);
     });
-
-   it ("correct EBNFparser",function(){
+/*
+  it ("correct EBNFparser",function(){
         let dataset:any=[{"courses_dept":"epse","courses_avg":97.41},
             {"courses_dept":"cnps","courses_avg":97.47},{"courses_dept":"cnps","courses_avg":97.47},
             {"courses_dept":"math","courses_avg":97.48},{"courses_dept":"math","courses_avg":97.48},
@@ -52,15 +52,16 @@ describe("QueryController", function () {
             {"courses_dept":"epse","courses_avg":98.58},{"courses_dept":"nurs","courses_avg":98.58},
             {"courses_dept":"epse","courses_avg":98.7},{"courses_dept":"nurs","courses_avg":98.71},
             {"courses_dept":"nurs","courses_avg":98.71},{"courses_dept":"eece","courses_avg":98.75},
-            {"courses_dept":"eece","courses_avg":98.75},{"courses_dept":"epse","courses_avg":98.76},{
-                "courses_dept":"epse","courses_avg":98.76},{"courses_dept":"epse","courses_avg":98.8},
+            {"courses_dept":"eece","courses_avg":98.75},{"courses_dept":"epse","courses_avg":98.76},
+            {"courses_dept":"epse","courses_avg":98.76},{"courses_dept":"epse","courses_avg":98.8},
             {"courses_dept":"cnps","courses_avg":99.19},{"courses_dept":"math","courses_avg":99.78},
             {"courses_dept":"math","courses_avg":99.78}];
         let controller = new QueryController(dataset);
      let valid:boolean=controller.parserEBNF(
-
-
-             {"IS": {"courses_dept": "adhe"}},dataset[0]
+         {"AND": [
+             {"GT": {"courses_avg": 70}},
+             {"IS": {"courses_dept": "cpsc"}}
+         ]},dataset[0]
      );
         expect(valid).to.equal(false);});
 
@@ -77,21 +78,21 @@ describe("QueryController", function () {
 
 
 
-    });
+    });*/
 
   it ("correct present",function(){
-        let dataset:any=[{"courses_dept":"epse","courses_avg":97.41},
+        let dataset:any=[{"courses_dept":"epse","courses_":97.41},
             {"courses_dept":"cnps","courses_avg":97.47},{"courses_dept":"cnps","courses_avg":97.47},
             {"courses_dept":"math","courses_avg":97.48}];
-        let controller = new QueryController(dataset);
-
+        let controller = new QueryController1({});
         let diu:Array<any>=controller.represent(
-            "courses_avg" ,dataset
+            "courses_dept",dataset
         );
-
-        let valid:boolean= diu===[{"courses_dept":"epse"},
+       Log.trace("diu"+diu)
+      /*  let valid:boolean= diu===[{"courses_dept":"epse"},
                 {"courses_dept":"cnps"},{"courses_dept":"cnps"},
-                {"courses_dept":"math"}]
+                {"courses_dept":"math"}]  */
+        let valid:boolean=diu[0]["courses_dept"]==="epse";
         expect(valid).to.equal(true);});
 
     /*it("Should be able to query, although the answer will be empty", function () {
@@ -123,3 +124,35 @@ describe("QueryController", function () {
     expect(isValid).to.equal(true);
     expect(actual= "q0.json").to.equal(true) ;
 })*/
+
+
+it ("correct Query",function(){
+    let datasets:any={"epse123":[{"courses_dept":"epse","courses_avg":97.41,"courses_id":123},
+        {"courses_dept":"epse","courses_avg":97.47,"courses_id":123},{"courses_dept":"epse","courses_avg":97.47,"courses_id":123},
+        {"courses_dept":"epse","courses_avg":97.48,"courses_id":123}],
+        "math12":
+        [{"courses_dept":"math","courses_avg":97.48,"courses_id":12},
+        {"courses_dept":"math","courses_avg":97.69,"courses_id":12},{"courses_dept":"math","courses_avg":97.78,"courses_id":12},
+        {"courses_dept":"math","courses_avg":98,"courses_id":12}]}
+    let controller1 = new QueryController1(datasets);
+    let query: QueryRequest = {
+        "GET": ["courses_dept", "courses_avg"],
+        "WHERE": {
+            "GT": {
+                "courses_avg": 90
+            }
+        },
+        "ORDER": "courses_avg",
+        "AS": "TABLE"
+    }
+    let  actual=controller1.query(query);
+
+    expect(actual=== {"render":"TABLE","result":[
+            {"courses_dept":"epse","courses_avg":97.41},
+            {"courses_dept":"epse","courses_avg":97.47},{"courses_dept":"epse","courses_avg":97.47},
+            {"courses_dept":"epse","courses_avg":97.48}, {"courses_dept":"math","courses_avg":97.48},
+            {"courses_dept":"math","courses_avg":97.69},{"courses_dept":"math","courses_avg":97.78},
+            {"courses_dept":"math","courses_avg":98}]
+        }).to.equal(true) ;});
+
+

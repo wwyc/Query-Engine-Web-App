@@ -75,12 +75,12 @@ export default class DatasetController {
             //Log.trace("what is the currentPath" + currentPath)
             //fs1.readdirSync(currentPath).forEach(function(file: any)
             //{
-                //Log.trace("INSIDE readdirsync")
-                //Log.trace("what is the file    " + file)
+            //Log.trace("INSIDE readdirsync")
+            //Log.trace("what is the file    " + file)
 
-                var data1 = fs1.readFileSync("../cpsc310project/data/courses.json")
+            var data1 = fs1.readFileSync("../cpsc310project/data/courses.json")
 
-                that.datasets["courses"] = JSON.parse(data1)
+            that.datasets["courses"] = JSON.parse(data1)
 
             //})
 
@@ -187,11 +187,11 @@ export default class DatasetController {
                         that.save(id, processedDataset)
 
                     })
-                        /*.catch(function(err){
-                        Log.error("'DatasetController::process(..) - ERRORr!!!  " + err.message)
-                        //reject(err)
-                        //return reject(true)
-                    })*/
+                    /*.catch(function(err){
+                     Log.error("'DatasetController::process(..) - ERRORr!!!  " + err.message)
+                     //reject(err)
+                     //return reject(true)
+                     })*/
 
                     fulfill(true)
 
@@ -237,10 +237,9 @@ export default class DatasetController {
             Log.trace("save dataset error" + e.message)
         }
         /*fs2.writeFile('data/'+id+'.json', datasetToSave, (err: string) => {
-            // The file is created (if it does not exist) or truncated (if it exists).
-            Log.trace("save dataset error" + err)
-
-        })*/;
+         // The file is created (if it does not exist) or truncated (if it exists).
+         Log.trace("save dataset error" + err)
+         })*/;
     }
 
 
