@@ -264,5 +264,4 @@ export default class QueryController {
 
         return resultArray;
     }
-
 }
