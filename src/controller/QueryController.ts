@@ -72,14 +72,14 @@ export default class QueryController {
     }
 
 //deal with where
-    public  dealWithWhere(where: any,get: any){
+    public  dealWithWhere(where: any, get: string) {
         var selectedSections:any = []
 
         //not able to access this.datasets directly; JSON.stringify and then parse it again fixed it
         var datasetsNew = JSON.parse(JSON.stringify(this.datasets))
 
         // Retrieve dataset from given GET
-        var datasetRetrived = datasetsNew["courses"];
+        var datasetRetrived = datasetsNew[this.stringPrefix(get)];
 
         var sections: any = []
 
@@ -170,10 +170,13 @@ export default class QueryController {
 
         if (where['IS']!==undefined) {
 
-            var whereKey2 = Object.keys(where['IS']).toString()
-            var whereValue2 = where['IS'][Object.keys(where['IS'])[0]]
+            var wi = where['IS'];
+            var wistring: string = wi[Object.keys(wi)[0]];
 
-            valid = valid&&(section[whereKey2] == whereValue2);
+            /*  if(wistring.includes("*"))
+             wistring = wistring.split('*').join('');  */
+            valid = valid && (section[Object.keys(wi)[0]] === wistring);
+            Log.trace("IS reg :" + section[Object.keys(wi)[0]]);
         }
 
         if(typeof where['NOT']!=='undefined') {
