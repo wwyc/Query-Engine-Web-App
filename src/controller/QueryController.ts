@@ -35,7 +35,6 @@ export default class QueryController {
         Log.trace('QueryController::query( ' + JSON.stringify(query) + ' )');//json string
 
         // TODO: implement this
-
         //parse the json query to string
         var get = query.GET;                            // can be string or array of string
         var where = query.WHERE;                        //json object or json array
@@ -52,7 +51,6 @@ export default class QueryController {
 
         var finalResultObjArray: any = this.represent(get,intermediate);
 
-
         //Do this if order was requested
         if(order !== null){
             finalResultObjArray=this.sortArray(finalResultObjArray,order);
@@ -61,7 +59,6 @@ export default class QueryController {
         Log.trace("this is FINAL result:  "  + JSON.stringify(finalResultObjArray))
 
         return {render: format, result: finalResultObjArray};
-
     }
 
 //deal with where
@@ -151,7 +148,6 @@ export default class QueryController {
         }
 
 
-
         if (where['GT'] || where['EQ'] || where['LT']!== undefined) {
 
             if (where['GT']!== undefined) {
@@ -160,7 +156,6 @@ export default class QueryController {
                 var whereValue = where['GT'][Object.keys(where['GT'])[0]]
 
                 valid = valid&&(section[whereKey] > whereValue);
-
             }
 
             if (where['EQ']!==undefined) {
