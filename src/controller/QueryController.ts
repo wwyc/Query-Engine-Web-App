@@ -139,7 +139,6 @@ export default class QueryController {
                 for (var ANDfilter of where['AND']) {
                     validList1.push(this.parserEBNF(ANDfilter, section));
                 }
-
                 for (var eachValid of validList1) {
                     if (eachValid === false)
                         valid = false;
@@ -266,7 +265,6 @@ export default class QueryController {
             }
             return 0;
         });
-
         return resultArray;
     }
 }
