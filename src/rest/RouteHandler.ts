@@ -51,14 +51,14 @@ export default class RouteHandler {
 
                 controller.process(id, req.body).then(function (result) {
 
-                    //Log.trace(controller.getDataset(id).toString)
-                    if (controller.isEmpty(controller.getDatasets)){
-                        res.json(204, {success: result});
+                    if (controller.getDataset(id) == null){
+                        res.json(204, {success:result})
                         Log.trace("dataset with this ID is new")
+
                     } else {
-                        res.json(201, {success:result})
+                        res.json(201, {success: result});
                         Log.trace("dataset with this ID already exists!")
-                    }
+                            }
 
                 }).catch(function (err: Error) {
                     Log.trace('RouteHandler::postDataset(..) - ERROR: ' + err.message);

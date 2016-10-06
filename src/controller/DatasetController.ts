@@ -55,7 +55,7 @@ export default class DatasetController {
 
             this.datasets[id] = JSON.parse(data);
 
-            Log.trace("inside getdataset method" + JSON.stringify(this.datasets[id]))}
+            Log.trace("inside getdataset() method" + JSON.stringify(this.datasets[id]))}
 
         return this.datasets[id];
     }

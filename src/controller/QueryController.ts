@@ -114,36 +114,58 @@ export default class QueryController {
         }
         */
 
+        /*Complex query to try
+         {
+         "GET": ["courses_dept", "courses_id", "courses_avg"],
+         "WHERE": {
+         "OR": [
+         {"AND": [
+         {"GT": {"courses_avg": 50}},
+         {"IS": {"courses_dept": "food"}}
+         ]},
+         {"GT": {"courses_avg": 95}}
+         ]
+         },
+         "ORDER": "courses_avg",
+         "AS": "TABLE"
+         }*/
+
         if (typeof where['AND']!=='undefined'||typeof where['OR']!== 'undefined') {
             //Log.trace("type1!!!")
             if (typeof where['AND'] !== 'undefined') {
-                for (var i of where['AND']) {
-                    var validList1: any = []
-                    validList1.push(this.parserEBNF(i, section));
-                    for (var eachValid of validList1) {
-                        if (eachValid === false)
-                            valid = false;
-                    }
+
+                var validList1: any = []
+
+                for (var ANDfilter of where['AND']) {
+                    validList1.push(this.parserEBNF(ANDfilter, section));
                 }
+
+                for (var eachValid of validList1) {
+                    if (eachValid === false)
+                        valid = false;
+                }
+
             }
 
             if (typeof where['OR'] !== 'undefined') {
 
-                for (var j of where['OR']) {
-                    var validList2: any = [];
-                    validList2.push(this.parserEBNF(j, section));
-                    for (var eachValid of validList2) {
-                        if (eachValid === true) {
-                            valid = true
-                        } else {
-                            valid = false
-                        }
-                        //if (where['AND'].hasOwnProperty(i))
-                        //Log.trace("and type" + typeof i);
-                        //valid = valid || this.parserEBNF(i, section);
-                        //Log.trace("AND success," + i[Object.keys(i)[0]]);
-                    }
+                //Log.trace(" what is where['OR']?   "  + Object.keys(where['OR']).toString())
+                var validList2: any = [];
+
+                for (var ORfilter of where['OR']) {
+                    validList2.push(this.parserEBNF(ORfilter, section));
                 }
+
+                valid = false
+
+                for (var eachValid of validList2) {
+                    if (eachValid === true) {
+                        valid = true
+                    }
+
+                }
+
+
             }
         }
 
