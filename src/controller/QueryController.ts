@@ -43,17 +43,19 @@ export default class QueryController {
 
         var intermediate: any = []
 
-        if(typeof get === 'string'){
-            intermediate = this.dealWithWhere(where,get)
-        } else {intermediate=this.dealWithWhere(where,get[0])}
+        if (typeof get === 'string') {
+            intermediate = this.dealWithWhere(where, get)
+        } else {
+            intermediate = this.dealWithWhere(where, get[0])
+        }
 
         var values: any = []
 
-        var finalResultObjArray: any = this.represent(get,intermediate);
+        var finalResultObjArray: any = this.represent(get, intermediate);
 
         //Do this if order was requested
-        if(order !== null){
-            finalResultObjArray=this.sortArray(finalResultObjArray,order);
+        if (order !== null) {
+            finalResultObjArray = this.sortArray(finalResultObjArray, order);
         }
 
         Log.trace("this is FINAL result:  " + JSON.stringify(finalResultObjArray))
@@ -63,7 +65,7 @@ export default class QueryController {
 
 //deal with where
     public  dealWithWhere(where: any, get: any) {
-        var selectedSections:any = []
+        var selectedSections: any = []
 
         //not able to access this.datasets directly; JSON.stringify and then parse it again fixed it
         var datasetsNew = JSON.parse(JSON.stringify(this.datasets))
@@ -73,30 +75,31 @@ export default class QueryController {
 
         var sections: any = []
 
-        for (var key in datasetRetrived){
+        for (var key in datasetRetrived) {
             sections = datasetRetrived[key]
 
-            for (var key in sections){
+            for (var key in sections) {
                 var section = sections[key]
 
-                if (this.parserEBNF(where,section)){
+                if (this.parserEBNF(where, section)) {
                     //add section to list if it meets WHERE criteria in query
-                    selectedSections.push(section)}
+                    selectedSections.push(section)
+                }
             }
         }
         return selectedSections;
     }
 
     //helper function that returns prefix of string from GET
-    public stringPrefix(get:string){
+    public stringPrefix(get: string) {
         let prefix: any
-        prefix=get.split("_")[0];
+        prefix = get.split("_")[0];
         //Log.trace(prefix);
         return prefix;
     }
 
 
-    public parserEBNF(where:any,section:any) {
+    public parserEBNF(where: any, section: any) {
 
         let valid = true;
 
@@ -130,7 +133,7 @@ export default class QueryController {
          "AS": "TABLE"
          }*/
 
-        if (typeof where['AND']!=='undefined'||typeof where['OR']!== 'undefined') {
+        if (typeof where['AND'] !== 'undefined' || typeof where['OR'] !== 'undefined') {
             //Log.trace("type1!!!")
             if (typeof where['AND'] !== 'undefined') {
 
@@ -170,36 +173,36 @@ export default class QueryController {
         }
 
 
-        if (where['GT'] || where['EQ'] || where['LT']!== undefined) {
+        if (where['GT'] || where['EQ'] || where['LT'] !== undefined) {
 
-            if (where['GT']!== undefined) {
+            if (where['GT'] !== undefined) {
 
                 var whereKey = Object.keys(where['GT']).toString()
                 var whereValue = where['GT'][Object.keys(where['GT'])[0]]
 
-                valid = valid&&(section[whereKey] > whereValue);
+                valid = valid && (section[whereKey] > whereValue);
             }
 
-            if (where['EQ']!==undefined) {
+            if (where['EQ'] !== undefined) {
 
                 var whereKey = Object.keys(where['EQ']).toString()
                 var whereValue = where['EQ'][Object.keys(where['EQ'])[0]]
 
-                valid = valid&&(Math.floor((section[whereKey])) == whereValue);
+                valid = valid && (Math.floor((section[whereKey])) == whereValue);
 
             }
 
-            if (where['LT']!== undefined) {
+            if (where['LT'] !== undefined) {
 
                 var whereKey1 = Object.keys(where['LT']).toString()
                 var whereValue1 = where['LT'][Object.keys(where['LT'])[0]]
 
-                valid = valid&&(section[whereKey1] < whereValue1);
+                valid = valid && (section[whereKey1] < whereValue1);
 
             }
         }
 
-        if (where['IS']!==undefined) {
+        if (where['IS'] !== undefined) {
 
             var whereKey2 = Object.keys(where['IS']).toString()
             var whereValue2 = where['IS'][Object.keys(where['IS'])[0]]
@@ -207,44 +210,46 @@ export default class QueryController {
             valid = valid && (section[whereKey2] == whereValue2);
         }
 
-        if(typeof where['NOT']!=='undefined') {
-            valid =valid&&(!this.parserEBNF(where['NOT'],section));
+        if (typeof where['NOT'] !== 'undefined') {
+            valid = valid && (!this.parserEBNF(where['NOT'], section));
         }
 
         return valid;
     }
+
     /**
      * Find the value from each section given key in GET
      *
      * @returns object for final result{[id: string: {}} returns empty if nothing was found
      */
-    public represent (GETInput: any, sectionArray: any){
+    public represent(GETInput: any, sectionArray: any) {
 
         //Log.trace("what is type of getArray:"  + Array.isArray(getArray))
-        var resultArray:any = []
+        var resultArray: any = []
 
 // Check to see if GET is string or Array
-        if(typeof GETInput === 'string'){
-            for (var sectionX of sectionArray){
-                var resultObj : any ={}
+        if (typeof GETInput === 'string') {
+            for (var sectionX of sectionArray) {
+                var resultObj: any = {}
                 resultObj[GETInput] = sectionX[GETInput]
                 resultArray.push(resultObj)
             }
         }
-        else if(Array.isArray(GETInput)){
+        else if (Array.isArray(GETInput)) {
 
-            for (var eachSection of sectionArray){
-                var resultObj1 : any ={}
-                for (var j = 0; j<Object.keys(GETInput).length; j++){
+            for (var eachSection of sectionArray) {
+                var resultObj1: any = {}
+                for (var j = 0; j < Object.keys(GETInput).length; j++) {
                     var key = GETInput[j]
                     resultObj1[key] = eachSection[key];
                 }
                 resultArray.push(resultObj1)
             }
             return resultArray;
-        }}
+        }
+    }
 
-    public sortArray(resultArray: any, order:any) {
+    public sortArray(resultArray: any, order: any) {
         //Log.trace("INSIDE sorting!")
         resultArray.sort(function (a: any, b: any) {
             var value1 = a[order];
