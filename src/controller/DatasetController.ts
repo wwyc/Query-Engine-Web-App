@@ -55,7 +55,7 @@ export default class DatasetController {
 
             this.datasets[id] = JSON.parse(data);
 
-            Log.trace("inside getdataset method" + JSON.stringify(this.datasets[id]))}
+            Log.trace("inside getdataset() method" + JSON.stringify(this.datasets[id]))}
 
         return this.datasets[id];
     }
@@ -91,6 +91,8 @@ export default class DatasetController {
 
         let that = this;
 
+        var isValidDataset: any = false
+
         return new Promise(function (fulfill, reject) {
             try {
                 let myZip = new JSZip();
@@ -108,8 +110,15 @@ export default class DatasetController {
 
                     var promiseArray:any = []
 
+                    //Log.trace("what is isValidDataset  0      " + isValidDataset)
+
+
                     zip.forEach(function (Path: string, file: JSZipObject){
 
+                        if (file.dir){
+                             if (Path.includes("courses/"))
+                             {isValidDataset = true}
+                   }
                         if (!file.dir) {
                             stringPromise = file.async("string") // string from JSZipObject?
                             promiseArray.push(stringPromise)
@@ -124,50 +133,59 @@ export default class DatasetController {
 
                         Log.trace("endResult:  "+ endResult.length);
 
-                        //if (id == "courses") {
 
-                        let courseMap: any = {}
+                        if (id == "courses") {
 
-                        for (var objs of endResult){
+                            let courseMap: any = {}
 
-                            var courseObj = JSON.parse(objs)
+                            for (var objs of endResult) {
 
-                            if (courseObj.result.length !== 0) {
+                                    var courseObj = JSON.parse(objs)
 
-                                var sessions: any = []
+                                if (courseObj.result.length !== 0) {
 
-                                for (var obj of  courseObj.result) {
-                                    var session = new Session()
+                                    var sessions: any = []
 
-                                    session.courses_dept = obj["Subject"]
-                                    session.courses_id = obj["Course"]
-                                    session.courses_avg = obj["Avg"]
-                                    session.courses_instructor = obj["Professor"]
-                                    session.courses_title = obj["Title"]
-                                    session.courses_pass = obj["Pass"]
-                                    session.courses_fail = obj["Fail"]
-                                    session.courses_audit = obj["Audit"]
+                                    for (var obj of  courseObj.result) {
+                                        var session = new Session()
 
-                                    sessions.push(session)
-                                }}
+                                        session.courses_dept = obj["Subject"]
+                                        session.courses_id = obj["Course"]
+                                        session.courses_avg = obj["Avg"]
+                                        session.courses_instructor = obj["Professor"]
+                                        session.courses_title = obj["Title"]
+                                        session.courses_pass = obj["Pass"]
+                                        session.courses_fail = obj["Fail"]
+                                        session.courses_audit = obj["Audit"]
 
-                            if (typeof sessions !== "undefined") {
+                                        sessions.push(session)
+                                    }
+                                }
 
-                                courseMap[session.courses_dept + session.courses_id] = sessions
+                                if (typeof sessions !== "undefined") {
 
-                            }
+                                    courseMap[session.courses_dept + session.courses_id] = sessions
+
+                                }
+
                         }
 
                         processedDataset = courseMap
+                        }
 
                         that.save(id, processedDataset)
 
                     })
 
+                    if (isValidDataset == false){
+                        throw Error
+                    }
 
                     fulfill(true)
 
                     Log.trace("processedDataset FINAL type" + typeof processedDataset)
+
+
 
                 }).catch(function (err) {
                     Log.error('DatasetController::process(..) - unzip ERROR: ' + err.message);
@@ -219,6 +237,8 @@ export default class DatasetController {
         }
         return true;
     }
+
+
 
 
 }
