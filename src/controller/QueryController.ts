@@ -142,12 +142,10 @@ export default class QueryController {
                 for (var ANDfilter of where['AND']) {
                     validList1.push(this.parserEBNF(ANDfilter, section));
                 }
-
                 for (var eachValid of validList1) {
                     if (eachValid === false)
                         valid = false;
                 }
-
             }
 
             if (typeof where['OR'] !== 'undefined') {
@@ -158,7 +156,6 @@ export default class QueryController {
                 for (var ORfilter of where['OR']) {
                     validList2.push(this.parserEBNF(ORfilter, section));
                 }
-
                 valid = false
 
                 for (var eachValid of validList2) {
@@ -177,37 +174,47 @@ export default class QueryController {
 
             if (where['GT'] !== undefined) {
 
-                var whereKey = Object.keys(where['GT']).toString()
-                var whereValue = where['GT'][Object.keys(where['GT'])[0]]
+                var whereKey1 = Object.keys(where['GT']).toString()
+                var whereValue1 = where['GT'][Object.keys(where['GT'])[0]]
 
-                valid = valid && (section[whereKey] > whereValue);
+                valid = valid && (section[whereKey1] > whereValue1);
             }
 
             if (where['EQ'] !== undefined) {
 
-                var whereKey = Object.keys(where['EQ']).toString()
-                var whereValue = where['EQ'][Object.keys(where['EQ'])[0]]
+                var whereKey2 = Object.keys(where['EQ']).toString()
+                var whereValue2 = where['EQ'][Object.keys(where['EQ'])[0]]
 
-                valid = valid && (Math.floor((section[whereKey])) == whereValue);
+                valid = valid && (Math.floor((section[whereKey2])) == whereValue2);
 
             }
 
             if (where['LT'] !== undefined) {
 
-                var whereKey1 = Object.keys(where['LT']).toString()
-                var whereValue1 = where['LT'][Object.keys(where['LT'])[0]]
+                var whereKey3 = Object.keys(where['LT']).toString()
+                var whereValue3 = where['LT'][Object.keys(where['LT'])[0]]
 
-                valid = valid && (section[whereKey1] < whereValue1);
+                valid = valid && (section[whereKey3] < whereValue3);
 
             }
         }
 
         if (where['IS'] !== undefined) {
 
-            var whereKey2 = Object.keys(where['IS']).toString()
-            var whereValue2 = where['IS'][Object.keys(where['IS'])[0]]
+            var whereKey4 = Object.keys(where['IS']).toString()
+            var whereValue4 = where['IS'][Object.keys(where['IS'])[0]]
 
-            valid = valid && (section[whereKey2] == whereValue2);
+
+            if (whereValue4.includes("*")) {
+
+                var whereValue4 = whereValue4.split("*").join("")
+                //Log.trace("what is beforeWild    " + beforeWild)
+
+                valid = valid && (section[whereKey4].includes(whereValue4))
+            } else {
+                valid = valid && (section[whereKey4] == whereValue4);
+
+            }
         }
 
         if (typeof where['NOT'] !== 'undefined') {
@@ -216,7 +223,6 @@ export default class QueryController {
 
         return valid;
     }
-
     /**
      * Find the value from each section given key in GET
      *
@@ -263,7 +269,6 @@ export default class QueryController {
             }
             return 0;
         });
-
         return resultArray;
     }
 }
