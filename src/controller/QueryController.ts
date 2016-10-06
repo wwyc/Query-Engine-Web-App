@@ -155,7 +155,6 @@ export default class QueryController {
                 for (var ORfilter of where['OR']) {
                     validList2.push(this.parserEBNF(ORfilter, section));
                 }
-
                 valid = false
 
                 for (var eachValid of validList2) {
@@ -204,7 +203,17 @@ export default class QueryController {
             var whereKey2 = Object.keys(where['IS']).toString()
             var whereValue2 = where['IS'][Object.keys(where['IS'])[0]]
 
-            valid = valid&&(section[whereKey2] == whereValue2);
+
+            if (whereValue2.includes("*")){
+
+                var whereValue2 = whereValue2.split("*").join("")
+                //Log.trace("what is beforeWild    " + beforeWild)
+
+                valid = valid&&(section[whereKey2].includes(whereValue2))
+            } else {
+                valid = valid && (section[whereKey2] == whereValue2);
+
+            }
         }
 
         if(typeof where['NOT']!=='undefined') {
