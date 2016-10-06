@@ -144,7 +144,6 @@ export default class QueryController {
                     if (eachValid === false)
                         valid = false;
                 }
-
             }
 
             if (typeof where['OR'] !== 'undefined') {
