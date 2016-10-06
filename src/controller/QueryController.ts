@@ -134,7 +134,7 @@ export default class QueryController {
          }*/
 
         if (typeof where['AND'] !== 'undefined' || typeof where['OR'] !== 'undefined') {
-            //Log.trace("type1!!!")
+            //  Log.trace("type1!!!")
             if (typeof where['AND'] !== 'undefined') {
 
                 var validList1: any = []
