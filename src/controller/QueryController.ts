@@ -35,7 +35,6 @@ export default class QueryController {
         Log.trace('QueryController::query( ' + JSON.stringify(query) + ' )');//json string
 
         // TODO: implement this
-
         //parse the json query to string
         var get = query.GET;                            // can be string or array of string
         var where = query.WHERE;                        //json object or json array
@@ -52,34 +51,25 @@ export default class QueryController {
 
         var finalResultObjArray: any = this.represent(get,intermediate);
 
-        //Log.trace("this is FINAL result:  "  + JSON.stringify(finalResultObjArray))
-
         //Do this if order was requested
         if(order !== null){
-            //Log.trace("INSIDE ORDER")
-
             finalResultObjArray=this.sortArray(finalResultObjArray,order);
-
-            //Log.trace("this is FINAL result:  "  + JSON.stringify(finalResultObjArray))
-
         }
 
-
-        //Log.trace("result type"+ typeof finalResultObjArray)
+        Log.trace("this is FINAL result:  " + JSON.stringify(finalResultObjArray))
 
         return {render: format, result: finalResultObjArray};
-
     }
 
 //deal with where
-    public  dealWithWhere(where: any, get: string) {
+    public  dealWithWhere(where: any, get: any) {
         var selectedSections:any = []
 
         //not able to access this.datasets directly; JSON.stringify and then parse it again fixed it
         var datasetsNew = JSON.parse(JSON.stringify(this.datasets))
 
         // Retrieve dataset from given GET
-        var datasetRetrived = datasetsNew[this.stringPrefix(get)];
+        var datasetRetrived = datasetsNew["courses"];
 
         var sections: any = []
 
@@ -107,33 +97,75 @@ export default class QueryController {
 
 
     public parserEBNF(where:any,section:any) {
-        //GT= > EQ= LT<
-        //AND OR NOT
-        // parse where
-        //implemenntion of EBNF
-        // and or follow array，
-        // for loop
+
         let valid = true;
-        //Log.trace("VALID ")
+
+        /*//simple query to try AND/OR functionality
+         {
+         "GET": ["courses_dept", "courses_id", "courses_avg"],
+         "WHERE": {
+         "AND": [
+         {"GT": {"courses_avg": 70}},
+         {"IS": {"courses_dept": "adhe"}}
+         ]
+         },
+         "ORDER": "courses_avg",
+         "AS": "TABLE"
+         }
+         */
+
+        /*Complex query to try
+         {
+         "GET": ["courses_dept", "courses_id", "courses_avg"],
+         "WHERE": {
+         "OR": [
+         {"AND": [
+         {"GT": {"courses_avg": 50}},
+         {"IS": {"courses_dept": "food"}}
+         ]},
+         {"GT": {"courses_avg": 95}}
+         ]
+         },
+         "ORDER": "courses_avg",
+         "AS": "TABLE"
+         }*/
 
         if (typeof where['AND']!=='undefined'||typeof where['OR']!== 'undefined') {
             //Log.trace("type1!!!")
             if (typeof where['AND'] !== 'undefined') {
-                for (var i of where['AND']) {
-                    //if (where['AND'].hasOwnProperty(i))
-                    //Log.trace("and type" + typeof i);
-                    valid = valid && this.parserEBNF(i, section);
 
+                var validList1: any = []
+
+                for (var ANDfilter of where['AND']) {
+                    validList1.push(this.parserEBNF(ANDfilter, section));
                 }
+
+                for (var eachValid of validList1) {
+                    if (eachValid === false)
+                        valid = false;
+                }
+
             }
 
             if (typeof where['OR'] !== 'undefined') {
-                for (var i of where['OR']) {
-                    //if (where['AND'].hasOwnProperty(i))
-                    //Log.trace("and type" + typeof i);
-                    valid = valid || this.parserEBNF(i, section);
-                    //Log.trace("AND success," + i[Object.keys(i)[0]]);
+
+                //Log.trace(" what is where['OR']?   "  + Object.keys(where['OR']).toString())
+                var validList2: any = [];
+
+                for (var ORfilter of where['OR']) {
+                    validList2.push(this.parserEBNF(ORfilter, section));
                 }
+
+                valid = false
+
+                for (var eachValid of validList2) {
+                    if (eachValid === true) {
+                        valid = true
+                    }
+
+                }
+
+
             }
         }
 
@@ -146,7 +178,6 @@ export default class QueryController {
                 var whereValue = where['GT'][Object.keys(where['GT'])[0]]
 
                 valid = valid&&(section[whereKey] > whereValue);
-
             }
 
             if (where['EQ']!==undefined) {
@@ -170,13 +201,10 @@ export default class QueryController {
 
         if (where['IS']!==undefined) {
 
-            var wi = where['IS'];
-            var wistring: string = wi[Object.keys(wi)[0]];
+            var whereKey2 = Object.keys(where['IS']).toString()
+            var whereValue2 = where['IS'][Object.keys(where['IS'])[0]]
 
-            /*  if(wistring.includes("*"))
-             wistring = wistring.split('*').join('');  */
-            valid = valid && (section[Object.keys(wi)[0]] === wistring);
-
+            valid = valid && (section[whereKey2] == whereValue2);
         }
 
         if(typeof where['NOT']!=='undefined') {
