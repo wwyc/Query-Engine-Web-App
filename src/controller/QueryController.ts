@@ -41,7 +41,7 @@ export default class QueryController {
         var order = query.ORDER;
         var format = query.AS;
 
-        var intermediate: any = []
+        var intermediate: any = [];
 
         if (typeof get === 'string') {
             intermediate = this.dealWithWhere(where, get)
@@ -49,7 +49,7 @@ export default class QueryController {
             intermediate = this.dealWithWhere(where, get[0])
         }
 
-        var values: any = []
+        var values: any = [];
 
         var finalResultObjArray: any = this.represent(get, intermediate);
 
