@@ -96,8 +96,10 @@ export default class RouteHandler {
                 if (typeof datasets[id] === 'undefined') {
                     res.json(424, {missing: [id]});
                 }
-                let result = controller.query(query);
-                res.json(200, result);
+                else {
+                    let result = controller.query(query);
+                    res.json(200, result);
+                }
             } else {
                 res.json(400, {status: 'invalid query'});
             }
