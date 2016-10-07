@@ -38,7 +38,7 @@ describe("QueryController", function () {
 
         expect(isValid).to.equal(false);
     });
-/*
+
   it ("correct EBNFparser",function(){
         let dataset:any=[{"courses_dept":"epse","courses_avg":97.41},
             {"courses_dept":"cnps","courses_avg":97.47},{"courses_dept":"cnps","courses_avg":97.47},
@@ -58,10 +58,14 @@ describe("QueryController", function () {
             {"courses_dept":"math","courses_avg":99.78}];
         let controller = new QueryController(dataset);
      let valid:boolean=controller.parserEBNF(
-         {"AND": [
-             {"GT": {"courses_avg": 70}},
-             {"IS": {"courses_dept": "cpsc"}}
-         ]},dataset[0]
+         {
+             "AND": [{
+                 "OR": [
+                     {"GT": {"courses_avg": 99}},
+                     {"IS": {"courses_dept": "*cp*"}}
+                 ]
+             }]
+         }, dataset[0]
      );
         expect(valid).to.equal(false);});
 
@@ -80,7 +84,7 @@ describe("QueryController", function () {
 
     });*/
 
-  it ("correct present",function(){
+    /* it ("correct present",function(){
         let dataset:any=[{"courses_dept":"epse","courses_":97.41},
             {"courses_dept":"cnps","courses_avg":97.47},{"courses_dept":"cnps","courses_avg":97.47},
             {"courses_dept":"math","courses_avg":97.48}];
@@ -92,7 +96,7 @@ describe("QueryController", function () {
       /*  let valid:boolean= diu===[{"courses_dept":"epse"},
                 {"courses_dept":"cnps"},{"courses_dept":"cnps"},
                 {"courses_dept":"math"}]  */
-        let valid:boolean=diu[0]["courses_dept"]==="epse";
+    /*    let valid:boolean=diu[0]["courses_dept"]==="epse";
         expect(valid).to.equal(true);});
 
     /*it("Should be able to query, although the answer will be empty", function () {

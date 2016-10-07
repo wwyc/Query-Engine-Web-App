@@ -58,7 +58,7 @@ export default class RouteHandler {
                     } else {
                         res.json(201, {success: result});
                         Log.trace("dataset with this ID already exists!")
-                            }
+                    }
 
                 }).catch(function (err: Error) {
                     Log.trace('RouteHandler::postDataset(..) - ERROR: ' + err.message);
@@ -78,7 +78,6 @@ export default class RouteHandler {
         try {
             let query: QueryRequest = req.params;
 
-
             let datasets: Datasets = RouteHandler.datasetController.getDatasets();
 
             Log.trace("RouteHandler - what is in Datasets?" + Object.keys(RouteHandler.datasetController.getDatasets()))
@@ -87,8 +86,20 @@ export default class RouteHandler {
             let isValid = controller.isValid(query);
 
             if (isValid === true) {
-                let result = controller.query(query);
-                res.json(200, result);
+                var get = query.GET;
+                var id: string
+                if (typeof get === 'string') {
+                    id = get.split("_")[0];
+                } else {
+                    id = get[0].split("_")[0];
+                }
+                if (typeof datasets[id] === 'undefined') {
+                    res.json(424, {missing: [id]});
+                }
+                else {
+                    let result = controller.query(query);
+                    res.json(200, result);
+                }
             } else {
                 res.json(400, {status: 'invalid query'});
             }
