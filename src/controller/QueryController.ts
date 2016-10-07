@@ -41,29 +41,31 @@ export default class QueryController {
         var order = query.ORDER;
         var format = query.AS;
 
-        var intermediate: any = []
+        var intermediate: any = [];
 
-        if(typeof get === 'string'){
-            intermediate = this.dealWithWhere(where,get)
-        } else {intermediate=this.dealWithWhere(where,get[0])}
-
-        var values: any = []
-
-        var finalResultObjArray: any = this.represent(get,intermediate);
-
-        //Do this if order was requested
-        if(order !== undefined){
-            finalResultObjArray=this.sortArray(finalResultObjArray,order);
+        if (typeof get === 'string') {
+            intermediate = this.dealWithWhere(where, get)
+        } else {
+            intermediate = this.dealWithWhere(where, get[0])
         }
 
-        Log.trace("this is FINAL result:  "  + JSON.stringify(finalResultObjArray))
+        var values: any = [];
+
+        var finalResultObjArray: any = this.represent(get, intermediate);
+
+        //Do this if order was requested
+        if (order !== null) {
+            finalResultObjArray = this.sortArray(finalResultObjArray, order);
+        }
+
+        Log.trace("this is FINAL result:  " + JSON.stringify(finalResultObjArray))
 
         return {render: format, result: finalResultObjArray};
     }
 
 //deal with where
-    public  dealWithWhere(where: any,get: any){
-        var selectedSections:any = []
+    public  dealWithWhere(where: any, get: any) {
+        var selectedSections: any = []
 
         //not able to access this.datasets directly; JSON.stringify and then parse it again fixed it
         var datasetsNew = JSON.parse(JSON.stringify(this.datasets))
@@ -73,46 +75,47 @@ export default class QueryController {
 
         var sections: any = []
 
-        for (var key in datasetRetrived){
+        for (var key in datasetRetrived) {
             sections = datasetRetrived[key]
 
-            for (var key in sections){
-                var section = sections[key]
-
-                if (this.parserEBNF(where,section)){
+            /*   for (var key in sections) {
+             var section = sections[key]  */
+            for (var section of sections) {
+                if (this.parserEBNF(where, section)) {
                     //add section to list if it meets WHERE criteria in query
-                    selectedSections.push(section)}
+                    selectedSections.push(section)
+                }
             }
         }
         return selectedSections;
     }
 
     //helper function that returns prefix of string from GET
-    public stringPrefix(get:string){
+    public stringPrefix(get: string) {
         let prefix: any
-        prefix=get.split("_")[0];
+        prefix = get.split("_")[0];
         //Log.trace(prefix);
         return prefix;
     }
 
 
-    public parserEBNF(where:any,section:any) {
+    public parserEBNF(where: any, section: any) {
 
         let valid = true;
 
         /*//simple query to try AND/OR functionality
-        {
-            "GET": ["courses_dept", "courses_id", "courses_avg"],
-            "WHERE": {
-            "AND": [
-                {"GT": {"courses_avg": 70}},
-                {"IS": {"courses_dept": "adhe"}}
-            ]
-        },
-            "ORDER": "courses_avg",
-            "AS": "TABLE"
-        }
-        */
+         {
+         "GET": ["courses_dept", "courses_id", "courses_avg"],
+         "WHERE": {
+         "AND": [
+         {"GT": {"courses_avg": 70}},
+         {"IS": {"courses_dept": "adhe"}}
+         ]
+         },
+         "ORDER": "courses_avg",
+         "AS": "TABLE"
+         }
+         */
 
         /*Complex query to try
          {
@@ -130,109 +133,103 @@ export default class QueryController {
          "AS": "TABLE"
          }*/
 
-        if (typeof where['AND']!=='undefined'||typeof where['OR']!== 'undefined') {
-            //Log.trace("type1!!!")
+        if (typeof where['AND'] !== 'undefined' || typeof where['OR'] !== 'undefined') {
+            //  Log.trace("type1!!!")
             if (typeof where['AND'] !== 'undefined') {
-
-                var validList1: any = []
-
+                var validList1: any = [];
                 for (var ANDfilter of where['AND']) {
                     validList1.push(this.parserEBNF(ANDfilter, section));
                 }
-                for (var eachValid of validList1) {
-                    if (eachValid === false)
+                //  Log.trace("validList1" + validList1);
+
+                //  Log.trace("validlist1: "+validList1.length);
+                for (var eachValid1 of validList1) {
+                    if (eachValid1 === false)
                         valid = false;
                 }
             }
 
             if (typeof where['OR'] !== 'undefined') {
 
-                //Log.trace(" what is where['OR']?   "  + Object.keys(where['OR']).toString())
-                var validList2: any = [];
 
+                var validList2: any = [];
                 for (var ORfilter of where['OR']) {
                     validList2.push(this.parserEBNF(ORfilter, section));
                 }
-                valid = false
+                //    Log.trace("validList2:" + validList2);
+                /*     var ORfilter:any;
+                 for (var key in where['OR'])
+                 {
+                 ORfilter=  where['OR'][key];
+                 validList1.push(this.parserEBNF(ORfilter, section));}  */
 
-                for (var eachValid of validList2) {
-                    if (eachValid === true) {
+                valid = false;
+
+                for (var eachValid2 of validList2) {
+                    if (eachValid2 === true) {
                         valid = true
+
                     }
-
                 }
-
-
             }
         }
 
 
-        if (where['GT'] || where['EQ'] || where['LT']!== undefined) {
+        if (typeof where['GT'] || typeof where['EQ'] || typeof where['LT'] !== 'undefined') {
 
-            if (where['GT']!== undefined) {
+            if (typeof where['GT'] !== 'undefined') {
 
-                var whereKey = Object.keys(where['GT']).toString()
-                var whereValue = where['GT'][Object.keys(where['GT'])[0]]
+                var whereKey1 = Object.keys(where['GT']).toString()
+                var whereValue1 = where['GT'][Object.keys(where['GT'])[0]]
 
-                valid = valid&&(section[whereKey] > whereValue);
+                valid = valid && (section[whereKey1] > whereValue1);
             }
 
-            if (where['EQ']!==undefined) {
-
-                var whereKey = Object.keys(where['EQ']).toString()
-                var whereValue = where['EQ'][Object.keys(where['EQ'])[0]]
-
-                valid = valid&&((section[whereKey]) == whereValue);
+            if (typeof where['EQ'] !== 'undefined') {
+                var whereKey2 = Object.keys(where['EQ']).toString()
+                var whereValue2 = where['EQ'][Object.keys(where['EQ'])[0]]
+                valid = valid && (((section[whereKey2])) === whereValue2);
 
             }
 
-            if (where['LT']!== undefined) {
+            if (typeof where['LT'] !== 'undefined') {
 
-                var whereKey1 = Object.keys(where['LT']).toString()
-                var whereValue1 = where['LT'][Object.keys(where['LT'])[0]]
+                var whereKey3 = Object.keys(where['LT']).toString()
+                var whereValue3 = where['LT'][Object.keys(where['LT'])[0]]
 
-                valid = valid&&(section[whereKey1] < whereValue1);
+                valid = valid && (section[whereKey3] < whereValue3);
 
             }
         }
 
-        if (where['IS']!==undefined) {
+        if (typeof where['IS'] !== 'undefined') {
 
-            var whereKey2 = Object.keys(where['IS']).toString()
-            var whereValue2 = where['IS'][Object.keys(where['IS'])[0]]
-
-
-            if (whereValue2.includes("*")){
-
-                //Log.trace("what is split 0   "  +whereValue2.split("*")[0])
-                //Log.trace("what is split 1   "  +whereValue2.split("*")[1])
-                //Log.trace("what is split 2   "  +whereValue2.split("*")[2])
-
-                if ((whereValue2.split("*")[1] == "") && (whereValue2.split("*")[2] == undefined)){
-                    //* is in front
-                    valid = valid&&(section[whereKey2].includes(whereValue2.split("*")[0]))
-
-                } else if ((whereValue2.split("*")[0] == "") && (whereValue2.split("*")[2] == undefined)){
-                    //* is at the end
-                    valid = valid&&(section[whereKey2].includes(whereValue2.split("*")[1]))
-
-                } else if ((whereValue2.split("*")[0] == "") && (whereValue2.split("*")[2] == "")){
-                    // * is in the middle
-                    valid = valid&&(section[whereKey2].includes(whereValue2.split("*")[1]))
+            var whereKey4 = Object.keys(where['IS']).toString();
+            var whereValue4 = where['IS'][Object.keys(where['IS'])[0]];
+            var sectionWhere = section[whereKey4];
+            if (sectionWhere !== "") {
+                if (whereValue4.substring(0, 1) === "*" && whereValue4.substring(whereValue4.length - 1, whereValue4.length) === "*") {
+                    var whereValue4 = whereValue4.split("*").join("");
+                    valid = valid && sectionWhere.includes(whereValue4);
                 }
-
-                //var whereValue2 = whereValue2.split("*").join("")
-                //Log.trace("what is beforeWild    " + beforeWild)
-
-                //valid = valid&&(section[whereKey2].includes(whereValue2))
-            } else {
-                valid = valid && (section[whereKey2] == whereValue2);
-
+                else if (whereValue4.substring(0, 1) === "*") {
+                    var whereValue4 = whereValue4.split("*").join("");
+                    valid = valid && (sectionWhere.substring(sectionWhere.length - whereValue4.length, sectionWhere.length) === whereValue4)
+                }
+                else if (whereValue4.substring(whereValue4.length - 1, whereValue4.length) === "*") {
+                    var whereValue4 = whereValue4.split("*").join("");
+                    valid = valid && (sectionWhere.substring(0, whereValue4.length) === whereValue4)
+                }
+                else {
+                    valid = valid && (sectionWhere === whereValue4);
+                }
             }
+            else
+                valid = false;
         }
 
-        if(typeof where['NOT']!=='undefined') {
-            valid =valid&&(!this.parserEBNF(where['NOT'],section));
+        if (typeof where['NOT'] !== 'undefined') {
+            valid = valid && (!this.parserEBNF(where['NOT'], section));
         }
 
         return valid;
@@ -242,33 +239,34 @@ export default class QueryController {
      *
      * @returns object for final result{[id: string: {}} returns empty if nothing was found
      */
-    public represent (GETInput: any, sectionArray: any){
+    public represent(GETInput: any, sectionArray: any) {
 
         //Log.trace("what is type of getArray:"  + Array.isArray(getArray))
-        var resultArray:any = []
+        var resultArray: any = []
 
 // Check to see if GET is string or Array
-        if(typeof GETInput === 'string'){
-            for (var sectionX of sectionArray){
-                var resultObj : any ={}
+        if (typeof GETInput === 'string') {
+            for (var sectionX of sectionArray) {
+                var resultObj: any = {}
                 resultObj[GETInput] = sectionX[GETInput]
                 resultArray.push(resultObj)
             }
         }
-        else if(Array.isArray(GETInput)){
+        else if (Array.isArray(GETInput)) {
 
-            for (var eachSection of sectionArray){
-                var resultObj1 : any ={}
-                for (var j = 0; j<Object.keys(GETInput).length; j++){
+            for (var eachSection of sectionArray) {
+                var resultObj1: any = {}
+                for (var j = 0; j < Object.keys(GETInput).length; j++) {
                     var key = GETInput[j]
                     resultObj1[key] = eachSection[key];
                 }
                 resultArray.push(resultObj1)
             }
             return resultArray;
-        }}
+        }
+    }
 
-    public sortArray(resultArray: any, order:any) {
+    public sortArray(resultArray: any, order: any) {
         //Log.trace("INSIDE sorting!")
         resultArray.sort(function (a: any, b: any) {
             var value1 = a[order];
