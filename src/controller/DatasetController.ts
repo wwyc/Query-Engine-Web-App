@@ -20,6 +20,7 @@ export interface Datasets {
 export default class DatasetController {
 
     private datasets: Datasets = {};
+    public relativePath: any
 
     constructor() {
         Log.trace('DatasetController::init()');
@@ -51,7 +52,9 @@ export default class DatasetController {
             //check if dataset is in disk
             var fs = require('fs');
 
-            try {var data = fs.readFileSync("../cpsc310project/data/"+id+".json")
+            Log.trace("inside getdataset(id)    " + this.relativePath)
+
+            try {var data = fs.readFileSync(this.relativePath + "/data/"+id+".json")
                 Log.trace("dataset is in disk")
             }
             catch (err){
@@ -73,10 +76,26 @@ export default class DatasetController {
 
         Log.trace("this.datasets - is it empty?:  " + this.isEmpty(this.datasets))
 
-        if (this.isEmpty(this.datasets)|| (typeof this.datasets == "undefined")) {              //check if datasets in memory is empty
+        if (this.isEmpty(this.datasets)|| (typeof this.datasets == "undefined")) {
+            //check if datasets in memory is empty
             var fs1 = require('fs');
-            var data1 = fs1.readFileSync("../cpsc310project/data/courses.json")
-            that.datasets["courses"] = JSON.parse(data1)
+            //read directory and return files (array of file names)
+
+            that.relativePath = process.cwd()
+
+            Log.trace(that.relativePath)
+
+            fs1.readdirSync(that.relativePath + "/data/", 'utf8', (err: string, files: any) => {
+                    //iterate through array of file names and get all?
+                    for (var file of files) {
+                    //.JSON is always 5 characters
+                        Log.trace("file.split[0]   " + file.split(".")[0])
+                        this.datasets[file.split(".")[0]] = this.getDataset(file)
+                    }
+                    /*
+                     var data1 = fs1.readFileSync("../cpsc310project/data/courses.json")
+                     that.datasets["courses"] = JSON.parse(data1)*/
+                })
 
         }
 
@@ -117,7 +136,8 @@ export default class DatasetController {
                     zip.forEach(function (Path: string, file: JSZipObject){
 
                         if (file.dir){
-                             if (Path.includes("courses/"))
+                            //Log.trace("iterating over" + Path)
+                             if (Path.includes(id))
                              {isValidDataset = true}
                    }
                         if (!file.dir) {
@@ -212,7 +232,10 @@ export default class DatasetController {
 
         try {
             fs2.writeFileSync('data/' + id + '.json', datasetToSave, 'utf8')
-            //Log.trace("file writting success")
+            Log.trace("which directory and i in?"  + process.cwd())
+            Log.trace("writting files success")
+
+            this.relativePath = process.cwd()
         } catch(e){
             Log.trace("save dataset error" + e.message)
         }

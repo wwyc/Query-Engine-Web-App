@@ -51,7 +51,8 @@ export default class RouteHandler {
 
                 controller.process(id, req.body).then(function (result) {
 
-                    if (controller.getDataset(id) == null){
+                    if (controller.getDatasets()[id] == null){
+                        // Dataset is not in disk
                         res.json(204, {success:result})
                         Log.trace("dataset with this ID is new")
 
@@ -121,12 +122,18 @@ export default class RouteHandler {
             if (!(RouteHandler.datasetController.isEmpty(datasetToDelete) || (datasetToDelete == null))){
 
                 //  check if dataset is empty in memory or disk
-                delete RouteHandler.datasetController.getDatasets()[id]
+                delete RouteHandler.datasetController.getDatasets()[id];
 
-                fs.unlinkSync("../cpsc310project/data/" + id+".json")
+                Log.trace("what is relativePath  " + RouteHandler.datasetController.relativePath)
+                fs.unlinkSync(RouteHandler.datasetController.relativePath + "/data/" + id+".json")
 
-                Log.trace('RouteHandler::deleteQuery(..) - successful')
-                res.json(204, {success: {status: 'dataset deleted'}});
+
+                Log.trace('RouteHandler::deleteQuery(..) - successful');
+                res.json(204, {success: 'dataset deleted'});
+
+                //res.send(204).json({success: 'dataset deleted'});
+                //res.send(204);
+
 
             } else {
                 // produce error if not found in both memory or disk
