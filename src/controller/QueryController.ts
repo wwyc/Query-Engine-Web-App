@@ -78,9 +78,9 @@ export default class QueryController {
         for (var key in datasetRetrived) {
             sections = datasetRetrived[key]
 
-            for (var key in sections) {
-                var section = sections[key]
-
+            /*   for (var key in sections) {
+             var section = sections[key]  */
+            for (var section of sections) {
                 if (this.parserEBNF(where, section)) {
                     //add section to list if it meets WHERE criteria in query
                     selectedSections.push(section)
@@ -136,43 +136,49 @@ export default class QueryController {
         if (typeof where['AND'] !== 'undefined' || typeof where['OR'] !== 'undefined') {
             //  Log.trace("type1!!!")
             if (typeof where['AND'] !== 'undefined') {
-
-                var validList1: any = []
-
+                var validList1: any = [];
                 for (var ANDfilter of where['AND']) {
                     validList1.push(this.parserEBNF(ANDfilter, section));
                 }
-                for (var eachValid of validList1) {
-                    if (eachValid === false)
+                //    Log.trace("validList1"+ validList1);
+
+                //  Log.trace("validlist1: "+validList1.length);
+                for (var eachValid1 of validList1) {
+                    if (eachValid1 === false)
                         valid = false;
                 }
             }
 
             if (typeof where['OR'] !== 'undefined') {
 
-                //Log.trace(" what is where['OR']?   "  + Object.keys(where['OR']).toString())
-                var validList2: any = [];
 
+                var validList2: any = [];
                 for (var ORfilter of where['OR']) {
                     validList2.push(this.parserEBNF(ORfilter, section));
                 }
-                valid = false
+                //    Log.trace("validList2:" + validList2);
+                /*     var ORfilter:any;
+                 for (var key in where['OR'])
+                 {
+                 ORfilter=  where['OR'][key];
+                 validList1.push(this.parserEBNF(ORfilter, section));}  */
 
-                for (var eachValid of validList2) {
-                    if (eachValid === true) {
+                valid = false;
+
+                for (var eachValid2 of validList2) {
+                    if (eachValid2 === true) {
                         valid = true
+
                     }
 
                 }
-
-
             }
         }
 
 
-        if (where['GT'] || where['EQ'] || where['LT'] !== undefined) {
+        if (typeof where['GT'] || typeof where['EQ'] || typeof where['LT'] !== 'undefined') {
 
-            if (where['GT'] !== undefined) {
+            if (typeof where['GT'] !== 'undefined') {
 
                 var whereKey1 = Object.keys(where['GT']).toString()
                 var whereValue1 = where['GT'][Object.keys(where['GT'])[0]]
@@ -180,16 +186,14 @@ export default class QueryController {
                 valid = valid && (section[whereKey1] > whereValue1);
             }
 
-            if (where['EQ'] !== undefined) {
-
+            if (typeof where['EQ'] !== 'undefined') {
                 var whereKey2 = Object.keys(where['EQ']).toString()
                 var whereValue2 = where['EQ'][Object.keys(where['EQ'])[0]]
-
-                valid = valid && (Math.floor((section[whereKey2])) == whereValue2);
+                valid = valid && (((section[whereKey2])) === whereValue2);
 
             }
 
-            if (where['LT'] !== undefined) {
+            if (typeof where['LT'] !== 'undefined') {
 
                 var whereKey3 = Object.keys(where['LT']).toString()
                 var whereValue3 = where['LT'][Object.keys(where['LT'])[0]]
@@ -199,20 +203,20 @@ export default class QueryController {
             }
         }
 
-        if (where['IS'] !== undefined) {
+        if (typeof where['IS'] !== 'undefined') {
 
-            var whereKey4 = Object.keys(where['IS']).toString()
-            var whereValue4 = where['IS'][Object.keys(where['IS'])[0]]
+            var whereKey4 = Object.keys(where['IS']).toString();
+            var whereValue4 = where['IS'][Object.keys(where['IS'])[0]];
 
 
             if (whereValue4.includes("*")) {
 
-                var whereValue4 = whereValue4.split("*").join("")
-                //Log.trace("what is beforeWild    " + beforeWild)
+                var whereValue4 = whereValue4.split("*").join("");
+
 
                 valid = valid && (section[whereKey4].includes(whereValue4))
             } else {
-                valid = valid && (section[whereKey4] == whereValue4);
+                valid = valid && (section[whereKey4] === whereValue4);
 
             }
         }
