@@ -35,27 +35,35 @@ export default class DatasetController {
     public getDataset(id: string): any {
         // TODO: this should check if the dataset is on disk in ./data if it is not already in memory.
 
-        if (this.isEmpty(this.datasets) || (typeof this.datasets == "undefined")){       // check if dataset/memory is empty
-            var keys = Object.keys(this.datasets);  // check if dataset is in memory
-            //     can we use containsKey(key: string): bool?
+
+        // check if dataset/memory is empty
+        if (!(this.isEmpty(this.datasets) || (typeof this.datasets == "undefined"))){
+
+            Log.trace("dataset is in memory")
+            var keys = Object.keys(this.datasets);
             for (var id1 of keys) {
-                console.log(id1);
+                Log.trace(id1);
                 if (id == id1){
                     return this.datasets[id];
                 }
-            }}else {
+            }}  else {
 
-            var fs = require('fs');             //check if dataset is in disk
+            //check if dataset is in disk
+            var fs = require('fs');
 
-            try {var data = fs.readFileSync("data/"+id+".json")}
+            try {var data = fs.readFileSync("../cpsc310project/data/"+id+".json")
+                Log.trace("dataset is in disk")
+            }
             catch (err){
-                Log.trace("dataset with given id Not Found")
+                Log.trace("inside getDataset:  dataset with given id Not Found")
                 return null;
             }
 
             this.datasets[id] = JSON.parse(data);
 
-            Log.trace("inside getdataset() method" + JSON.stringify(this.datasets[id]))}
+            //Log.trace("inside getdataset() method" + JSON.stringify(this.datasets[id]))
+
+            }
 
         return this.datasets[id];
     }
@@ -69,9 +77,7 @@ export default class DatasetController {
 
         if (this.isEmpty(this.datasets)|| (typeof this.datasets == "undefined")) {              //check if datasets in memory is empty
             var fs1 = require('fs');
-
             var data1 = fs1.readFileSync("../cpsc310project/data/courses.json")
-
             that.datasets["courses"] = JSON.parse(data1)
 
         }
@@ -110,9 +116,6 @@ export default class DatasetController {
 
                     var promiseArray:any = []
 
-                    //Log.trace("what is isValidDataset  0      " + isValidDataset)
-
-
                     zip.forEach(function (Path: string, file: JSZipObject){
 
                         if (file.dir){
@@ -129,9 +132,9 @@ export default class DatasetController {
 
                     Promise.all(promiseArray).then(function(endResult: any) {
 
-                        Log.trace("INSIDE PROMISE ALL")
+                        //Log.trace("INSIDE PROMISE ALL")
 
-                        Log.trace("endResult:  "+ endResult.length);
+                        //Log.trace("endResult:  "+ endResult.length);
 
 
                         if (id == "courses") {
@@ -140,7 +143,7 @@ export default class DatasetController {
 
                             for (var objs of endResult) {
 
-                                    var courseObj = JSON.parse(objs)
+                            var courseObj = JSON.parse(objs)
 
                                 if (courseObj.result.length !== 0) {
 
@@ -163,18 +166,12 @@ export default class DatasetController {
                                 }
 
                                 if (typeof sessions !== "undefined") {
-
                                     courseMap[session.courses_dept + session.courses_id] = sessions
-
                                 }
-
                         }
-
                         processedDataset = courseMap
                         }
-
                         that.save(id, processedDataset)
-
                     })
 
                     if (isValidDataset == false){
@@ -184,8 +181,6 @@ export default class DatasetController {
                     fulfill(true)
 
                     Log.trace("processedDataset FINAL type" + typeof processedDataset)
-
-
 
                 }).catch(function (err) {
                     Log.error('DatasetController::process(..) - unzip ERROR: ' + err.message);
@@ -219,12 +214,10 @@ export default class DatasetController {
 
         try {
             fs2.writeFileSync('data/' + id + '.json', datasetToSave, 'utf8')
-
             //Log.trace("file writting success")
         } catch(e){
             Log.trace("save dataset error" + e.message)
         }
-
     }
 
 
@@ -237,8 +230,4 @@ export default class DatasetController {
         }
         return true;
     }
-
-
-
-
 }

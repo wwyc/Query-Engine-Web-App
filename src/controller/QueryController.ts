@@ -52,7 +52,7 @@ export default class QueryController {
         var finalResultObjArray: any = this.represent(get,intermediate);
 
         //Do this if order was requested
-        if(order !== null){
+        if(order !== undefined){
             finalResultObjArray=this.sortArray(finalResultObjArray,order);
         }
 
@@ -182,7 +182,7 @@ export default class QueryController {
                 var whereKey = Object.keys(where['EQ']).toString()
                 var whereValue = where['EQ'][Object.keys(where['EQ'])[0]]
 
-                valid = valid&&(Math.floor((section[whereKey])) == whereValue);
+                valid = valid&&((section[whereKey]) == whereValue);
 
             }
 
@@ -204,10 +204,27 @@ export default class QueryController {
 
             if (whereValue2.includes("*")){
 
-                var whereValue2 = whereValue2.split("*").join("")
+                //Log.trace("what is split 0   "  +whereValue2.split("*")[0])
+                //Log.trace("what is split 1   "  +whereValue2.split("*")[1])
+                //Log.trace("what is split 2   "  +whereValue2.split("*")[2])
+
+                if ((whereValue2.split("*")[1] == "") && (whereValue2.split("*")[2] == undefined)){
+                    //* is in front
+                    valid = valid&&(section[whereKey2].includes(whereValue2.split("*")[0]))
+
+                } else if ((whereValue2.split("*")[0] == "") && (whereValue2.split("*")[2] == undefined)){
+                    //* is at the end
+                    valid = valid&&(section[whereKey2].includes(whereValue2.split("*")[1]))
+
+                } else if ((whereValue2.split("*")[0] == "") && (whereValue2.split("*")[2] == "")){
+                    // * is in the middle
+                    valid = valid&&(section[whereKey2].includes(whereValue2.split("*")[1]))
+                }
+
+                //var whereValue2 = whereValue2.split("*").join("")
                 //Log.trace("what is beforeWild    " + beforeWild)
 
-                valid = valid&&(section[whereKey2].includes(whereValue2))
+                //valid = valid&&(section[whereKey2].includes(whereValue2))
             } else {
                 valid = valid && (section[whereKey2] == whereValue2);
 

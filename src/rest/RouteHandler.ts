@@ -105,20 +105,24 @@ export default class RouteHandler {
 
             var id: string = req.params.id;
 
-            //  check if dataset is empty in memory
+            var datasetToDelete = RouteHandler.datasetController.getDataset(id)
 
-            delete RouteHandler.datasetController.getDatasets()
+            if (!(RouteHandler.datasetController.isEmpty(datasetToDelete) || (datasetToDelete == null))){
 
-            fs.unlinkSync("../cpsc310project/data/" + id+".json")
+                //  check if dataset is empty in memory or disk
+                delete RouteHandler.datasetController.getDatasets()[id]
 
-            Log.trace('RouteHandler::deleteQuery(..) - successful')
+                fs.unlinkSync("../cpsc310project/data/" + id+".json")
 
-            res.send(204)
+                Log.trace('RouteHandler::deleteQuery(..) - successful')
+                res.json(204, {success: {status: 'dataset deleted'}});
 
-            // produce error if not found in both memory or disk
+            } else {
+                // produce error if not found in both memory or disk
+                throw Error}
 
         } catch (err) {
-            Log.error('RouteHandler::deleteQuery(..) - ERROR: dataset with given not found' + err.message);
+            Log.error('RouteHandler::deleteQuery(..) - ERROR: dataset with given not found   ' + err.message);
             res.send(404);
         }
     }
