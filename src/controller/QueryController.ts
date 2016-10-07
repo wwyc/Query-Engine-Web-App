@@ -140,7 +140,7 @@ export default class QueryController {
                 for (var ANDfilter of where['AND']) {
                     validList1.push(this.parserEBNF(ANDfilter, section));
                 }
-                //    Log.trace("validList1"+ validList1);
+                //  Log.trace("validList1" + validList1);
 
                 //  Log.trace("validlist1: "+validList1.length);
                 for (var eachValid1 of validList1) {
@@ -170,7 +170,6 @@ export default class QueryController {
                         valid = true
 
                     }
-
                 }
             }
         }
@@ -207,18 +206,26 @@ export default class QueryController {
 
             var whereKey4 = Object.keys(where['IS']).toString();
             var whereValue4 = where['IS'][Object.keys(where['IS'])[0]];
-
-
-            if (whereValue4.includes("*")) {
-
-                var whereValue4 = whereValue4.split("*").join("");
-
-
-                valid = valid && (section[whereKey4].includes(whereValue4))
-            } else {
-                valid = valid && (section[whereKey4] === whereValue4);
-
+            var sectionWhere = section[whereKey4];
+            if (sectionWhere !== "") {
+                if (whereValue4.substring(0, 1) === "*" && whereValue4.substring(whereValue4.length - 1, whereValue4.length) === "*") {
+                    var whereValue4 = whereValue4.split("*").join("");
+                    valid = valid && sectionWhere.includes(whereValue4);
+                }
+                else if (whereValue4.substring(0, 1) === "*") {
+                    var whereValue4 = whereValue4.split("*").join("");
+                    valid = valid && (sectionWhere.substring(sectionWhere.length - whereValue4.length, sectionWhere.length) === whereValue4)
+                }
+                else if (whereValue4.substring(whereValue4.length - 1, whereValue4.length) === "*") {
+                    var whereValue4 = whereValue4.split("*").join("");
+                    valid = valid && (sectionWhere.substring(0, whereValue4.length) === whereValue4)
+                }
+                else {
+                    valid = valid && (sectionWhere === whereValue4);
+                }
             }
+            else
+                valid = false;
         }
 
         if (typeof where['NOT'] !== 'undefined') {
