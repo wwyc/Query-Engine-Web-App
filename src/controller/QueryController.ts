@@ -292,9 +292,6 @@ export default class QueryController {
         return valid;
     }
 
-    /*  public containIllegalSymbol(value:any){
-     if value.includes()
-     }*/
 
 
 }
