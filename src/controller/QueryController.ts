@@ -4,8 +4,7 @@
 
 import {Datasets, default as DatasetController} from "./DatasetController";
 import Log from "../Util";
-import {bodyParser} from "restify";
-import {stringify} from "querystring";
+
 
 export interface QueryRequest {
     GET: string|string[];
