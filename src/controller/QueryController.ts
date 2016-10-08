@@ -32,34 +32,40 @@ export default class QueryController {
     }
 
     public query(query: QueryRequest): QueryResponse {
-        Log.trace('QueryController::query( ' + JSON.stringify(query) + ' )');//json string
+        Log.trace('QueryController::query( ' + JSON.stringify(query) + ' )');
 
         // TODO: implement this
-        //parse the json query to string
-        var get = query.GET;                            // can be string or array of string
-        var where = query.WHERE;                        //json object or json array
+
+
+        var get = query.GET;
+        var where = query.WHERE;
         var order = query.ORDER;
         var format = query.AS;
-
         var intermediate: any = [];
 
+        if (format !== "TABLE")
+            throw Error;
         if (typeof get === 'string') {
+            if (this.isvalidKey(get) === false)
+                throw Error;
             intermediate = this.dealWithWhere(where, get)
         } else {
+            for (var i of get) {
+                if (this.isvalidKey(i) === false)
+                    throw Error;
+            }
             intermediate = this.dealWithWhere(where, get[0])
         }
-
         var values: any = [];
-
         var finalResultObjArray: any = this.represent(get, intermediate);
-
         //Do this if order was requested
-        if (order !== null) {
+        if (order !== null && typeof order !== 'undefined') {
+            if (this.isvalidKey(order) === false)
+                throw Error;
+            else
             finalResultObjArray = this.sortArray(finalResultObjArray, order);
         }
-
-        Log.trace("this is FINAL result:  " + JSON.stringify(finalResultObjArray))
-
+        Log.trace("this is FINAL result:  " + JSON.stringify(finalResultObjArray));
         return {render: format, result: finalResultObjArray};
     }
 
@@ -102,37 +108,6 @@ export default class QueryController {
     public parserEBNF(where: any, section: any) {
 
         let valid = true;
-
-        /*//simple query to try AND/OR functionality
-         {
-         "GET": ["courses_dept", "courses_id", "courses_avg"],
-         "WHERE": {
-         "AND": [
-         {"GT": {"courses_avg": 70}},
-         {"IS": {"courses_dept": "adhe"}}
-         ]
-         },
-         "ORDER": "courses_avg",
-         "AS": "TABLE"
-         }
-         */
-
-        /*Complex query to try
-         {
-         "GET": ["courses_dept", "courses_id", "courses_avg"],
-         "WHERE": {
-         "OR": [
-         {"AND": [
-         {"GT": {"courses_avg": 50}},
-         {"IS": {"courses_dept": "food"}}
-         ]},
-         {"GT": {"courses_avg": 95}}
-         ]
-         },
-         "ORDER": "courses_avg",
-         "AS": "TABLE"
-         }*/
-
         if (typeof where['AND'] !== 'undefined' || typeof where['OR'] !== 'undefined') {
             //  Log.trace("type1!!!")
             if (typeof where['AND'] !== 'undefined') {
@@ -140,9 +115,8 @@ export default class QueryController {
                 for (var ANDfilter of where['AND']) {
                     validList1.push(this.parserEBNF(ANDfilter, section));
                 }
-                //  Log.trace("validList1" + validList1);
+                //   Log.trace("validList1" + validList1);
 
-                //  Log.trace("validlist1: "+validList1.length);
                 for (var eachValid1 of validList1) {
                     if (eachValid1 === false)
                         valid = false;
@@ -156,12 +130,7 @@ export default class QueryController {
                 for (var ORfilter of where['OR']) {
                     validList2.push(this.parserEBNF(ORfilter, section));
                 }
-                //    Log.trace("validList2:" + validList2);
-                /*     var ORfilter:any;
-                 for (var key in where['OR'])
-                 {
-                 ORfilter=  where['OR'][key];
-                 validList1.push(this.parserEBNF(ORfilter, section));}  */
+                //      Log.trace("validList2:" + validList2);
 
                 valid = false;
 
@@ -181,52 +150,80 @@ export default class QueryController {
 
                 var whereKey1 = Object.keys(where['GT']).toString()
                 var whereValue1 = where['GT'][Object.keys(where['GT'])[0]]
-
+                //  Log.trace("GT type"+typeof whereValue1)
+                if (this.isvalidKey(whereKey1) === false)
+                    throw Error;
+                //   if(numberRE.test(whereValue1.toString))
                 valid = valid && (section[whereKey1] > whereValue1);
+                //   else
+                //    throw Error;
             }
 
             if (typeof where['EQ'] !== 'undefined') {
                 var whereKey2 = Object.keys(where['EQ']).toString()
                 var whereValue2 = where['EQ'][Object.keys(where['EQ'])[0]]
+                if (this.isvalidKey(whereKey2) === false)
+                    throw Error;
+                //  if(/[1-9]*[0-9]+ ('.' [0-9]+ )?/.test(whereValue2))
                 valid = valid && (((section[whereKey2])) === whereValue2);
-
+                //   else
+                //  throw Error;
             }
 
             if (typeof where['LT'] !== 'undefined') {
 
                 var whereKey3 = Object.keys(where['LT']).toString()
                 var whereValue3 = where['LT'][Object.keys(where['LT'])[0]]
-
+                if (this.isvalidKey(whereKey3) === false)
+                    throw Error;
+                //   if(/[1-9]*[0-9]+ ('.' [0-9]+ )?/.test(whereValue3))
                 valid = valid && (section[whereKey3] < whereValue3);
-
+                // else
+                //      throw Error;
             }
         }
 
         if (typeof where['IS'] !== 'undefined') {
-
+            var ISexp = new RegExp('[a-zA-Z0-9,_-]+', 'g');
             var whereKey4 = Object.keys(where['IS']).toString();
             var whereValue4 = where['IS'][Object.keys(where['IS'])[0]];
+            if (this.isvalidKey(whereKey4) === false)
+                throw Error;
+
             var sectionWhere = section[whereKey4];
-            if (sectionWhere !== "") {
+
                 if (whereValue4.substring(0, 1) === "*" && whereValue4.substring(whereValue4.length - 1, whereValue4.length) === "*") {
-                    var whereValue4 = whereValue4.split("*").join("");
+                    whereValue4 = whereValue4.split("*").join("");
+                    //    if (!ISexp.test(whereValue4))
+                    //       throw Error;
+                    //    else
                     valid = valid && sectionWhere.includes(whereValue4);
+
                 }
                 else if (whereValue4.substring(0, 1) === "*") {
-                    var whereValue4 = whereValue4.split("*").join("");
+                    whereValue4 = whereValue4.split("*").join("");
+                    //     if (!ISexp.test(whereValue4))
+                    //         throw Error;
+                    //     else
                     valid = valid && (sectionWhere.substring(sectionWhere.length - whereValue4.length, sectionWhere.length) === whereValue4)
+
                 }
                 else if (whereValue4.substring(whereValue4.length - 1, whereValue4.length) === "*") {
-                    var whereValue4 = whereValue4.split("*").join("");
+                    whereValue4 = whereValue4.split("*").join("");
+                    //    if (!ISexp.test(whereValue4))
+                    //        throw Error;
+                    //    else
                     valid = valid && (sectionWhere.substring(0, whereValue4.length) === whereValue4)
                 }
+
                 else {
+                    //  if (!ISexp.test(whereValue4))
+                    //       throw Error;
+                    //   else
                     valid = valid && (sectionWhere === whereValue4);
+
                 }
             }
-            else
-                valid = false;
-        }
 
         if (typeof where['NOT'] !== 'undefined') {
             valid = valid && (!this.parserEBNF(where['NOT'], section));
@@ -282,4 +279,22 @@ export default class QueryController {
         });
         return resultArray;
     }
+
+    public isvalidKey(key: string): boolean {
+        var valid: boolean;
+        if (key === "courses_dept" || key === "courses_id" || key === "courses_avg" ||
+            key === "courses_instructor" || key === "courses_title" || key === "courses_pass" ||
+            key === "courses_fail" || key === "courses_audit"
+        )
+            valid = true;
+        else
+            valid = false;
+        return valid;
+    }
+
+    /*  public containIllegalSymbol(value:any){
+     if value.includes()
+     }*/
+
+
 }

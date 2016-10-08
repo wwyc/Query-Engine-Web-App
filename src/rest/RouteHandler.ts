@@ -51,7 +51,8 @@ export default class RouteHandler {
 
                 controller.process(id, req.body).then(function (result) {
 
-                    if (controller.getDataset(id) == null){
+                    if (controller.getDatasets()[id] == null) {
+                        // Dataset is not in disk
                         res.json(204, {success:result})
                         Log.trace("dataset with this ID is new")
 
@@ -105,7 +106,7 @@ export default class RouteHandler {
             }
         } catch (err) {
             Log.error('RouteHandler::postQuery(..) - ERROR: ' + err);
-            res.send(403);
+            res.send(400, {status: 'invalid query'});
         }
         return next();
     }
@@ -116,20 +117,31 @@ export default class RouteHandler {
 
             var id: string = req.params.id;
 
-            //  check if dataset is empty in memory
+            var datasetToDelete = RouteHandler.datasetController.getDataset(id)
 
-            delete RouteHandler.datasetController.getDatasets()
+            if (!(RouteHandler.datasetController.isEmpty(datasetToDelete) || (datasetToDelete == null))) {
 
-            fs.unlinkSync("../cpsc310project/data/" + id+".json")
+                //  check if dataset is empty in memory or disk
+                delete RouteHandler.datasetController.getDatasets()[id];
 
-            Log.trace('RouteHandler::deleteQuery(..) - successful')
+                Log.trace("what is relativePath  " + RouteHandler.datasetController.relativePath)
+                fs.unlinkSync(RouteHandler.datasetController.relativePath + "/data/" + id + ".json")
 
-            res.send(204)
 
-            // produce error if not found in both memory or disk
+                Log.trace('RouteHandler::deleteQuery(..) - successful');
+                res.json(204, {success: 'dataset deleted'});
+
+                //res.send(204).json({success: 'dataset deleted'});
+                //res.send(204);
+
+
+            } else {
+                // produce error if not found in both memory or disk
+                throw Error
+            }
 
         } catch (err) {
-            Log.error('RouteHandler::deleteQuery(..) - ERROR: dataset with given not found' + err.message);
+            Log.error('RouteHandler::deleteQuery(..) - ERROR: dataset with given not found   ' + err.message);
             res.send(404);
         }
     }
