@@ -41,24 +41,30 @@ export default class QueryController {
         var order = query.ORDER;
         var format = query.AS;
         var intermediate: any = [];
-
+        var orderValid: boolean = order !== null && typeof order !== 'undefined';
         if (format !== "TABLE")
             throw Error;
         if (typeof get === 'string') {
             if (this.isvalidKey(get) === false)
                 throw Error;
+            if (get !== order && orderValid)
+                throw Error;
+            else
             intermediate = this.dealWithWhere(where, get)
         } else {
             for (var i of get) {
                 if (this.isvalidKey(i) === false)
                     throw Error;
             }
+            if (!get.includes(order) && orderValid)
+                throw Error;
+            else
             intermediate = this.dealWithWhere(where, get[0])
         }
         var values: any = [];
         var finalResultObjArray: any = this.represent(get, intermediate);
         //Do this if order was requested
-        if (order !== null && typeof order !== 'undefined') {
+        if (orderValid) {
             if (this.isvalidKey(order) === false)
                 throw Error;
             else
@@ -183,7 +189,7 @@ export default class QueryController {
         }
 
         if (typeof where['IS'] !== 'undefined') {
-            //  var ISexp = new RegExp('^[a-zA-z0-9,_]+$');
+            //   var ISexp = new RegExp('/xxx[\x00-\x7F]+xxx/');
             var whereKey4 = Object.keys(where['IS']).toString();
             var whereValue4 = where['IS'][Object.keys(where['IS'])[0]];
             if (this.isvalidKey(whereKey4) === false)
@@ -193,31 +199,31 @@ export default class QueryController {
 
                 if (whereValue4.substring(0, 1) === "*" && whereValue4.substring(whereValue4.length - 1, whereValue4.length) === "*") {
                     whereValue4 = whereValue4.substring(1, whereValue4.length - 1);
-                    //   if (!ISexp.test(whereValue4))
-                    //         throw Error;
-                    //     else
+                    /*       if (!ISexp.test(whereValue4))
+                     throw Error;
+                     else    */
                     valid = valid && sectionWhere.includes(whereValue4);
                 }
                 else if (whereValue4.substring(0, 1) === "*") {
                     whereValue4 = whereValue4.substring(1, whereValue4.length);
-                    //         if (!ISexp.test(whereValue4))
-                    //             throw Error;
-                    //        else
+                    /*          if (!ISexp.test(whereValue4))
+                     throw Error;
+                     else   */
                     valid = valid && (sectionWhere.substring(sectionWhere.length - whereValue4.length, sectionWhere.length) === whereValue4)
 
                 }
                 else if (whereValue4.substring(whereValue4.length - 1, whereValue4.length) === "*") {
                     whereValue4 = whereValue4.substring(0, whereValue4.length - 1);
-                    //      if (!ISexp.test(whereValue4))
-                    //        throw Error;
-                    //     else
+                    /*     if (!ISexp.test(whereValue4))
+                     throw Error;
+                     else      */
                     valid = valid && (sectionWhere.substring(0, whereValue4.length) === whereValue4)
                 }
 
                 else {
-                    //     if (!ISexp.test(whereValue4))
-                    //         throw Error;
-                    //      else
+                    /*       if (!ISexp.test(whereValue4))
+                     throw Error;
+                     else   */
                     valid = valid && (sectionWhere === whereValue4);
 
                 }
