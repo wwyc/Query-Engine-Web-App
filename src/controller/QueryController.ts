@@ -341,7 +341,6 @@ export default class QueryController {
         }
         return isvalidKeyResult;
     }
-
-
+    
 }
 
