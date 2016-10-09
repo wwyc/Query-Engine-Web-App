@@ -74,38 +74,55 @@ export default class RouteHandler {
         return next();
     }
 //add 424(check if on memory)
-    public static postQuery(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace('RouteHandler::postQuery(..) - params: ' + JSON.stringify(req.params));
-        try {
-            let query: QueryRequest = req.params;
+    public static postQuery(req:restify.Request,res:restify.Response,next:restify.Next){
+        Log.trace('RouteHandler::postQuery(..)-params:'+JSON.stringify(req.params));
+        try{
+            let query:QueryRequest=req.params;
 
-            let datasets: Datasets = RouteHandler.datasetController.getDatasets();
+            let datasets:Datasets=RouteHandler.datasetController.getDatasets();
 
-            Log.trace("RouteHandler - what is in Datasets?" + Object.keys(RouteHandler.datasetController.getDatasets()))
+            Log.trace("RouteHandler-whatisinDatasets?"+Object.keys(RouteHandler.datasetController.getDatasets()))
 
-            let controller = new QueryController(datasets);
-            let isValid = controller.isValid(query);
+            let controller=new QueryController(datasets);
+            let isValid=controller.isValid(query);
 
-            if (isValid === true) {
-                var get = query.GET;
-                var id: string
-                if (typeof get === 'string') {
-                    id = get.split("_")[0];
-                } else {
-                    id = get[0].split("_")[0];
+            var GETKey=query.GET;
+            var id:string
+
+            if(isValid===true){
+
+                if(typeof GETKey==='string'&&GETKey.includes("_")){
+                    id=GETKey.split("_")[0];
+                }else if(Array.isArray(GETKey)&&GETKey[0].includes("_")){
+                    id=GETKey[0].split("_")[0];
                 }
-                if (typeof datasets[id] === 'undefined') {
-                    res.json(424, {missing: [id]});
+//checkifdatasetwithidexists
+                Log.trace(id)
+
+                if(typeof datasets[id]=='undefined'){
+                    Log.error('RouteHandler::postQuery(..)-ERROR:'+'datasetnotfound');
+                    res.json(424,{missing:[id]});
                 }
-                else {
-                    let result = controller.query(query);
-                    res.json(200, result);
+                else{
+//datasetwithidexits
+//callqueryfunctionandreturnresultsorcatcherror
+                    try{
+                        let result=controller.query(query);
+                        res.json(200,result);
+                        Log.trace('RouteHandler::postQuery(..)-:'+'querysuccess');
+
+                    }catch(err){
+                        Log.error('RouteHandler::postQuery(..)-ERROR:'+'errorcaughtinquery()...invalidquery');
+                        res.json(400,{status:'invalidquery'});
+                    }
                 }
-            } else {
-                res.json(400, {status: 'invalid query'});
+            }else{
+//throwerrorifIsValid=false
+                Log.error('RouteHandler::postQuery(..)-ERROR:'+'isValid=false...invalidquery');
+                res.json(400,{status:'invalidquery'});
             }
-        } catch (err) {
-            Log.error('RouteHandler::postQuery(..) - ERROR: ' + err);
+        }catch(err){
+            Log.error('RouteHandler::postQuery(..)-ERROR:'+err);
             res.send(403);
         }
         return next();
