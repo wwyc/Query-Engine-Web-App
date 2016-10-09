@@ -156,8 +156,7 @@ export default class QueryController {
         //Log.trace(prefix);
         return prefix;
     }
-
-
+    
     public parserEBNF(where: any, section: any) {
 
         let valid = true;
