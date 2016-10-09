@@ -51,7 +51,7 @@ export default class RouteHandler {
 
                 controller.process(id, req.body).then(function (result) {
 
-                    if (controller.getDatasets()[id] == null) {
+                    if (controller.getDatasets()[id] == null){
                         // Dataset is not in disk
                         res.json(204, {success:result})
                         Log.trace("dataset with this ID is new")
@@ -74,45 +74,56 @@ export default class RouteHandler {
         return next();
     }
 //add 424(check if on memory)
-    public static postQuery(req: restify.Request, res: restify.Response, next: restify.Next) {
-        Log.trace('RouteHandler::postQuery(..) - params: ' + JSON.stringify(req.params));
-        try {
-            let query: QueryRequest = req.params;
+    public static postQuery(req:restify.Request,res:restify.Response,next:restify.Next){
+        Log.trace('RouteHandler::postQuery(..)-params:'+JSON.stringify(req.params));
+        try{
+            let query:QueryRequest=req.params;
 
-            let datasets: Datasets = RouteHandler.datasetController.getDatasets();
+            let datasets:Datasets=RouteHandler.datasetController.getDatasets();
 
-            Log.trace("RouteHandler - what is in Datasets?" + Object.keys(RouteHandler.datasetController.getDatasets()))
+            Log.trace("RouteHandler-whatisinDatasets?"+Object.keys(RouteHandler.datasetController.getDatasets()))
 
-            let controller = new QueryController(datasets);
-            let isValid = controller.isValid(query);
+            let controller=new QueryController(datasets);
+            let isValid=controller.isValid(query);
 
-            if (isValid === true) {
-                var get = query.GET;
-                var id: string
-                if (typeof get === 'string') {
-                    if (!get.includes("_"))
-                        res.json(400, {status: 'invalid query'});
-                    else
-                    id = get.split("_")[0];
-                } else {
-                    if (!get[0].includes("_"))
-                        res.json(400, {status: 'invalid query'});
-                    else
-                    id = get[0].split("_")[0];
+            var GETKey=query.GET;
+            var id:string
+
+            if(isValid===true){
+
+                if(typeof GETKey==='string'&&GETKey.includes("_")){
+                    id=GETKey.split("_")[0];
+                }else if(Array.isArray(GETKey)&&GETKey[0].includes("_")){
+                    id=GETKey[0].split("_")[0];
                 }
-                if (typeof datasets[id] === 'undefined') {
-                    res.json(424, {missing: [id]});
+//checkifdatasetwithidexists
+                Log.trace(id)
+
+                if(typeof datasets[id]=='undefined'){
+                    Log.error('RouteHandler::postQuery(..)-ERROR:'+'datasetnotfound');
+                    res.json(424,{missing:[id]});
                 }
-                else {
-                    let result = controller.query(query);
-                    res.json(200, result);
+                else{
+//datasetwithidexits
+//callqueryfunctionandreturnresultsorcatcherror
+                    try{
+                        let result=controller.query(query);
+                        res.json(200,result);
+                        Log.trace('RouteHandler::postQuery(..)-:'+'querysuccess');
+
+                    }catch(err){
+                        Log.error('RouteHandler::postQuery(..)-ERROR:'+'errorcaughtinquery()...invalidquery');
+                        res.json(400,{status:'invalidquery'});
+                    }
                 }
-            } else {
-                res.json(400, {status: 'invalid query'});
+            }else{
+//throwerrorifIsValid=false
+                Log.error('RouteHandler::postQuery(..)-ERROR:'+'isValid=false...invalidquery');
+                res.json(400,{status:'invalidquery'});
             }
-        } catch (err) {
-            Log.error('RouteHandler::postQuery(..) - ERROR: ' + err);
-            res.send(400, {status: 'invalid query'});
+        }catch(err){
+            Log.error('RouteHandler::postQuery(..)-ERROR:'+err);
+            res.send(403);
         }
         return next();
     }
@@ -125,13 +136,13 @@ export default class RouteHandler {
 
             var datasetToDelete = RouteHandler.datasetController.getDataset(id)
 
-            if (!(RouteHandler.datasetController.isEmpty(datasetToDelete) || (datasetToDelete == null))) {
+            if (!(RouteHandler.datasetController.isEmpty(datasetToDelete) || (datasetToDelete == null))){
 
                 //  check if dataset is empty in memory or disk
                 delete RouteHandler.datasetController.getDatasets()[id];
 
                 Log.trace("what is relativePath  " + RouteHandler.datasetController.relativePath)
-                fs.unlinkSync(RouteHandler.datasetController.relativePath + "/data/" + id + ".json")
+                fs.unlinkSync(RouteHandler.datasetController.relativePath + "/data/" + id+".json")
 
 
                 Log.trace('RouteHandler::deleteQuery(..) - successful');
@@ -143,8 +154,7 @@ export default class RouteHandler {
 
             } else {
                 // produce error if not found in both memory or disk
-                throw Error
-            }
+                throw Error}
 
         } catch (err) {
             Log.error('RouteHandler::deleteQuery(..) - ERROR: dataset with given not found   ' + err.message);

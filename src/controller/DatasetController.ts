@@ -85,17 +85,31 @@ export default class DatasetController {
 
             Log.trace(that.relativePath)
 
-            fs1.readdirSync(that.relativePath + "/data/", 'utf8', (err: string, files: any) => {
+            var Files=(fs1.readdirSync(that.relativePath+"/data/"))
+            /*Log.trace(Files)
+             Log.trace(typeofFiles)
+             Log.trace(Array.isArray(Files).toString())*/
+
+            for(var file of Files){
+
+                Log.trace(file)
+                Log.trace("file.split[0]"+file.split(".")[0])
+
+                var fileName=file.split(".")[0]
+                this.datasets[fileName]=this.getDataset(fileName)
+            }
+
+            /*fs1.readdirSync(that.relativePath + "/data/", 'utf8', (err: string, files: any) => {
                     //iterate through array of file names and get all?
                     for (var file of files) {
                     //.JSON is always 5 characters
                         Log.trace("file.split[0]   " + file.split(".")[0])
                         this.datasets[file.split(".")[0]] = this.getDataset(file)
                     }
-                    /*
+
                      var data1 = fs1.readFileSync("../cpsc310project/data/courses.json")
-                     that.datasets["courses"] = JSON.parse(data1)*/
-                })
+                     that.datasets["courses"] = JSON.parse(data1)
+                })*/
 
         }
 
