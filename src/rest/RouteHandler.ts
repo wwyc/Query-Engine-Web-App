@@ -90,8 +90,14 @@ export default class RouteHandler {
                 var get = query.GET;
                 var id: string
                 if (typeof get === 'string') {
+                    if (!get.includes("_"))
+                        res.json(400, {status: 'invalid query'});
+                    else
                     id = get.split("_")[0];
                 } else {
+                    if (!get[0].includes("_"))
+                        res.json(400, {status: 'invalid query'});
+                    else
                     id = get[0].split("_")[0];
                 }
                 if (typeof datasets[id] === 'undefined') {

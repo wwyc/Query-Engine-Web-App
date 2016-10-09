@@ -76,7 +76,7 @@ export default class QueryController {
         var datasetsNew = JSON.parse(JSON.stringify(this.datasets))
 
         // Retrieve dataset from given GET
-        var datasetRetrived = datasetsNew["courses"];
+        var datasetRetrived = datasetsNew[this.stringPrefix(get)];
 
         var sections: any = []
 
@@ -144,7 +144,7 @@ export default class QueryController {
 
 
         if (typeof where['GT'] || typeof where['EQ'] || typeof where['LT'] !== 'undefined') {
-
+            // var numberRE=new RegExp("^[1-9]*[0-9]+ ('.' [0-9]+ )?$")
             if (typeof where['GT'] !== 'undefined') {
 
                 var whereKey1 = Object.keys(where['GT']).toString()
@@ -152,10 +152,10 @@ export default class QueryController {
                 //  Log.trace("GT type"+typeof whereValue1)
                 if (this.isvalidKey(whereKey1) === false)
                     throw Error;
-                //   if(numberRE.test(whereValue1.toString))
+                //        if(numberRE.test(whereValue1.toString))
                 valid = valid && (section[whereKey1] > whereValue1);
-                //   else
-                //    throw Error;
+                //       else
+                //       throw Error;
             }
 
             if (typeof where['EQ'] !== 'undefined') {
@@ -163,10 +163,10 @@ export default class QueryController {
                 var whereValue2 = where['EQ'][Object.keys(where['EQ'])[0]]
                 if (this.isvalidKey(whereKey2) === false)
                     throw Error;
-                //  if(/[1-9]*[0-9]+ ('.' [0-9]+ )?/.test(whereValue2))
+                //    if(numberRE.test(whereValue2.toString()))
                 valid = valid && (((section[whereKey2])) === whereValue2);
-                //   else
-                //  throw Error;
+                //       else
+                //      throw Error;
             }
 
             if (typeof where['LT'] !== 'undefined') {
@@ -175,15 +175,15 @@ export default class QueryController {
                 var whereValue3 = where['LT'][Object.keys(where['LT'])[0]]
                 if (this.isvalidKey(whereKey3) === false)
                     throw Error;
-                //   if(/[1-9]*[0-9]+ ('.' [0-9]+ )?/.test(whereValue3))
+                //      if(numberRE.test(whereValue3.toString()))
                 valid = valid && (section[whereKey3] < whereValue3);
-                // else
-                //      throw Error;
+                //    else
+                //         throw Error;
             }
         }
 
         if (typeof where['IS'] !== 'undefined') {
-            var ISexp = new RegExp('[a-zA-Z0-9,_-]+', 'g');
+            //  var ISexp = new RegExp('^[a-zA-z0-9,_]+$');
             var whereKey4 = Object.keys(where['IS']).toString();
             var whereValue4 = where['IS'][Object.keys(where['IS'])[0]];
             if (this.isvalidKey(whereKey4) === false)
@@ -192,33 +192,32 @@ export default class QueryController {
             var sectionWhere = section[whereKey4];
 
                 if (whereValue4.substring(0, 1) === "*" && whereValue4.substring(whereValue4.length - 1, whereValue4.length) === "*") {
-                    whereValue4 = whereValue4.split("*").join("");
-                    //    if (!ISexp.test(whereValue4))
-                    //       throw Error;
-                    //    else
-                    valid = valid && sectionWhere.includes(whereValue4);
-
-                }
-                else if (whereValue4.substring(0, 1) === "*") {
-                    whereValue4 = whereValue4.split("*").join("");
-                    //     if (!ISexp.test(whereValue4))
+                    whereValue4 = whereValue4.substring(1, whereValue4.length - 1);
+                    //   if (!ISexp.test(whereValue4))
                     //         throw Error;
                     //     else
+                    valid = valid && sectionWhere.includes(whereValue4);
+                }
+                else if (whereValue4.substring(0, 1) === "*") {
+                    whereValue4 = whereValue4.substring(1, whereValue4.length);
+                    //         if (!ISexp.test(whereValue4))
+                    //             throw Error;
+                    //        else
                     valid = valid && (sectionWhere.substring(sectionWhere.length - whereValue4.length, sectionWhere.length) === whereValue4)
 
                 }
                 else if (whereValue4.substring(whereValue4.length - 1, whereValue4.length) === "*") {
-                    whereValue4 = whereValue4.split("*").join("");
-                    //    if (!ISexp.test(whereValue4))
+                    whereValue4 = whereValue4.substring(0, whereValue4.length - 1);
+                    //      if (!ISexp.test(whereValue4))
                     //        throw Error;
-                    //    else
+                    //     else
                     valid = valid && (sectionWhere.substring(0, whereValue4.length) === whereValue4)
                 }
 
                 else {
-                    //  if (!ISexp.test(whereValue4))
-                    //       throw Error;
-                    //   else
+                    //     if (!ISexp.test(whereValue4))
+                    //         throw Error;
+                    //      else
                     valid = valid && (sectionWhere === whereValue4);
 
                 }
