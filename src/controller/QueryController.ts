@@ -95,7 +95,7 @@ export default class QueryController {
         Log.trace('QueryController::query( ' + JSON.stringify(query) + ' )');//json string
 
         // TODO: implement this
-        //parse the json query to string
+
         var get = query.GET;                            // can be string or array of string
         var where = query.WHERE;                        //json object or json array
         var order = query.ORDER;
