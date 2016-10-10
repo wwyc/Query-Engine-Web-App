@@ -262,38 +262,40 @@ export default class QueryController {
             var ISRE = new RegExp("^[\x20-\x7F]+$");
             var whereKey4 = Object.keys(where['IS']).toString();
             var whereValue4 = where['IS'][Object.keys(where['IS'])[0]];
+            if (!ISRE.test(whereValue4))
+                throw  Error;
             if (this.isvalidKey(whereKey4) === false) {
                 throw Error
             }
-            ;
+
             var sectionWhere = section[whereKey4];
             if (sectionWhere !== "") {
                 if (whereValue4.substring(0, 1) === "*" && whereValue4.substring(whereValue4.length - 1, whereValue4.length) === "*") {
 
                     whereValue4 = whereValue4.substring(1, whereValue4.length - 1);
-                    if (!ISRE.test(whereValue4))
+                    /*   if (!ISRE.test(whereValue4))
                         throw  Error;
-                    else
+                     else   */
                     valid = valid && sectionWhere.includes(whereValue4);
                 }
                 else if (whereValue4.substring(0, 1) === "*") {
                     whereValue4 = whereValue4.substring(1, whereValue4.length);
-                    if (!ISRE.test(whereValue4))
+                    /*     if (!ISRE.test(whereValue4))
                         throw  Error;
-                    else
+                     else  */
                     valid = valid && (sectionWhere.substring(sectionWhere.length - whereValue4.length, sectionWhere.length) === whereValue4)
                 }
                 else if (whereValue4.substring(whereValue4.length - 1, whereValue4.length) === "*") {
                     whereValue4 = whereValue4.substring(0, whereValue4.length - 1);
-                    if (!ISRE.test(whereValue4))
+                    /*   if (!ISRE.test(whereValue4))
                         throw  Error;
-                    else
+                     else   */
                     valid = valid && (sectionWhere.substring(0, whereValue4.length) === whereValue4)
                 }
                 else {
-                    if (!ISRE.test(whereValue4))
+                    /*     if (!ISRE.test(whereValue4))
                         throw  Error;
-                    else
+                     else   */
                     valid = valid && (sectionWhere === whereValue4);
                 }
             }
