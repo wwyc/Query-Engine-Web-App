@@ -222,7 +222,7 @@ export default class QueryController {
                 var whereKey1 = Object.keys(where['GT']).toString()
                 var whereValue1 = where['GT'][Object.keys(where['GT'])[0]]
 
-                if (this.isvalidKey(whereKey1) === false) {
+                if (this.isvalidNumberKey(whereKey1) === false) {
                     throw Error
                 }
                 if (!numberRE.test(whereValue1.toString()))
@@ -234,7 +234,7 @@ export default class QueryController {
             if (typeof where['EQ'] !== 'undefined') {
                 var whereKey2 = Object.keys(where['EQ']).toString()
                 var whereValue2 = where['EQ'][Object.keys(where['EQ'])[0]]
-                if (this.isvalidKey(whereKey2) === false) {
+                if (this.isvalidNumberKey(whereKey2) === false) {
                     throw Error
                 }
                 if (!numberRE.test(whereValue2.toString()))
@@ -247,7 +247,7 @@ export default class QueryController {
 
                 var whereKey3 = Object.keys(where['LT']).toString()
                 var whereValue3 = where['LT'][Object.keys(where['LT'])[0]]
-                if (this.isvalidKey(whereKey3) === false) {
+                if (this.isvalidNumberKey(whereKey3) === false) {
                     throw Error
                 }
                 if (!numberRE.test(whereValue3.toString()))
@@ -264,7 +264,7 @@ export default class QueryController {
             var whereValue4 = where['IS'][Object.keys(where['IS'])[0]];
             if (!ISRE.test(whereValue4))
                 throw  Error;
-            if (this.isvalidKey(whereKey4) === false) {
+            if (this.isvalidStringKey(whereKey4) === false) {
                 throw Error
             }
 
@@ -273,29 +273,21 @@ export default class QueryController {
                 if (whereValue4.substring(0, 1) === "*" && whereValue4.substring(whereValue4.length - 1, whereValue4.length) === "*") {
 
                     whereValue4 = whereValue4.substring(1, whereValue4.length - 1);
-                    /*   if (!ISRE.test(whereValue4))
-                        throw  Error;
-                     else   */
+
                     valid = valid && sectionWhere.includes(whereValue4);
                 }
                 else if (whereValue4.substring(0, 1) === "*") {
                     whereValue4 = whereValue4.substring(1, whereValue4.length);
-                    /*     if (!ISRE.test(whereValue4))
-                        throw  Error;
-                     else  */
+
                     valid = valid && (sectionWhere.substring(sectionWhere.length - whereValue4.length, sectionWhere.length) === whereValue4)
                 }
                 else if (whereValue4.substring(whereValue4.length - 1, whereValue4.length) === "*") {
                     whereValue4 = whereValue4.substring(0, whereValue4.length - 1);
-                    /*   if (!ISRE.test(whereValue4))
-                        throw  Error;
-                     else   */
+
                     valid = valid && (sectionWhere.substring(0, whereValue4.length) === whereValue4)
                 }
                 else {
-                    /*     if (!ISRE.test(whereValue4))
-                        throw  Error;
-                     else   */
+
                     valid = valid && (sectionWhere === whereValue4);
                 }
             }
@@ -370,5 +362,31 @@ export default class QueryController {
         }
         return isvalidKeyResult;
     }
+
+    public isvalidNumberKey(key: any): any {
+        var isvalidKeyResult: any
+        if (key === "courses_avg" ||
+            key === "courses_pass" ||
+            key === "courses_fail" || key === "courses_audit"
+        ) {
+            isvalidKeyResult = true;
+        } else {
+            isvalidKeyResult = false;
+        }
+        return isvalidKeyResult;
+    }
+
+    public isvalidStringKey(key: any): any {
+        var isvalidKeyResult: any
+        if (key === "courses_dept" || key === "courses_id" ||
+            key === "courses_instructor" || key === "courses_title"
+        ) {
+            isvalidKeyResult = true;
+        } else {
+            isvalidKeyResult = false;
+        }
+        return isvalidKeyResult;
+    }
+
 
 }
