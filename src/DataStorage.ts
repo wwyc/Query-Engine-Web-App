@@ -5,7 +5,7 @@
 
 export default class Session{
     public courses_dept: string
-    public courses_id: number
+    public courses_id: string
     public courses_avg: number
     public courses_instructor: string
     public courses_title: string
