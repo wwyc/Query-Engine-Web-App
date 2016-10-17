@@ -36,13 +36,13 @@ export default class DatasetController {
     public getDataset(id: string): any {
         // TODO: this should check if the dataset is on disk in ./data if it is not already in memory.
 
-        Log.trace("inside getDataset(id) 1   " + process.cwd())
+        //Log.trace("inside getDataset(id) 1   " + process.cwd())
         this.relativePath = process.cwd()
 
         // check if dataset/memory is empty
         if (!(this.isEmpty(this.datasets) || (typeof this.datasets == "undefined"))){
 
-            Log.trace("INSIDE getDataset: dataset is in memory")
+            //Log.trace("INSIDE getDataset: dataset is in memory")
             var keys = Object.keys(this.datasets);
             for (var id1 of keys) {
                 Log.trace(id1);
@@ -54,13 +54,13 @@ export default class DatasetController {
             //check if dataset is in disk
             var fs = require('fs');
 
-            Log.trace("inside getDataset(id)    " + this.relativePath)
+            //Log.trace("inside getDataset(id)    " + this.relativePath)
 
             try {var data = fs.readFileSync(this.relativePath + "/data/"+id+".json")
-                Log.trace("dataset is in disk")
+                //Log.trace("dataset is in disk")
             }
             catch (err){
-                Log.trace("inside getDataset:  dataset with given id Not Found")
+                //Log.trace("inside getDataset:  dataset with given id Not Found")
                 return null;
             }
 
@@ -85,14 +85,14 @@ export default class DatasetController {
 
             that.relativePath = process.cwd()
 
-            Log.trace(that.relativePath)
+            //Log.trace(that.relativePath)
 
             var Files=(fs1.readdirSync(that.relativePath+"/data/"))
 
             for(var file of Files){
 
-                Log.trace(file)
-                Log.trace("file.split[0]"+file.split(".")[0])
+                //Log.trace(file)
+                //Log.trace("file.split[0]"+file.split(".")[0])
 
                 var fileName=file.split(".")[0]
                 this.datasets[fileName]=this.getDataset(fileName)
@@ -152,14 +152,13 @@ export default class DatasetController {
                         }
                     })
 
-                    Log.trace("PromiseArray length:  "+ promiseArray.length);
+                    //Log.trace("PromiseArray length:  "+ promiseArray.length);
 
                     Promise.all(promiseArray).then(function(endResult: any) {
 
                         Log.trace("INSIDE PROMISE ALL")
 
                         Log.trace("endResult:  "+ endResult.length);
-
 
                         if (id == "courses") {
 
@@ -195,11 +194,11 @@ export default class DatasetController {
                         }
                         processedDataset = courseMap
                         }
-                        Log.trace("before saving dataset")
+                        //Log.trace("before saving dataset")
                         that.save(id, processedDataset)
                     })
 
-                    Log.trace("after saving dataset")
+                    //Log.trace("after saving dataset")
 
 
                     if (isValidDataset == false){
@@ -243,7 +242,7 @@ export default class DatasetController {
 
         try {
             fs2.writeFileSync('data/' + id + '.json', datasetToSave, 'utf8')
-            Log.trace("INSIDE save:  which directory am i in?"  + process.cwd())
+            //Log.trace("INSIDE save:  which directory am i in?"  + process.cwd())
             Log.trace("writting files success")
 
             this.relativePath = process.cwd()

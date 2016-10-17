@@ -99,8 +99,8 @@ export default class QueryController {
             finalResultObjArray = this.sortArray(finalResultObjArray, order);
         }
 
-        Log.trace("this is FINAL result:  " + JSON.stringify(finalResultObjArray))
-        Log.trace("this is FINAL result:  " + JSON.stringify({render: format, result: finalResultObjArray}))
+        //Log.trace("this is FINAL result:  " + JSON.stringify(finalResultObjArray))
+        //Log.trace("this is FINAL result:  " + JSON.stringify({render: format, result: finalResultObjArray}))
 
         return {render: format.toLowerCase(), result: finalResultObjArray};
     }
