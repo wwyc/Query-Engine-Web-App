@@ -28,49 +28,36 @@ export default class QueryController {
 
         var isValidResult=false
 
-//Log.trace(query.WHERE.toString())
-//
-//Log.trace(typeofquery.WHERE)
-//Log.trace(Object.keys(query.WHERE).length.toString())
-//
-//Log.trace(Object.keys(query.WHERE).toString())
-//
-//Log.trace(typeofquery)
-//
-//Log.trace((typeofquery=='undefined').toString())
-
         if((typeof query=='undefined')
             ||(query==null)
             ||(Object.keys(query).length<2)
             ||(query.AS!=="TABLE")
-
         ){
             return false;
         }
 
-//checkifWHEREexistsorisitempty
+        //checkifWHEREexistsorisitempty
         if((typeof query.WHERE=='undefined')||query.WHERE==null){
             return false
         }else if(Object.keys(query.WHERE).length<1){
             return false
         }
 
-
         if(typeof query.GET==='string'){
-//checkifGETkeyisvalid&checkifORDERisequalinGETkey
+        //check if GET key is valid & check if ORDER is equal in GET key
             if(this.isvalidKey(query.GET)&&(query.ORDER==null||query.ORDER==query.GET)){
                 isValidResult=true}
 
         }else if(Array.isArray(query.GET)){
 
-//gothrougheachelementofarrayandcheckifGETkeyisvalid
+            //gothrougheachelementofarrayandcheckifGETkeyisvalid
             for(var j=0;j<Object.keys(query.GET).length;j++){
                 if(!this.isvalidKey(query.GET[j])){
                     return false
                 }
             }
 
-//trytofindGETkeyinORDER
+            //try to find GET key in ORDER
             if(query.ORDER!==null){
                 isValidResult=false
                 for(var j=0;j<Object.keys(query.GET).length;j++){
@@ -80,12 +67,7 @@ export default class QueryController {
                 }
             }
 
-
-
         }else{isValidResult=false}
-
-
-
 
         return isValidResult;
     }
@@ -118,8 +100,9 @@ export default class QueryController {
         }
 
         Log.trace("this is FINAL result:  " + JSON.stringify(finalResultObjArray))
+        Log.trace("this is FINAL result:  " + JSON.stringify({render: format, result: finalResultObjArray}))
 
-        return {render: format, result: finalResultObjArray};
+        return {render: format.toLowerCase(), result: finalResultObjArray};
     }
 
 //deal with where
@@ -156,7 +139,7 @@ export default class QueryController {
         //Log.trace(prefix);
         return prefix;
     }
-    
+
     public parserEBNF(where: any, section: any) {
 
         let valid = true;
