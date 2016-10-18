@@ -28,15 +28,17 @@ describe("DatasetController", function () {
         return zip.generateAsync(opts).then(function (data) {
             Log.test('Dataset created');
             let controller = new DatasetController();
-            return controller.process('setA', data);
+            return controller.process('courses', data);
         }).then(function (result) {
             Log.test('Dataset processed; result: ' + result);
             expect(result).to.equal(true);
         });
 
+
     });
 
-    /*it("Should be able to delete a Dataset", function () {
+
+/*    it("Should be able to delete a Dataset", function () {
         Log.test('Creating dataset');
         let content = {key: 'value'};
         let zip = new JSZip();
@@ -47,7 +49,7 @@ describe("DatasetController", function () {
         return zip.generateAsync(opts).then(function (data) {
             Log.test('Dataset created');
             let controller = new DatasetController();
-            return controller.process('setA', data);
+            return controller.process('courses', data);
         }).then(function (result) {
             Log.test('Dataset processed; result: ' + result);
             expect(result).to.equal(true);

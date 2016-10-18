@@ -10,7 +10,9 @@ import {stringify} from "querystring";
 export interface QueryRequest {
     GET: string|string[];
     WHERE: {};
-    ORDER: string;
+    //GROUP:string[];
+    //APPLY:any[];
+    ORDER: any;
     AS: string;
 }
 
@@ -26,68 +28,57 @@ export default class QueryController {
 
     public isValid(query:QueryRequest):boolean{
 
-        var isValidResult=false
+        //var isValidResult=false
 
-//Log.trace(query.WHERE.toString())
-//
-//Log.trace(typeofquery.WHERE)
-//Log.trace(Object.keys(query.WHERE).length.toString())
-//
-//Log.trace(Object.keys(query.WHERE).toString())
-//
-//Log.trace(typeofquery)
-//
-//Log.trace((typeofquery=='undefined').toString())
-
-        if((typeof query=='undefined')
-            ||(query==null)
-            ||(Object.keys(query).length<2)
-            ||(query.AS!=="TABLE")
-
-        ){
-            return false;
-        }
-
-//checkifWHEREexistsorisitempty
-        if((typeof query.WHERE=='undefined')||query.WHERE==null){
-            return false
-        }else if(Object.keys(query.WHERE).length<1){
-            return false
+        if (typeof query !== 'undefined' && query !== null && Object.keys(query).length > 0) {
+            return true;
         }
 
 
-        if(typeof query.GET==='string'){
-//checkifGETkeyisvalid&checkifORDERisequalinGETkey
-            if(this.isvalidKey(query.GET)&&(query.ORDER==null||query.ORDER==query.GET)){
-                isValidResult=true}
+        /*   if((typeof query=='undefined')
+         ||(query==null)
+         ||(Object.keys(query).length<2)
+         ||(query.AS!=="TABLE")
 
-        }else if(Array.isArray(query.GET)){
+         ){
+         return false;
+         }*/
 
-//gothrougheachelementofarrayandcheckifGETkeyisvalid
-            for(var j=0;j<Object.keys(query.GET).length;j++){
-                if(!this.isvalidKey(query.GET[j])){
-                    return false
-                }
-            }
-
-//trytofindGETkeyinORDER
-            if(query.ORDER!==null){
-                isValidResult=false
-                for(var j=0;j<Object.keys(query.GET).length;j++){
-                    if(query.ORDER==null||query.GET[j]==query.ORDER){
-                        isValidResult=true
-                    }
-                }
-            }
+        /*   //checkifWHEREexistsorisitempty
+         if((typeof query.WHERE=='undefined')||query.WHERE==null){
+         return false
+         }else if(Object.keys(query.WHERE).length<1){
+         return false
+         }
 
 
+         if(typeof query.GET==='string'){
+         //check if GET key is valid & check if ORDER is equal in GET key
+         if(this.isvalidKey(query.GET)&&(query.ORDER==null||query.ORDER==query.GET)){
+         isValidResult=true}
 
-        }else{isValidResult=false}
+         }else if(Array.isArray(query.GET)){
 
+         //gothrougheachelementofarrayandcheckifGETkeyisvalid
+         for(var j=0;j<Object.keys(query.GET).length;j++){
+         if(!this.isvalidKey(query.GET[j])){
+         return false
+         }
+         }
 
+         //try to find GET key in ORDER
+         if(query.ORDER!==null||typeof query.ORDER == "string"){
+         isValidResult=false
+         for(var j=0;j<Object.keys(query.GET).length;j++){
+         if(query.ORDER==null||query.GET[j]==query.ORDER){
+         isValidResult=true
+         }
+         }
+         }
 
+         }else{isValidResult=false}*/
 
-        return isValidResult;
+        return false;
     }
 
     public query(query: QueryRequest): QueryResponse {
@@ -99,13 +90,15 @@ export default class QueryController {
         var where = query.WHERE;                        //json object or json array
         var order = query.ORDER;
         var format = query.AS;
+        //var apply = query.APPLY;
+
 
         var intermediate: any = [];
 
         if (typeof get === 'string') {
-            intermediate = this.dealWithWhere(where, get)
+            intermediate = this.dealWithWhere(where/*, get*/)
         } else {
-            intermediate = this.dealWithWhere(where, get[0])
+            intermediate = this.dealWithWhere(where/*, get[0]*/)
         }
 
         var values: any = [];
@@ -114,16 +107,20 @@ export default class QueryController {
 
         //Do this if order was requested
         if (order !== null) {
+            Log.trace("what is type of order?   " + typeof order);
+            Log.trace("is it array? order?   " + Array.isArray(order));
+
             finalResultObjArray = this.sortArray(finalResultObjArray, order);
         }
 
         Log.trace("this is FINAL result:  " + JSON.stringify(finalResultObjArray))
+        Log.trace("this is FINAL result:  " + JSON.stringify({render: format, result: finalResultObjArray}))
 
         return {render: format, result: finalResultObjArray};
     }
 
 //deal with where
-    public  dealWithWhere(where: any, get: any) {
+    public  dealWithWhere(where: any/*, get: any*/) {
         var selectedSections: any = []
 
         //not able to access this.datasets directly; JSON.stringify and then parse it again fixed it
@@ -137,8 +134,6 @@ export default class QueryController {
         for (var key in datasetRetrived) {
             sections = datasetRetrived[key]
 
-            /*   for (var key in sections) {
-             var section = sections[key]  */
             for (var section of sections) {
                 if (this.parserEBNF(where, section)) {
                     //add section to list if it meets WHERE criteria in query
@@ -149,14 +144,8 @@ export default class QueryController {
         return selectedSections;
     }
 
-    //helper function that returns prefix of string from GET
-    public stringPrefix(get: string) {
-        let prefix: any
-        prefix = get.split("_")[0];
-        //Log.trace(prefix);
-        return prefix;
-    }
-    
+
+
     public parserEBNF(where: any, section: any) {
 
         let valid = true;
@@ -177,9 +166,6 @@ export default class QueryController {
                 for (var ANDfilter of where['AND']) {
                     validList1.push(this.parserEBNF(ANDfilter, section));
                 }
-                //  Log.trace("validList1" + validList1);
-
-                //  Log.trace("validlist1: "+validList1.length);
                 for (var eachValid1 of validList1) {
                     if (eachValid1 === false)
                         valid = false;
@@ -188,17 +174,10 @@ export default class QueryController {
 
             if (typeof where['OR'] !== 'undefined') {
 
-
                 var validList2: any = [];
                 for (var ORfilter of where['OR']) {
                     validList2.push(this.parserEBNF(ORfilter, section));
                 }
-                //    Log.trace("validList2:" + validList2);
-                /*     var ORfilter:any;
-                 for (var key in where['OR'])
-                 {
-                 ORfilter=  where['OR'][key];
-                 validList1.push(this.parserEBNF(ORfilter, section));}  */
 
                 valid = false;
 
@@ -312,18 +291,60 @@ export default class QueryController {
     }
 
     public sortArray(resultArray: any, order: any) {
-        //Log.trace("INSIDE sorting!")
+        Log.trace("INSIDE sorting!")
         resultArray.sort(function (a: any, b: any) {
-            var value1 = a[order];
-            //Log.trace("value1  " + value1)
-            var value2 = b[order];
-            if (value1 < value2) {
-                return -1;
+
+            if (typeof order == "string") {
+                //orderkey is a string
+                var value1 = a[order];
+                //Log.trace("value1  " + value1)
+                var value2 = b[order];
+                if (value1 < value2) {
+                    return -1;
+                }
+                if (value1 > value2) {
+                    return 1;
+                }
+                return 0;
+
+            } else {
+
+                var orderkey:any=order['keys'];//orderkey is an array
+                //  Log.trace("orderkey"+JSON.stringify(orderkey));
+                var i=0;
+                if(order['dir']==='UP')// lowers come first
+                {  while(i<orderkey.length)
+                {
+                    var value1 = a[orderkey[i]];
+                    var value2 = b[orderkey[i]];
+                    //  Log.trace("value1,2DOWN"+value1+ value2)
+                    if (value1 < value2) {
+                        return -1;
+                    }
+                    if (value1 > value2) {
+                        return 1;
+                    }
+                    else
+                        i++; }
+                    return 0;}
+
+                if(order['dir']==='DOWN')
+                {  while(i<orderkey.length)
+                {
+                    var value1 = a[orderkey[i]];
+                    var value2 = b[orderkey[i]];
+                    //Log.trace("value1,2UP"+value1+ value2)
+                    if (value1 < value2) {
+                        return 1;
+                    }
+                    if (value1 > value2) {
+                        return -1;
+                    }
+                    else
+                        i++; }
+                    return 0;}
             }
-            if (value1 > value2) {
-                return 1;
-            }
-            return 0;
+
         });
         return resultArray;
     }
@@ -340,6 +361,15 @@ export default class QueryController {
         }
         return isvalidKeyResult;
     }
-    
+
 }
 
+
+
+//helper function that returns prefix of string from GET
+/*    public stringPrefix(get: string) {
+ let prefix: any
+ prefix = get.split("_")[0];
+ //Log.trace(prefix);
+ return prefix;
+ }*/

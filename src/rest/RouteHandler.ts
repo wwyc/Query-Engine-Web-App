@@ -10,10 +10,13 @@ import QueryController from '../controller/QueryController';
 
 import {QueryRequest} from "../controller/QueryController";
 import Log from '../Util';
+import InsightFacade from "../controller/InsightFacade";
 
 export default class RouteHandler {
 
     private static datasetController = new DatasetController();
+    private static UBCInsightFacade = new InsightFacade();
+
 
     public static getHomepage(req: restify.Request, res: restify.Response, next: restify.Next) {
         Log.trace('RoutHandler::getHomepage(..)');
@@ -47,24 +50,8 @@ export default class RouteHandler {
                 req.body = concated.toString('base64');
                 Log.trace('RouteHandler::postDataset(..) on end; total length: ' + req.body.length);
 
-                let controller = RouteHandler.datasetController;
+                RouteHandler.UBCInsightFacade.addDataset(id, req.body)
 
-                controller.process(id, req.body).then(function (result) {
-
-                    if (controller.getDatasets()[id] == null){
-                        // Dataset is not in disk
-                        res.json(204, {success:result})
-                        Log.trace("dataset with this ID is new")
-
-                    } else {
-                        res.json(201, {success: result});
-                        Log.trace("dataset with this ID already exists!")
-                    }
-
-                }).catch(function (err: Error) {
-                    Log.trace('RouteHandler::postDataset(..) - ERROR: ' + err.message);
-                    res.json(400, {err: err.message});
-                });
             });
 
         } catch (err) {
@@ -79,48 +66,8 @@ export default class RouteHandler {
         try{
             let query:QueryRequest=req.params;
 
-            let datasets:Datasets=RouteHandler.datasetController.getDatasets();
+           RouteHandler.UBCInsightFacade.performQuery(query)
 
-            Log.trace("RouteHandler-whatisinDatasets?"+Object.keys(RouteHandler.datasetController.getDatasets()))
-
-            let controller=new QueryController(datasets);
-            let isValid=controller.isValid(query);
-
-            var GETKey=query.GET;
-            var id:string
-
-            if(isValid===true){
-
-                if(typeof GETKey==='string'&&GETKey.includes("_")){
-                    id=GETKey.split("_")[0];
-                }else if(Array.isArray(GETKey)&&GETKey[0].includes("_")){
-                    id=GETKey[0].split("_")[0];
-                }
-//checkifdatasetwithidexists
-                Log.trace(id)
-
-                if(typeof datasets[id]=='undefined'){
-                    Log.error('RouteHandler::postQuery(..)-ERROR:'+'datasetnotfound');
-                    res.json(424,{missing:[id]});
-                }
-                else{
-//datasetwithidexits
-//callqueryfunctionandreturnresultsorcatcherror
-                    try{
-                        let result=controller.query(query);
-                        res.json(200,result);
-                        Log.trace('RouteHandler::postQuery(..)-:'+'querysuccess');
-
-                    }catch(err){
-                        Log.error('RouteHandler::postQuery(..)-ERROR:'+'errorcaughtinquery()...invalidquery');
-                        res.json(400,{status:'invalidquery'});
-                    }
-                }
-            }else{
-//throwerrorifIsValid=false
-                Log.error('RouteHandler::postQuery(..)-ERROR:'+'isValid=false...invalidquery');
-                res.json(400,{status:'invalidquery'});
-            }
         }catch(err){
             Log.error('RouteHandler::postQuery(..)-ERROR:'+err);
             res.send(403);
@@ -134,27 +81,7 @@ export default class RouteHandler {
 
             var id: string = req.params.id;
 
-            var datasetToDelete = RouteHandler.datasetController.getDataset(id)
-
-            if (!(RouteHandler.datasetController.isEmpty(datasetToDelete) || (datasetToDelete == null))){
-
-                //  check if dataset is empty in memory or disk
-                delete RouteHandler.datasetController.getDatasets()[id];
-
-                Log.trace("what is relativePath  " + RouteHandler.datasetController.relativePath)
-                fs.unlinkSync(RouteHandler.datasetController.relativePath + "/data/" + id+".json")
-
-
-                Log.trace('RouteHandler::deleteQuery(..) - successful');
-                res.json(204, {success: 'dataset deleted'});
-
-                //res.send(204).json({success: 'dataset deleted'});
-                //res.send(204);
-
-
-            } else {
-                // produce error if not found in both memory or disk
-                throw Error}
+            RouteHandler.UBCInsightFacade.removeDataset(id)
 
         } catch (err) {
             Log.error('RouteHandler::deleteQuery(..) - ERROR: dataset with given not found   ' + err.message);

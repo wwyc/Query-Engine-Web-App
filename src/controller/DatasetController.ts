@@ -99,18 +99,6 @@ export default class DatasetController {
                 this.datasets[fileName]=this.getDataset(fileName)
             }
 
-            /*fs1.readdirSync(that.relativePath + "/data/", 'utf8', (err: string, files: any) => {
-                    //iterate through array of file names and get all?
-                    for (var file of files) {
-                    //.JSON is always 5 characters
-                        Log.trace("file.split[0]   " + file.split(".")[0])
-                        this.datasets[file.split(".")[0]] = this.getDataset(file)
-                    }
-
-                     var data1 = fs1.readFileSync("../cpsc310project/data/courses.json")
-                     that.datasets["courses"] = JSON.parse(data1)
-                })*/
-
         }
 
         return this.datasets;
@@ -164,9 +152,9 @@ export default class DatasetController {
 
                     Promise.all(promiseArray).then(function(endResult: any) {
 
-                        //Log.trace("INSIDE PROMISE ALL")
+                        Log.trace("INSIDE PROMISE ALL")
 
-                        //Log.trace("endResult:  "+ endResult.length);
+                        Log.trace("endResult:  "+ endResult.length);
 
 
                         if (id == "courses") {
@@ -180,10 +168,8 @@ export default class DatasetController {
                                 if (courseObj.result.length !== 0) {
 
                                     var sessions: any = []
-
                                     for (var obj of  courseObj.result) {
                                         var session = new Session()
-
                                         session.courses_dept = obj["Subject"]
                                         session.courses_id = obj["Course"]
                                         session.courses_avg = obj["Avg"]
@@ -192,7 +178,6 @@ export default class DatasetController {
                                         session.courses_pass = obj["Pass"]
                                         session.courses_fail = obj["Fail"]
                                         session.courses_audit = obj["Audit"]
-
                                         sessions.push(session)
                                     }
                                 }
@@ -234,7 +219,7 @@ export default class DatasetController {
      * @param id
      * @param processedDataset
      */
-    private save(id: string, processedDataset: any) {
+    public save(id: string, processedDataset: any) {
         // add it to the memory model
         this.datasets[id] = processedDataset;
 
