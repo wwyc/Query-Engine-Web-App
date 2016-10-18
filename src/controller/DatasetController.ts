@@ -171,7 +171,7 @@ export default class DatasetController {
                                 if (courseObj.result.length !== 0) {
 
                                     var sessions: any = []
-
+                                      var i=0;
                                     for (var obj of  courseObj.result) {
                                         var session = new Session()
 
@@ -183,8 +183,9 @@ export default class DatasetController {
                                         session.courses_pass = obj["Pass"]
                                         session.courses_fail = obj["Fail"]
                                         session.courses_audit = obj["Audit"]
-
+                                        session.courses_uuid=obj["Subject"]+obj["Course"]+i
                                         sessions.push(session)
+                                        i++;
                                     }
                                 }
 
