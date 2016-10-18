@@ -481,9 +481,9 @@ export default class QueryController {
                 else
                 for (var i = 0; i < grouplist.length; i++) {
                     var groupobject = grouplist[i];
-                    Log.trace("groupobject"+groupobject)
+                 //   Log.trace("groupobject"+groupobject)
                     var sessions: any = groupobject[Object.keys(groupobject)[0]];
-                    Log.trace("sessions"+sessions);
+                 //   Log.trace("sessions"+sessions);
                     var sum: any;
                     for (var j = 0; j < sessions.length; j++);
                     {
@@ -491,10 +491,10 @@ export default class QueryController {
                     }
                     var averageValue: any;
                     averageValue = sum / sessions.length;
-                    Log.trace("avg"+averageValue)// stuck here
+                 //   Log.trace("avg"+averageValue)// stuck here
                     newobject[applynewkey] = averageValue;
                     Object.keys(groupobject).push(newobject);
-                    Log.trace("key"+key);
+                   // Log.trace("key"+key);
                 }
             }
 
