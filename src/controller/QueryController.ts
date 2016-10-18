@@ -308,12 +308,12 @@ export default class QueryController {
         //Log.trace("what is type of getArray:"  + Array.isArray(getArray))
         var resultArray: any = []
 
-        for(var sectionObject of sectionArray)
-        {   var sections:any=[];
-            for (var key in sectionObject) {
-                sections = sectionObject[key];
+      /*  for(var sectionObject of sectionArray)
+        {  */ var sections:any=[];
+            for (var key in sectionArray) {
+                sections = sectionArray[key];
                 for(var i=0;i<sections.length;i++)
-                {  var resultObj: any = {}
+                {  var resultObj: any = {};
                    for(var a=0;a<GETInput.length;a++)
                    {  if(this.isvalidKey(
                            GETInput[a]
@@ -336,7 +336,7 @@ export default class QueryController {
                    }}
                    resultArray.push(resultObj);
                 }}
-        }
+
             return resultArray;
         }
 
@@ -347,12 +347,14 @@ export default class QueryController {
         //Log.trace("INSIDE sorting!")
         resultArray.sort(function (a: any, b: any) {
             var orderkey:any=order['keys'];//orderkey is an array
+          //  Log.trace("orderkey"+JSON.stringify(orderkey));
             var i=0;
             if(order['dir']==='DOWN')// lowers come first
             {  while(i<orderkey.length)
-            { if(this.isvalidKey(orderkey[i]))
+            {
                 var value1 = a[orderkey[i]];
                 var value2 = b[orderkey[i]];
+              //  Log.trace("value1,2DOWN"+value1+ value2)
             if (value1 < value2) {
                 return -1;
             }
@@ -365,21 +367,24 @@ export default class QueryController {
 
             if(order['dir']==='UP')
             {  while(i<orderkey.length)
-            { if(this.isvalidKey(orderkey[i]))
+            {
                 var value1 = a[orderkey[i]];
                 var value2 = b[orderkey[i]];
+                Log.trace("value1,2UP"+value1+ value2)
                 if (value1 < value2) {
-                    return -1;
+                    return 1;
                 }
                 if (value1 > value2) {
-                    return 1;
+                    return -1;
                 }
                 else
                     i++; }
                 return 0;}
 
         });
+     //   Log.trace("resultArray"+JSON.stringify( resultArray))
         return resultArray;
+
     }
    //group the data into list of map
     public dealWithGroup(group:any,intermediate:any):any{
@@ -463,18 +468,22 @@ export default class QueryController {
 
 //deal with Apply
     public dealWithApply(apply:any,grouplist:any):any {
+        Log.trace("jump into apply")
         for (var applyobject of apply) {
             var applynewkey=Object.keys(applyobject)[0];//coursesAvg
             var applyvalue=applyobject[Object.keys(applyobject)[0]];
             var applytoken=Object.keys(applyvalue)[0];//AVG
-            var applystring=applyvalue[Object.keys(applytoken)[0]];//courses_avg
+            var applystring=applyvalue[Object.keys(applyvalue)[0]];//courses_avg
             if (applytoken === 'AVG') {
+                Log.trace("jump into AVG")
                 if(!this.isvalidNumberKey(applystring))
                     throw Error;
                 else
                 for (var i = 0; i < grouplist.length; i++) {
                     var groupobject = grouplist[i];
+                    Log.trace("groupobject"+groupobject)
                     var sessions: any = groupobject[Object.keys(groupobject)[0]];
+                    Log.trace("sessions"+sessions);
                     var sum: any;
                     for (var j = 0; j < sessions.length; j++);
                     {
@@ -482,9 +491,10 @@ export default class QueryController {
                     }
                     var averageValue: any;
                     averageValue = sum / sessions.length;
-                    var newobject: any = {};
+                    Log.trace("avg"+averageValue)// stuck here
                     newobject[applynewkey] = averageValue;
                     Object.keys(groupobject).push(newobject);
+                    Log.trace("key"+key);
                 }
             }
 
@@ -494,7 +504,8 @@ export default class QueryController {
                 else
                 for (var i = 0; i < grouplist.length; i++) {
                     var groupobject = grouplist[i];
-                    var sessions: any = groupobject[Object.keys(groupobject)[0]];
+                    var key:any=Object.keys(groupobject)[0];
+                    var sessions: any = groupobject[key];
                     var min: any;
                     for (var j = 0; j < sessions.length-1; j++);
                     {
@@ -505,7 +516,7 @@ export default class QueryController {
                     }
                     var newobject: any = {};
                     newobject[applynewkey] = min;
-                    Object.keys(groupobject).push(newobject);
+                    key.push(newobject);
                 }
 
             }
@@ -516,7 +527,8 @@ export default class QueryController {
                 else
                 for (var i = 0; i < grouplist.length; i++) {
                     var groupobject = grouplist[i];
-                    var sessions: any = groupobject[Object.keys(groupobject)[0]];
+                    var key:any=Object.keys(groupobject)[0];
+                    var sessions: any = groupobject[key];
                     var max: any;
                     for (var j = 0; j < sessions.length-1; j++);
                     {
@@ -527,7 +539,7 @@ export default class QueryController {
                     }
                     var newobject: any = {};
                     newobject[applynewkey] = max;
-                    Object.keys(groupobject).push(newobject);
+                     key.push(newobject);
                 }
             }
 
@@ -535,7 +547,8 @@ export default class QueryController {
             if (applytoken === 'COUNT') {
                 for (var i = 0; i < grouplist.length; i++) {
                     var groupobject = grouplist[i];
-                    var sessions: any = groupobject[Object.keys(groupobject)[0]];
+                    var key:any=Object.keys(groupobject)[0];
+                    var sessions: any = groupobject[key];
                     var count=0;
                     for (var j = 0; j < sessions.length-1; j++);
                     {   for (var a=0;a<Object.keys(sessions[j]).length;a++)
@@ -544,7 +557,7 @@ export default class QueryController {
                     }
                     var newobject: any = {};
                     newobject[applynewkey] = count;
-                    Object.keys(groupobject).push(newobject);
+                   key.push(newobject);
                 }
 
                 }
