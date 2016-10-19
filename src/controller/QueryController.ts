@@ -10,8 +10,8 @@ import {stringify} from "querystring";
 export interface QueryRequest {
     GET: string|string[];
     WHERE: {};
-    //GROUP:string[];
-    //APPLY:any[];
+    GROUP:string[];
+    APPLY:any[];
     ORDER: any;
     AS: string;
 }
@@ -26,59 +26,164 @@ export default class QueryController {
         this.datasets = datasets;
     }
 
-    public isValid(query:QueryRequest):boolean{
+    public isValid(query:QueryRequest):boolean {
 
-        //var isValidResult=false
+        var isValidResult = false
 
         if (typeof query !== 'undefined' && query !== null && Object.keys(query).length > 0) {
-            return true;
+            isValidResult = true;
         }
 
-
-        /*   if((typeof query=='undefined')
-         ||(query==null)
-         ||(Object.keys(query).length<2)
-         ||(query.AS!=="TABLE")
-
-         ){
-         return false;
-         }*/
-
-        /*   //checkifWHEREexistsorisitempty
-         if((typeof query.WHERE=='undefined')||query.WHERE==null){
-         return false
-         }else if(Object.keys(query.WHERE).length<1){
-         return false
-         }
+        //if APPLY exists, GROUP cannot be undefined
+        if (typeof query.APPLY !== 'undefined') {
+            if (typeof query.GROUP == 'undefined') {
+                return false
+            }
 
 
-         if(typeof query.GET==='string'){
-         //check if GET key is valid & check if ORDER is equal in GET key
-         if(this.isvalidKey(query.GET)&&(query.ORDER==null||query.ORDER==query.GET)){
-         isValidResult=true}
+            // All keys in GET that do not have underscore should appear in APPLY
+/*            for (var s = 0; s < Object.keys(query.GET).length; s++) {
+                    var isinAPPLY = false
+                if (!(s.toString().includes("_"))) {
+                    for (var applyOBJ of query.APPLY) {
+                        var applykey = Object.keys(applyOBJ)[0]
+                        if (query.GET[s] == applykey) {
+                            isinAPPLY = true
+                        }
+                    }
+                }
 
-         }else if(Array.isArray(query.GET)){
+                if (!isinAPPLY){
+                    return false
+                }
 
-         //gothrougheachelementofarrayandcheckifGETkeyisvalid
-         for(var j=0;j<Object.keys(query.GET).length;j++){
-         if(!this.isvalidKey(query.GET[j])){
-         return false
-         }
-         }
+            }*/
 
-         //try to find GET key in ORDER
-         if(query.ORDER!==null||typeof query.ORDER == "string"){
-         isValidResult=false
-         for(var j=0;j<Object.keys(query.GET).length;j++){
-         if(query.ORDER==null||query.GET[j]==query.ORDER){
-         isValidResult=true
-         }
-         }
-         }
 
-         }else{isValidResult=false}*/
+        }
 
-        return false;
+        // if GROUP exists, APPLY cannot be undefined
+        if (typeof query.GROUP !== 'undefined') {
+            if (typeof query.APPLY == 'undefined') {
+                return false
+            }
+
+            //keys in GROUP should be in GET
+            for (var i = 0; i < Object.keys(query.GROUP).length; i++) {
+                // check if all keys in GROUP are presented in GET String
+                if (!this.isvalidKey(query.GROUP[i])) {
+                    return false
+                }
+                //if GET is a string
+                if (typeof query.GET == 'string') {
+                    if (!(query.GROUP[i] == query.GET)) {
+                        return false
+                    }
+                } else {
+                    // check if all keys in GROUP are presented in GET Array
+                    var ISinGetKey = false
+                    for (var j = 0; j < Object.keys(query.GET).length; j++) {
+                        if (query.GET[j] == query.GROUP[i]) {
+                            ISinGetKey = true
+                        }
+                    }
+                    if (!ISinGetKey) {
+                        return false
+                    }
+                }
+            }
+
+            //keys in GET should be in either GROUP or APPLY
+            for (var k = 0; k < Object.keys(query.GET).length; k++) {
+                var ISKeyinGROUPorAPPLY = false
+                // check GROUP keys
+                for (var m = 0; m < Object.keys(query.GROUP).length; m++) {
+                    if (query.GET[k] == query.GROUP[m]) {
+                        ISKeyinGROUPorAPPLY = true
+                    }
+                }
+                // check APPLY keys
+                for (var applyOBJ of query.APPLY) {
+                    var applykey=Object.keys(applyOBJ)[0]
+                    Log.trace("what is in applyOBJ key" + applykey)
+                        if (query.GET[k] == applykey) {
+                            ISKeyinGROUPorAPPLY = true
+                        }
+                        if (!ISKeyinGROUPorAPPLY) {
+                            return false
+
+                        }
+
+                }
+            }
+
+            //Keys appear in GROUP or APPLY cannot appear in the other one
+            for (var p = 0; p < Object.keys(query.GROUP).length; p++) {
+                var ISKeyinbothGROUPandAPPLY = false
+                for (var applyOBJ of query.APPLY) {
+                    var applykey=Object.keys(applyOBJ)[0]
+                    if (query.GROUP[p] == applykey) {
+                        ISKeyinbothGROUPandAPPLY = true
+                }
+                }
+                if (ISKeyinbothGROUPandAPPLY){
+                    return false
+                }
+                }
+
+
+            }
+
+
+
+
+
+
+            /*   if((typeof query=='undefined')
+             ||(query==null)
+             ||(Object.keys(query).length<2)
+             ||(query.AS!=="TABLE")
+
+             ){
+             return false;
+             }*/
+
+            /*   //checkifWHEREexistsorisitempty
+             if((typeof query.WHERE=='undefined')||query.WHERE==null){
+             return false
+             }else if(Object.keys(query.WHERE).length<1){
+             return false
+             }
+
+
+             if(typeof query.GET==='string'){
+             //check if GET key is valid & check if ORDER is equal in GET key
+             if(this.isvalidKey(query.GET)&&(query.ORDER==null||query.ORDER==query.GET)){
+             isValidResult=true}
+
+             }else if(Array.isArray(query.GET)){
+
+             //gothrougheachelementofarrayandcheckifGETkeyisvalid
+             for(var j=0;j<Object.keys(query.GET).length;j++){
+             if(!this.isvalidKey(query.GET[j])){
+             return false
+             }
+             }
+
+             //try to find GET key in ORDER
+             if(query.ORDER!==null||typeof query.ORDER == "string"){
+             isValidResult=false
+             for(var j=0;j<Object.keys(query.GET).length;j++){
+             if(query.ORDER==null||query.GET[j]==query.ORDER){
+             isValidResult=true
+             }
+             }
+             }
+
+             }else{isValidResult=false}*/
+
+            return isValidResult;
+
     }
 
     public query(query: QueryRequest): QueryResponse {
@@ -277,7 +382,6 @@ export default class QueryController {
             }
         }
         else if (Array.isArray(GETInput)) {
-
             for (var eachSection of sectionArray) {
                 var resultObj1: any = {}
                 for (var j = 0; j < Object.keys(GETInput).length; j++) {
@@ -286,8 +390,9 @@ export default class QueryController {
                 }
                 resultArray.push(resultObj1)
             }
-            return resultArray;
         }
+        return resultArray;
+
     }
 
     public sortArray(resultArray: any, order: any) {

@@ -17,7 +17,7 @@ export default class InsightFacade implements IInsightFacade {
     private static datasetController = new DatasetController();
 
     // TODO: need to implement this
-    
+
 
     addDataset(id:string, content: string): Promise<InsightResponse> {
         return new Promise(function (fulfill, reject) {
@@ -83,7 +83,7 @@ export default class InsightFacade implements IInsightFacade {
 
             let datasets = dcontroller.getDatasets();
 
-            Log.trace("RouteHandler-whatisinDatasets?"+Object.keys(dcontroller.getDatasets()))
+            Log.trace("InsightFascade-whatisinDatasets?    "+Object.keys(dcontroller.getDatasets()))
 
             let qcontroller=new QueryController(datasets);
             let isValid=qcontroller.isValid(query);
