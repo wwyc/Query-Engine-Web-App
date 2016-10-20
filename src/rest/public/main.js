@@ -27,7 +27,7 @@ $(function () {
         try {
             $.ajax("/query", {type:"POST", data: query, contentType: "application/json", dataType: "json", success: function(data) {
 
-                if (data["render"] == "TABLE") {
+                if (data["render"] == "table") {
                     generateTable(data["result"]);
                 }
             }}).fail(function (e) {

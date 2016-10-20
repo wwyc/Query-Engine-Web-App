@@ -52,7 +52,7 @@ export default class DatasetController {
             //check if dataset is in disk
             var fs = require('fs');
 
-            Log.trace("inside getdataset(id)    " + this.relativePath)
+            //Log.trace("inside getdataset(id)    " + this.relativePath)
 
             try {var data = fs.readFileSync(this.relativePath + "/data/"+id+".json")
                 Log.trace("dataset is in disk")
@@ -86,14 +86,8 @@ export default class DatasetController {
             Log.trace(that.relativePath)
 
             var Files=(fs1.readdirSync(that.relativePath+"/data/"))
-            /*Log.trace(Files)
-             Log.trace(typeofFiles)
-             Log.trace(Array.isArray(Files).toString())*/
 
             for(var file of Files){
-
-                Log.trace(file)
-                Log.trace("file.split[0]"+file.split(".")[0])
 
                 var fileName=file.split(".")[0]
                 this.datasets[fileName]=this.getDataset(fileName)
@@ -148,13 +142,13 @@ export default class DatasetController {
                         }
                     })
 
-                    Log.trace("PromiseArray length:  "+ promiseArray.length);
+                    //Log.trace("PromiseArray length:  "+ promiseArray.length);
 
                     Promise.all(promiseArray).then(function(endResult: any) {
 
                         Log.trace("INSIDE PROMISE ALL")
 
-                        Log.trace("endResult:  "+ endResult.length);
+                        //Log.trace("endResult:  "+ endResult.length);
 
 
                         if (id == "courses") {
@@ -189,23 +183,27 @@ export default class DatasetController {
                         processedDataset = courseMap
                         }
                         that.save(id, processedDataset)
+                        Log.trace("process dataset...dataset saved")
+
+                        fulfill(true)
+
                     })
 
                     if (isValidDataset == false){
+                        reject(false)
                         throw Error
                     }
 
-                    fulfill(true)
 
-                    Log.trace("processedDataset FINAL type" + typeof processedDataset)
+                    //Log.trace("processedDataset FINAL type" + typeof processedDataset)
 
                 }).catch(function (err) {
                     Log.error('DatasetController::process(..) - unzip ERROR: ' + err.message);
-                    reject(err);
+                    reject(false);
                 });
             } catch (err) {
                 Log.trace('DatasetController::process(..) - ERROR: ' + err);
-                reject(err);
+                reject(false);
             }
         })
 
@@ -231,8 +229,8 @@ export default class DatasetController {
 
         try {
             fs2.writeFileSync('data/' + id + '.json', datasetToSave, 'utf8')
-            Log.trace("which directory and i in?"  + process.cwd())
-            Log.trace("writting files success")
+            //Log.trace("which directory and i in?"  + process.cwd())
+            //Log.trace("writting files success")
 
             this.relativePath = process.cwd()
         } catch(e){
