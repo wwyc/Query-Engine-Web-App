@@ -160,7 +160,7 @@ export default class QueryController {
         Log.trace("this is FINAL result:  " + JSON.stringify(finalResultObjArray))
         //Log.trace("this is FINAL result:  " + JSON.stringify({render: format, result: finalResultObjArray}))
 
-        return {render: format.toLowerCase(), result: finalResultObjArray};
+        return {render: format, result: finalResultObjArray};
     }
 
 //deal with where
