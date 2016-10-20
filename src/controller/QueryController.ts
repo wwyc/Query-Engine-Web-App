@@ -30,22 +30,95 @@ export default class QueryController {
         var isValidResult = false
         if (typeof query !== 'undefined' && query !== null && Object.keys(query).length > 0) {
             isValidResult = true;
-            //
-            // Log.trace("what is apply  " + query.APPLY.toString())
-            Log.trace("what is apply type  " + typeof query.APPLY)
 
-             if (typeof query.APPLY !== 'undefined') {
-                            if (typeof query.GROUP == 'undefined') {
-                                return false
-                            }
-                        }
-
-            if (typeof query.GROUP !== 'undefined') {
-                if (typeof query.APPLY == 'undefined') {
+            //•	Kanga: APPLY without GROUP should not be valid.
+            //•	Jonah: Empty GROUP should not be valid.
+            if (typeof query.APPLY !== 'undefined'&& query.APPLY !== null) {
+                if (typeof query.GROUP == 'undefined'||query.GROUP == null||query.GROUP.length == 0) {
+                    Log.trace("APPLY without GROUP should not be valid.")
+                    Log.trace("Empty GROUP should not be valid.")
                     return false
                 }
             }
+
+            //•	Kodiak: GROUP without APPLY should not be valid.
+            if (typeof query.GROUP !== 'undefined' && query.GROUP !== null) {
+                if (typeof query.APPLY == 'undefined'|| query.APPLY == null) {
+                    Log.trace("GROUP without APPLY should not be valid.")
+                    return false
+                }
+
+                //•	Liberation: Group should contains only valid keys (separated by underscore).
+                for (var i = 0; i < Object.keys(query.GROUP).length; i++) {
+                    // check if all keys in GROUP are presented in GET String
+                    if (!this.isvalidKey(query.GROUP[i])) {
+                        Log.trace("some keys in GROUP are not valid")
+                        return false
+                    }
+                }
+
+                //•	Kryptonite: All keys in GROUP should be presented in GET.
+                for (var a = 0; a < Object.keys(query.GROUP).length; a++) {
+                    //if GET is a string
+                    if (typeof query.GET == 'string') {
+                        if (!(query.GROUP[a] == query.GET)) {
+                            Log.trace("All keys in GROUP should be presented in GET.")
+                            return false
+                        }
+                    } else {
+                        // check if all keys in GROUP are presented in GET Array
+                        var ISinGetKey = false
+                        for (var j = 0; j < Object.keys(query.GET).length; j++) {
+                            if (query.GROUP[a] == query.GET[j]) {
+                                ISinGetKey = true
+                            }
+                        }
+                        if (!ISinGetKey) {
+                            Log.trace("All keys in GROUP should be presented in GET.")
+                            return false
+                        }
+                    }
+                }
+
+
+                //•	Laguna: If a key appears in GROUP or in APPLY, it cannot appear in the other one.
+                for (var p = 0; p < Object.keys(query.GROUP).length; p++) {
+                    var ISKeyinbothGROUPandAPPLY = false
+                    for (var applyOBJ of query.APPLY) {
+                        var applykey=Object.keys(applyOBJ)[0]
+                        if (query.GROUP[p] == applykey) {
+                            ISKeyinbothGROUPandAPPLY = true
+                        }
+                    }
+                    if (ISKeyinbothGROUPandAPPLY){
+                        Log.trace("GROUP & APPLY cannot have the same keys")
+                        return false
+                    }
+                }
+
+
+                //Malibu: APPLY rules should be unique.
+                for (var applyOBJ1 of query.APPLY) {
+                    var duplicateinAPPLY = false
+
+                    var applykey1=Object.keys(applyOBJ1)[0]
+
+                    for (var applyOBJ2 of query.APPLY) {
+                        var applykey2=Object.keys(applyOBJ2)[0]
+                        {
+                            if (applykey1 == applykey2) {
+                                duplicateinAPPLY = true
+                            }
+                        }
+                    }
+                    if (duplicateinAPPLY){
+                        Log.trace("duplicate keys found in APPLY")
+                        return false
+                    }
+                }
+            }
         }
+
 
         return isValidResult;
     }
@@ -313,6 +386,15 @@ export default class QueryController {
             isvalidKeyResult=false;
         }
         return isvalidKeyResult;
+    }
+
+    public isEmpty(myObject: any) {
+        for(var key in myObject) {
+            if (myObject.hasOwnProperty(key)) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }

@@ -109,11 +109,20 @@ export default class RouteHandler {
             let UBCfacade3 = new InsightFacade()
 
 
-            UBCfacade3.removeDataset(id)
+            UBCfacade3.removeDataset(id).then(function(response){
+                    if (response.code == 204){
+                        res.send(204)
+                    }  else if (response.code == 404){
+                        res.send(404);
+                    }else if (response.code == 400){
+                        res.send(400);
+                    }
+                }
+            )
 
         } catch (err) {
             Log.error('RouteHandler::deleteQuery(..) - ERROR: dataset with given not found   ' + err.message);
-            res.send(404);
+            res.send(400);
         }
     }
 }

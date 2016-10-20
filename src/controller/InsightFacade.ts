@@ -65,32 +65,37 @@ export default class InsightFacade implements IInsightFacade {
     }
 
     removeDataset(id: string): Promise<InsightResponse>{
-        return new Promise(function (fulfill, reject) {
-            //Log.trace('InsightFacade::deleteDataset(..) - params: ' + id);
 
             return new Promise(function (fulfill, reject) {
+                Log.trace('InsightFacade::deleteDataset(..) - params: ' + id);
 
-                let dcontroller = new DatasetController();
+                try {
 
-                var datasetToDelete = dcontroller.getDataset(id)
+                    let dcontroller = new DatasetController();
 
-                //  check if dataset is empty in memory or disk
-                if (!(dcontroller.isEmpty(datasetToDelete) || (datasetToDelete == null))){
+                    var datasetToDelete = dcontroller.getDataset(id)
 
-                    delete dcontroller.getDatasets()[id];
-                    fs.unlinkSync(dcontroller.relativePath + "/data/" + id+".json")
+                    //  check if dataset is empty in memory or disk
+                    if (!(dcontroller.isEmpty(datasetToDelete) || (datasetToDelete == null))) {
 
-                    Log.trace('InsightFacade::deleteQuery(..) - successful');
-                    fulfill({code: 204})
+                        delete dcontroller.getDatasets()[id];
+                        fs.unlinkSync(dcontroller.relativePath + "/data/" + id + ".json")
 
-                } else {
-                    // produce error if not found in both memory or disk
-                    Log.trace('InsightFacade::deleteQuery(..) - failed');
-                    reject({code: 400})
+                        Log.trace('InsightFacade::deleteQuery(..) - successful');
+                        fulfill({code: 204})
+
+                    } else {
+                        // produce error if not found in both memory or disk
+                        Log.trace('InsightFacade::deleteQuery(..) - failed');
+                        reject({code: 404, err: "InsightFascade: deleteDataset Failed:  dataset does not exist"})
+                    }
+                }catch (err) {
+                    reject({code: 400, err: "InsightFascade: deleteDataset Failed: " + err.message})
+                    Log.trace('InsightFascade::performQuery Failed(..) - ERROR: ' + err.message );
+
                 }
 
             });
-        })
     }
 
     performQuery(query: QueryRequest): Promise<InsightResponse>{
@@ -102,6 +107,12 @@ export default class InsightFacade implements IInsightFacade {
                 let dcontroller = new DatasetController();
 
                 let datasets1 = dcontroller.getDatasets();
+
+                if(typeof datasets1=='undefined'){
+                    //Log.error('RouteHandler::postQuery(..)-ERROR:'+'datasetnotfound');
+                    reject({code: 424, body: ["InsightFascade: performQuery Failed:  dataset with " +id+ " missing"]})
+                    //res.json(424,{missing:[id]});
+                }
 
                         //dataset with id exits
                         //call query function and return results or catch error
@@ -120,10 +131,11 @@ export default class InsightFacade implements IInsightFacade {
                                     id = GETKey[0].split("_")[0];
                                 }
 
-                                if (typeof datasets1[id] == null || typeof datasets1[id] == 'undefined') {
+                                if(typeof datasets1[id]=='undefined'){
+                                    //Log.error('RouteHandler::postQuery(..)-ERROR:'+'datasetnotfound');
                                     reject({code: 424, body: ["InsightFascade: performQuery Failed:  dataset with " +id+ " missing"]})
+                                    //res.json(424,{missing:[id]});
                                 }
-
 
                                 let qresult = qcontroller.query(query);
                                 fulfill({code: 200, body: qresult})
@@ -139,7 +151,7 @@ export default class InsightFacade implements IInsightFacade {
 
             }catch (e) {
                 Log.trace('InsightFascade::performQuery Failed(..) - ERROR: ' + e.message);
-                reject({code: 400, err: ["InsightFascade: performQuery Failed:  " + e.message]})
+                reject({code: 400, err: "InsightFascade: performQuery Failed:  invalid query"})
             }
         })
 
