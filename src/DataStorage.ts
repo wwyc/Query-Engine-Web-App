@@ -12,6 +12,7 @@ export default class Session{
     public courses_pass: number
     public courses_fail: number
     public courses_audit: number
+    public courses_uuid: string
 
     constructor(){
         this.courses_dept = null
@@ -22,6 +23,7 @@ export default class Session{
         this.courses_pass = null
         this.courses_fail = null
         this.courses_audit = null
+        this.courses_uuid =null
 
     }
 }
