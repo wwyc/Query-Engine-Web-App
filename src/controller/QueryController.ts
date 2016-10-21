@@ -97,25 +97,23 @@ export default class QueryController {
                 }
 
 
-               //Malibu: APPLY rules should be unique.
-      /*          for (var applyOBJ1 of query.APPLY) {
-                    var duplicateinAPPLY = false
-
-                    var applykey1=Object.keys(applyOBJ1)[0]
-
-                    for (var applyOBJ2 of query.APPLY) {
-                        var applykey2=Object.keys(applyOBJ2)[0]
-                        {
-                            if (applykey1 == applykey2) {
-                                duplicateinAPPLY = true
-                            }
-                        }
-                    }
-                    if (duplicateinAPPLY){
-                        Log.trace("duplicate keys found in APPLY")
-                        return false
-                    }
-                }  */
+                //Malibu: APPLY rules should be unique.
+                /*          for (var applyOBJ1 of query.APPLY) {
+                 var duplicateinAPPLY = false
+                 var applykey1=Object.keys(applyOBJ1)[0]
+                 for (var applyOBJ2 of query.APPLY) {
+                 var applykey2=Object.keys(applyOBJ2)[0]
+                 {
+                 if (applykey1 == applykey2) {
+                 duplicateinAPPLY = true
+                 }
+                 }
+                 }
+                 if (duplicateinAPPLY){
+                 Log.trace("duplicate keys found in APPLY")
+                 return false
+                 }
+                 }  */
             }
         }
 
@@ -160,7 +158,7 @@ export default class QueryController {
         Log.trace("this is FINAL result:  " + JSON.stringify(finalResultObjArray))
         //Log.trace("this is FINAL result:  " + JSON.stringify({render: format, result: finalResultObjArray}))
 
-        return {render: format, result: finalResultObjArray};
+        return {render: format.toLowerCase(), result: finalResultObjArray};
     }
 
 //deal with where
@@ -181,11 +179,11 @@ export default class QueryController {
             /*   for (var key in sections) {
              var section = sections[key]  */
             for (var section of sections) {
-                if(where!=null&&Object.keys(where).length>0)
+                if(where!=null&&Object.keys(where).length>0&& where!=undefined)
                 { if (this.parserEBNF(where, section)) {
                     //add section to list if it meets WHERE criteria in query
                     selectedSections.push(section)}}
-                    else
+                else
                 { selectedSections.push(section) } ;
             }
         }
@@ -193,12 +191,12 @@ export default class QueryController {
     }
 
     //helper function that returns prefix of string from GET
-/*    public stringPrefix(get: string) {
-        let prefix: any
-        prefix = get.split("_")[0];
-        //Log.trace(prefix);
-        return prefix;
-    }*/
+    /*    public stringPrefix(get: string) {
+     let prefix: any
+     prefix = get.split("_")[0];
+     //Log.trace(prefix);
+     return prefix;
+     }*/
 
     public parserEBNF(where: any, section: any) {
 
@@ -377,7 +375,6 @@ export default class QueryController {
          sessions.push(intermediate[i]);
          intermediate.splice(i,1);}
          }
-
          groupMap[groupvalue] = sessions;
          groups.push(groupMap);
          Log.trace("groupMap"+ JSON.stringify(groupMap));
@@ -397,7 +394,7 @@ export default class QueryController {
                 groupvalue[group[a]]=intermediate[intermediate.length-1][group[a]];
 
 
-              //  Log.trace("groupvalue"+JSON.stringify( groupvalue));
+                //  Log.trace("groupvalue"+JSON.stringify( groupvalue));
             }
             sessions.push(groupvalue);
             for (var i=intermediate.length-1;i>=0;i--)
@@ -405,7 +402,7 @@ export default class QueryController {
             //   Log.trace("groupcheck   "+  this.checkGroupCorrect(group,intermediate[i],lastintermediate))
             { // Log.trace("lastintermediate+"+ lastintermediate);
                 sessions.push(intermediate[i]);
-             //   Log.trace("session.length"+sessions.length);
+                //   Log.trace("session.length"+sessions.length);
                 intermediate.splice(i,1); }
             }
 
@@ -439,159 +436,43 @@ export default class QueryController {
         }
         return valid;
     }
-/*
-    public dealWithApply(apply:any,grouplist:any):any {
-        var applylist:any=[];
-        var applykeys:any=[];
-        Log.trace("jump into apply")
-        for (var applyobject of apply) {
-            var applynewkey=Object.keys(applyobject)[0];//coursesAvg
-            applykeys.push(applynewkey);
-         //   Log.trace("applynewkey"+applynewkey)
-            var applyvalue=applyobject[Object.keys(applyobject)[0]];
-            var applytoken=Object.keys(applyvalue)[0];//AVG
-            var applystring=applyvalue[Object.keys(applyvalue)[0]];//courses_avg
-            Log.trace("applystring"+applystring);
-            if (applytoken === 'AVG') {
-                Log.trace("jump into AVG122")
-               if(!this.isvalidNumberKey(applystring))
-                  throw Error;
-               else
-                    for (var i = 0; i < grouplist.length; i++) {
-                        var sessions = grouplist[i];
-                        Log.trace("sessions"+JSON.stringify(sessions));
-                        var sum: number=0;
-                        var length:number=0;
-                        for (var j = 1; j<=sessions.length; j++);
-                        {   if( sessions[j][applystring]!=='undefined')
 
-                            {
-                            Log.trace("jump into loop")
-                            sum+=sessions[j][applystring];
-                            length++;  }
-
-
-                        }}
-                        var averageValue: any;
-                        averageValue = parseFloat((sum / length).toFixed(2));
-                        Log.trace("avg"+averageValue);
-                        grouplist[i][0][applynewkey]=averageValue;
-                       Log.trace("group12"+grouplist[i][0]);
-                    }
-            }
-
-            if (applytoken === 'MIN') {
-                if(!this.isvalidNumberKey(applystring))
-                    throw Error;
-                else
-                    for (var i = 0; i < grouplist.length; i++) {
-                        var sessions = grouplist[i];
-                      //  Log.trace("sessions"+JSON.stringify(sessions));
-                        var min: any;
-                        for ( var j = 1; j<=sessions.length; j++);
-                        {
-                            if(sessions[j][applystring]!=='undefined')
-
-                            { if(sessions[j][applystring]<=sessions[j-1][applystring])
-                                min = sessions[j][applystring];
-                            else
-                                min=sessions[j+1][applystring];
-                        }}
-                        grouplist[i][0][applynewkey]=min;
-                   //     Log.trace("group12"+grouplist[i][0]);
-                    }
-
-            }
-
-            if (applytoken === 'MAX') {
-                if(!this.isvalidNumberKey(applystring))
-                    throw Error;
-                else
-                    for (var i = 0; i < grouplist.length; i++) {
-                        var sessions = grouplist[i];
-                     //   Log.trace("sessions"+JSON.stringify(sessions));
-                        var max: any;
-                        for (var j = 1; j<=sessions.length; j++);
-                        {
-                            if( sessions[j][applystring]!=='undefined')
-                            {
-                                if(sessions[j][applystring]>=sessions[j-1][applystring])
-                                    max = sessions[j][applystring];
-                                else
-                                    max=sessions[j+1][applystring];
-                        }}
-                        grouplist[i][0][applynewkey]=max;
-                       // Log.trace("group12"+grouplist[i][0]);
-
-                    }
-            }
-
-
-            if (applytoken === 'COUNT') {
-                for (var i = 0; i < grouplist.length; i++) {
-                    var sessions = grouplist[i];
-                 //   Log.trace("sessions"+JSON.stringify(sessions));
-                    var count=0;
-                    for (var j = 1; j<=sessions.length; j++);
-                    {  if(sessions[j][applystring]!=='undefined')
-                   {
-                        for (var a=0;a<Object.keys(sessions[j]).length;a++)
-                        if(Object.keys(sessions[j])[a]===applystring)
-                        {count+=1;}
-                    }}
-                    grouplist[i][0][applynewkey]=count;
-                   // Log.trace("group12"+grouplist[i][0]);
-                }
-
-            }
-        }
-
-
-        for (var groupobject2 of grouplist){
-          if(this.checkArrayContain(groupobject2,applykeys))
-           applylist.push(groupobject2[0]);
-        }
-        Log.trace("applylist"+applylist);
-        return applylist;
-    }
-
-**/
     public dealWithApply(apply:any,grouplist:any):any {
         var applylist:any=[];
 
         Log.trace("jump into apply")
         for (var applyobject of apply) {
             var applynewkey=Object.keys(applyobject)[0];//coursesAvg
-          //  Log.trace("applynewkey"+applynewkey)
+            //  Log.trace("applynewkey"+applynewkey)
             var applyvalue=applyobject[Object.keys(applyobject)[0]];
             var applytoken=Object.keys(applyvalue)[0];//AVG
             var applystring=applyvalue[Object.keys(applyvalue)[0]];//courses_avg
-          //  Log.trace("applystring"+applystring);
+            //  Log.trace("applystring"+applystring);
             if (applytoken === 'AVG') {
-               // Log.trace("jump into AVG")
+                // Log.trace("jump into AVG")
                 if(!this.isvalidNumberKey(applystring))
                     throw Error;
                 else
                     for (var i = 0; i < grouplist.length; i++) {
                         var sessions = grouplist[i];
-                        Log.trace("sessions"+JSON.stringify(sessions));
+                       // Log.trace("sessions"+JSON.stringify(sessions));
                         var sum: number=0;
                         var length:number=0;
                         for (var j=1;j<sessions.length;j++)
                         { //  Log.trace("applystring"+applystring);
-                           // Log.trace("123"+sessions[j][applystring])
+                            // Log.trace("123"+sessions[j][applystring])
                             if( sessions[j][applystring]!=='undefined')
-                             sum+=sessions[j][applystring];
-                            Log.trace("sum111"+sum);
-                                length++;
+                                sum+=sessions[j][applystring];
+                           // Log.trace("sum111"+sum);
+                            length++;
                         }
-                       // Log.trace("sum"+sum)
-                       // Log.trace("length  "+length)
+                        // Log.trace("sum"+sum)
+                        // Log.trace("length  "+length)
                         var averageValue: any;
                         averageValue = parseFloat((sum / length).toFixed(2));
-                        Log.trace("avg"+averageValue);
+                       // Log.trace("avg"+averageValue);
                         grouplist[i][0][applynewkey]=averageValue;
-                        Log.trace("group12"+grouplist[i][0]);
+                      //  Log.trace("group12"+grouplist[i][0]);
                     }
             }
 
@@ -601,18 +482,21 @@ export default class QueryController {
                 else
                     for (var i = 0; i < grouplist.length; i++) {
                         var sessions = grouplist[i];
-                        Log.trace("sessions"+JSON.stringify(sessions));
-                        var min: any;
-                        for (var j = 1; j < sessions.length-1; j++)
-                        {
-                            if(sessions[j][applystring]<=sessions[j+1][applystring])
-                                min = sessions[j][applystring];
-                            else
-                                min=sessions[j+1][applystring];
-                        }
+                        var minsession:any=[];
+                        for(var j=1;j<sessions.length-1;j++)
+                        { if(sessions[j][applystring]!='undefined'&&
+                            sessions[j][applystring]!=null)
+                            minsession.push( sessions[j][applystring])}
+                        var min:number=0;
+                        if(minsession.length==0)
+                            min=0;
+                        else{
+                            min=Math.min.apply(Math,minsession);
+                            if(min===null)
+                                min=0;}
                         grouplist[i][0][applynewkey]=min;
-                        Log.trace("group12"+grouplist[i][0]);
                     }
+
 
             }
 
@@ -622,18 +506,20 @@ export default class QueryController {
                 else
                     for (var i = 0; i < grouplist.length; i++) {
                         var sessions = grouplist[i];
-                        Log.trace("sessions"+JSON.stringify(sessions));
-                        var max: any;
-                        for (var j = 1; j < sessions.length-1; j++)
-                        {
-                            if(sessions[j][applystring]>=sessions[j+1][applystring])
-                                max = sessions[j][applystring];
-                            else
-                                max=sessions[j+1][applystring];
-                        }
-                        grouplist[i][0][applynewkey]=max;
-                        Log.trace("group12"+grouplist[i][0]);
 
+                      var maxsession:any=[];
+                        for(var j=1;j<sessions.length-1;j++)
+                        {  if(sessions[j][applystring]!='undefined'&&
+                        sessions[j][applystring]!=null)
+                            maxsession.push(sessions[j][applystring])}
+                            var max:number=0;
+                        if(maxsession.length==0)
+                            max=0;
+                       else{
+                           max=Math.max.apply(Math,maxsession);
+                        if(max===null)
+                            max=0;}
+                        grouplist[i][0][applynewkey]=max;
                     }
             }
 
@@ -641,15 +527,20 @@ export default class QueryController {
             if (applytoken === 'COUNT') {
                 for (var i = 0; i < grouplist.length; i++) {
                     var sessions = grouplist[i];
-                    Log.trace("sessions"+JSON.stringify(sessions))
+                  //  Log.trace("sessions"+JSON.stringify(sessions))
                     var count=0;
-                    for (var j = 1; j < sessions.length-1; j++)
-                    {   for (var a=0;a<sessions[0].length;a++)
-                    { if(Object.keys(sessions[j])[a]===applystring)
-                    {count+=1;}}
+                    var keysession:any=[]
+                    for (var j = 1; j < sessions.length; j++)
+
+                    {
+                        if(sessions[j][applystring]!='undefined'&&
+                        sessions[j][applystring]!=null
+                        )
+                        keysession.push(sessions[j][applystring])
                     }
+                    count=keysession.length;
                     grouplist[i][0][applynewkey]=count;
-                    Log.trace("group12"+grouplist[i][0]);
+
                 }
 
             }
@@ -658,7 +549,7 @@ export default class QueryController {
             applylist.push(grouplist[i][0]);
         }
 
-      /*   for (var groupobject2 of grouplist){
+        /*   for (var groupobject2 of grouplist){
          if(this.checkArrayContain(groupobject2,applykeys))
          applylist.push(groupobject2[0]);
          }   */
@@ -678,8 +569,8 @@ export default class QueryController {
             {   if(applykey12===groupkey12)
             { valid2=true;
                 break;}
-             }
-        validlist.push(valid2)}
+            }
+            validlist.push(valid2)}
 
         for (var eachValid1 of validlist) {
             if (eachValid1 === false)
@@ -691,63 +582,63 @@ export default class QueryController {
     }
 
     public sortArray(resultArray: any, order: any) {
-           // Log.trace("INSIDE sorting!")
-            resultArray.sort(function (a: any, b: any) {
-                if (typeof order == "string") {
-                    //orderkey is a string
-                    var value1 = a[order];
-                    //Log.trace("value1  " + value1)
-                    var value2 = b[order];
-                    if (value1 < value2) {
-                        return -1;
-                    }
-                    if (value1 > value2) {
-                        return 1;
-                    }
-                    return 0;
-
+        // Log.trace("INSIDE sorting!")
+        resultArray.sort(function (a: any, b: any) {
+            if (typeof order == "string") {
+                //orderkey is a string
+                var value1 = a[order];
+                //Log.trace("value1  " + value1)
+                var value2 = b[order];
+                if (value1 < value2) {
+                    return -1;
                 }
+                if (value1 > value2) {
+                    return 1;
+                }
+                return 0;
 
-                else
-                    var orderkey:any=order['keys'];//orderkey is an array
-              //  Log.trace("orderkey"+JSON.stringify(orderkey));
-                var i=0;
-                if(order['dir']==='UP')// lowers come first
-                {  while(i<orderkey.length)
-                {
-                    var value1 = a[orderkey[i]];
-                    var value2 = b[orderkey[i]];
+            }
+
+            else
+                var orderkey:any=order['keys'];//orderkey is an array
+            //  Log.trace("orderkey"+JSON.stringify(orderkey));
+            var i=0;
+            if(order['dir']==='UP')// lowers come first
+            {  while(i<orderkey.length)
+            {
+                var value1 = a[orderkey[i]];
+                var value2 = b[orderkey[i]];
                 //    Log.trace("value1,2up"+value1+ value2)
-                    if (value1 < value2) {
-                        return -1;
-                    }
-                    if (value1 > value2) {
-                        return 1;
-                    }
-                    else
-                        i++; }
-                    return 0;}
+                if (value1 < value2) {
+                    return -1;
+                }
+                if (value1 > value2) {
+                    return 1;
+                }
+                else
+                    i++; }
+                return 0;}
 
-                if(order['dir']==='DOWN')
-                {  while(i<orderkey.length)
-                {
-                    var value1 = a[orderkey[i]];
-                    var value2 = b[orderkey[i]];
-                 //   Log.trace("value1,2down"+value1+ value2)
-                    if (value1 < value2) {
-                        return 1;
-                    }
-                    if (value1 > value2) {
-                        return -1;
-                    }
-                    else
-                        i++; }
-                    return 0;}
+            if(order['dir']==='DOWN')
+            {  while(i<orderkey.length)
+            {
+                var value1 = a[orderkey[i]];
+                var value2 = b[orderkey[i]];
+                //   Log.trace("value1,2down"+value1+ value2)
+                if (value1 < value2) {
+                    return 1;
+                }
+                if (value1 > value2) {
+                    return -1;
+                }
+                else
+                    i++; }
+                return 0;}
 
-            });
-           // Log.trace("resultArray"+JSON.stringify( resultArray))
-            return resultArray;
-        }
+        });
+        // Log.trace("resultArray"+JSON.stringify( resultArray))
+        return resultArray;
+    }
 
 
     public isvalidKey(key:any):any{
@@ -786,5 +677,19 @@ export default class QueryController {
         return true;
     }
 
-}
+    public contains(a:any, array:any):boolean{
+            for (var i = 0; i < a.length; i++) {
+                if (array[i] === a) {
+                    return true;
+                }
+            }
+            return false;
+        }
 
+
+
+
+
+
+
+}
