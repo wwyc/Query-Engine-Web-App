@@ -598,7 +598,7 @@ export default class QueryController {
         var isvalidKeyResult:any
         if(key==="courses_dept"||key==="courses_id"||key==="courses_avg"||
             key==="courses_instructor"||key==="courses_title"||key==="courses_pass"||
-            key==="courses_fail"||key==="courses_audit"
+            key==="courses_fail"||key==="courses_audit"||key==="courses_uuid"
         ){
             isvalidKeyResult=true;
         }else{
