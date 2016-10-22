@@ -98,7 +98,7 @@ export default class QueryController {
 
 
                 //Malibu: APPLY rules should be unique.
-                    /*      for (var applyOBJ1 of query.APPLY) {
+                /*          for (var applyOBJ1 of query.APPLY) {
                  var duplicateinAPPLY = false
                  var applykey1=Object.keys(applyOBJ1)[0]
                  for (var applyOBJ2 of query.APPLY) {
@@ -113,7 +113,7 @@ export default class QueryController {
                  Log.trace("duplicate keys found in APPLY")
                  return false
                  }
-                 }*/
+                 }  */
             }
         }
 
@@ -135,13 +135,16 @@ export default class QueryController {
         var intermediate: any = [];
         var grouplist:any=[];
         if (typeof get === 'string') {
+
             intermediate = this.dealWithWhere(where, get)
         } else {
             intermediate = this.dealWithWhere(where, get[0])
         }
 
-        if(group!==null && apply!=null) {
-          intermediate = this.dealWithGroup(apply, group, intermediate);
+        if(group!==null && apply!=null)
+        {
+            grouplist=this.dealWithGroup(group,intermediate);
+            intermediate=this.dealWithApply(apply,grouplist);
         }
 
 
@@ -155,7 +158,7 @@ export default class QueryController {
         Log.trace("this is FINAL result:  " + JSON.stringify(finalResultObjArray))
         //Log.trace("this is FINAL result:  " + JSON.stringify({render: format, result: finalResultObjArray}))
 
-        return {render: format, result: finalResultObjArray};
+        return {render: format.toLowerCase(), result: finalResultObjArray};
     }
 
 //deal with where
@@ -181,8 +184,11 @@ export default class QueryController {
                  else
                  { selectedSections.push(section) }
                  }
-
+               // selectedSections.push(section);
             }
+
+      //  if(where!=null&&Object.keys(where).length>0&& where!=undefined)
+     //   selectedSections.filter(this.parserEBNF,where)
         return selectedSections;
     }
 
@@ -350,13 +356,14 @@ export default class QueryController {
                 resultArray.push(resultObj1)
             }
         }
-        return resultArray;
-
+        return resultArray
     }
-    public dealWithGroup(apply:any,group:any,intermediate:any):any{
+
+    public dealWithGroup(group:any,intermediate:any):any{
         var groups:any=[];
         while(intermediate.length!=0)
         {   var sessions:any=[];
+            var groupMap: any = {};
             var lastintermediates:any=[];
             var groupvalue:any={};
             for (var a=0;a<group.length;a++)
@@ -372,14 +379,12 @@ export default class QueryController {
                 //   Log.trace("session.length"+sessions.length);
                 intermediate.splice(i,1); }
             }
-
-            groups.push(this.dealWithApply(apply,sessions));
+            groups.push(sessions);
         }
         Log.trace("groups length"+groups.length);
+
         return groups;
     }
-
-
 
     public checkGroupCorrect(group:any,intermediate:any,lastintermediates:any):boolean{
         var validlist:any=[];
@@ -399,37 +404,43 @@ export default class QueryController {
         return valid;
     }
 
-    public dealWithApply(apply:any,sessions:any):any {
+    public dealWithApply(apply:any,grouplist:any):any {
+        var applylist:any=[];
 
+        Log.trace("jump into apply")
         for (var applyobject of apply) {
             var applynewkey=Object.keys(applyobject)[0];//coursesAvg
             var applyvalue=applyobject[Object.keys(applyobject)[0]];
             var applytoken=Object.keys(applyvalue)[0];//AVG
             var applystring=applyvalue[Object.keys(applyvalue)[0]];//courses_avg
             if (applytoken === 'AVG') {
+                // Log.trace("jump into AVG")
                 if(!this.isvalidNumberKey(applystring))
                     throw Error;
                 else
+                    for (var i = 0; i < grouplist.length; i++) {
+                        var sessions = grouplist[i];
+                       // Log.trace("sessions"+JSON.stringify(sessions));
                         var sum: number=0;
-                        var length1:number=0;
+                        var length:number=0;
                         for (var j=1;j<sessions.length;j++)
                         {
-                        if(sessions[j][applystring]!='undefined'&&
-                                sessions[j][applystring]!=null)
+                            if( sessions[j][applystring]!=='undefined')
                                 sum+=sessions[j][applystring];
-                            length1++;
+                            length++;
                         }
-                        //Log.trace("sum"+sum)
-                        //Log.trace("length"+length1)
-                        var averageValue:number=0;
-                        averageValue = parseFloat((sum/length1).toFixed(2));
-                        //Log.trace("average"+averageValue)
-                        sessions[0][applynewkey]=averageValue;
+                        var averageValue: any;
+                        averageValue = parseFloat((sum / length).toFixed(2));
+                        grouplist[i][0][applynewkey]=averageValue;
                     }
+            }
+
             if (applytoken === 'MIN') {
                 if(!this.isvalidNumberKey(applystring))
                     throw Error;
                 else
+                    for (var i = 0; i < grouplist.length; i++) {
+                        var sessions = grouplist[i];
                         var minsession:any=[];
                         for(var j=1;j<sessions.length-1;j++)
                         { if(sessions[j][applystring]!='undefined'&&
@@ -442,13 +453,16 @@ export default class QueryController {
                             min=Math.min.apply(Math,minsession);
                             if(min===null)
                                 min=0;}
-                        sessions[0][applynewkey]=min;
+                        grouplist[i][0][applynewkey]=min;
                     }
+            }
 
             if (applytoken === 'MAX') {
                 if(!this.isvalidNumberKey(applystring))
                     throw Error;
                 else
+                    for (var i = 0; i < grouplist.length; i++) {
+                        var sessions = grouplist[i];
 
                       var maxsession:any=[];
                         for(var j=1;j<sessions.length-1;j++)
@@ -462,10 +476,14 @@ export default class QueryController {
                            max=Math.max.apply(Math,maxsession)
                         if(max===null)
                             max=0;}
-                        sessions[0][applynewkey]=max;
+                        grouplist[i][0][applynewkey]=max;
+                    }
             }
 
+
             if (applytoken === 'COUNT') {
+                for (var i = 0; i < grouplist.length; i++) {
+                    var sessions = grouplist[i];
                     var count=0;
                     var keysession:any=[]
                     for (var j = 1; j < sessions.length; j++)
@@ -477,12 +495,21 @@ export default class QueryController {
                         keysession.push(sessions[j][applystring])
                     }
                     count=keysession.length;
-                    sessions[0][applynewkey]=count;
+                    grouplist[i][0][applynewkey]=count;
 
                 }
-            }
 
-        return sessions[0];
+            }
+        }
+        for (var i = 0; i < grouplist.length; i++){
+            applylist.push(grouplist[i][0]);
+        }
+        /*   for (var groupobject2 of grouplist){
+         if(this.checkArrayContain(groupobject2,applykeys))
+         applylist.push(groupobject2[0]);
+         }   */
+        //Log.trace("applylist"+applylist);
+        return applylist;
     }
 
 /*
@@ -571,7 +598,7 @@ export default class QueryController {
         var isvalidKeyResult:any
         if(key==="courses_dept"||key==="courses_id"||key==="courses_avg"||
             key==="courses_instructor"||key==="courses_title"||key==="courses_pass"||
-            key==="courses_fail"||key==="courses_audit"||key==="courses_uuid"
+            key==="courses_fail"||key==="courses_audit"
         ){
             isvalidKeyResult=true;
         }else{
