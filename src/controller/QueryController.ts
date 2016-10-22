@@ -94,29 +94,25 @@ export default class QueryController {
                         Log.trace("GROUP & APPLY cannot have the same keys")
                         return false
                     }
-                }
+                }}
 
 
                 //Malibu: APPLY rules should be unique.
-                /*          for (var applyOBJ1 of query.APPLY) {
-                 var duplicateinAPPLY = false
-                 var applykey1=Object.keys(applyOBJ1)[0]
-                 for (var applyOBJ2 of query.APPLY) {
-                 var applykey2=Object.keys(applyOBJ2)[0]
-                 {
-                 if (applykey1 == applykey2) {
-                 duplicateinAPPLY = true
-                 }
-                 }
-                 }
-                 if (duplicateinAPPLY){
-                 Log.trace("duplicate keys found in APPLY")
-                 return false
-                 }
-                 }  */
+            if (typeof query.APPLY !== 'undefined'&& query.APPLY !== null)
+            {   var applyarray:any=[]
+                for(var applyObject of query.APPLY)
+                {applyarray.push(Object.keys(applyObject)[0])}
+                if(applyarray.length>1)
+                {  applyarray.sort();
+               for(var h=0; h<applyarray.length-1;h++)
+              {
+                 if(applyarray[h]===applyarray[h+1])
+                 { Log.trace("duplicate keys found in APPLY")
+                 return false;}
+             }}
             }
-        }
 
+        }
 
         return isValidResult;
     }
@@ -158,7 +154,7 @@ export default class QueryController {
         Log.trace("this is FINAL result:  " + JSON.stringify(finalResultObjArray))
         //Log.trace("this is FINAL result:  " + JSON.stringify({render: format, result: finalResultObjArray}))
 
-        return {render: format.toLowerCase(), result: finalResultObjArray};
+        return {render: format, result: finalResultObjArray};
     }
 
 //deal with where
@@ -366,7 +362,7 @@ export default class QueryController {
             var groupMap: any = {};
             var lastintermediates:any=[];
             var groupvalue:any={};
-            for (var a=0;a<group.length;a++)
+       /*     for (var a=0;a<group.length;a++)
             {  var lastintermediate:any;
                 lastintermediate=intermediate[intermediate.length-1][group[a]];
                 lastintermediates.push(lastintermediate);
@@ -378,6 +374,21 @@ export default class QueryController {
             {   sessions.push(intermediate[i]);
                 //   Log.trace("session.length"+sessions.length);
                 intermediate.splice(i,1); }
+            }    */
+
+            for (var a=0;a<group.length;a++)
+            {  var lastintermediate:any;
+                lastintermediate=intermediate[0][group[a]];
+                lastintermediates.push(lastintermediate);
+                groupvalue[group[a]]=intermediate[0][group[a]];
+            }
+            sessions.push(groupvalue);
+            for (var i=0;i<intermediate.length;i++)
+            {  if(this.checkGroupCorrect(group,intermediate[i],lastintermediates))
+            {   sessions.push(intermediate[i]);
+                intermediate.splice(i,1);
+                i--;
+            }
             }
             groups.push(sessions);
         }
@@ -442,7 +453,7 @@ export default class QueryController {
                     for (var i = 0; i < grouplist.length; i++) {
                         var sessions = grouplist[i];
                         var minsession:any=[];
-                        for(var j=1;j<sessions.length-1;j++)
+                        for(var j=1;j<sessions.length;j++)
                         { if(sessions[j][applystring]!='undefined'&&
                             sessions[j][applystring]!=null)
                             minsession.push( sessions[j][applystring])}
@@ -463,9 +474,8 @@ export default class QueryController {
                 else
                     for (var i = 0; i < grouplist.length; i++) {
                         var sessions = grouplist[i];
-
                       var maxsession:any=[];
-                        for(var j=1;j<sessions.length-1;j++)
+                        for(var j=1;j<sessions.length;j++)
                         {  if(sessions[j][applystring]!='undefined'&&
                         sessions[j][applystring]!=null)
                             maxsession.push(sessions[j][applystring])}
@@ -598,7 +608,7 @@ export default class QueryController {
         var isvalidKeyResult:any
         if(key==="courses_dept"||key==="courses_id"||key==="courses_avg"||
             key==="courses_instructor"||key==="courses_title"||key==="courses_pass"||
-            key==="courses_fail"||key==="courses_audit"||key==="courses_uuid"
+            key==="courses_fail"||key==="courses_audit"
         ){
             isvalidKeyResult=true;
         }else{
