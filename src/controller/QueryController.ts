@@ -34,7 +34,7 @@ export default class QueryController {
             //•	Kanga: APPLY without GROUP should not be valid.
             //•	Jonah: Empty GROUP should not be valid.
             if (typeof query.APPLY !== 'undefined'&& query.APPLY !== null) {
-                if (typeof query.GROUP === 'undefined'||query.GROUP === null) {
+                if (typeof query.GROUP === 'undefined'||query.GROUP === null||query.GROUP.length===0) {
                     Log.trace("APPLY without GROUP should not be valid.")
                     Log.trace("Empty GROUP should not be valid.")
                     return false
@@ -43,7 +43,7 @@ export default class QueryController {
 
             //•	Kodiak: GROUP without APPLY should not be valid.
             if (typeof query.GROUP !== 'undefined' && query.GROUP !== null) {
-                if (typeof query.APPLY === 'undefined'|| query.APPLY === null) {
+                if (typeof query.APPLY === 'undefined'|| query.APPLY === null ) {
                     Log.trace("GROUP without APPLY should not be valid.")
                     return false
                 }
