@@ -389,7 +389,7 @@ export default class QueryController {
                 var resultObj1: any = {}
                 for (var j = 0; j < Object.keys(GETInput).length; j++) {
                     var key = GETInput[j]
-               
+
                     resultObj1[key] = eachSection[key];
                 }
                 resultArray.push(resultObj1)
@@ -525,15 +525,21 @@ export default class QueryController {
                     var sessions = grouplist[i];
                     var count=0;
                     var keysession:any=[]
-                    for (var j = 1; j < sessions.length; j++)
 
+                    for (var j = 1; j < sessions.length; j++)
                     {
                         if(sessions[j][applystring]!='undefined'&&
                         sessions[j][applystring]!=null
                         )
                         keysession.push(sessions[j][applystring])
                     }
-                    count=keysession.length;
+                    if(keysession.length>1)
+                    {  keysession.sort();
+                        for(var h=0; h<keysession.length-1;h++)
+                        { if(keysession[h]===keysession[h+1])
+                        { keysession.splice(h,1)
+                            h--;}}}
+                                count=keysession.length;
                     grouplist[i][0][applynewkey]=count;
 
                 }
