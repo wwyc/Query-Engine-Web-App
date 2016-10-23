@@ -43,7 +43,7 @@ export default class QueryController {
 
             //•	Kodiak: GROUP without APPLY should not be valid.
             if (typeof query.GROUP !== 'undefined' && query.GROUP !== null) {
-                if (typeof query.APPLY == 'undefined'|| query.APPLY == null) {
+                if (typeof query.APPLY === 'undefined'|| query.APPLY === null) {
                     Log.trace("GROUP without APPLY should not be valid.")
                     return false
                 }
@@ -95,6 +95,49 @@ export default class QueryController {
                         return false
                     }
                 }}
+
+              //Kwyjibo: All keys in GET should be in either GROUP or APPLY.
+            // Lorax: All keys in GET that are not separated by an underscore should appe
+
+          if (typeof query.GET !== 'undefined'&& query.GET !== null)
+            {
+                if (typeof query.GET === 'string') {
+                    if(query.GET.includes("_"))
+                    {  if (typeof query.GROUP !== 'undefined' && query.GROUP !== null&&!this.isEmpty(query.GROUP)&&
+                    query.GROUP.length>0
+                    )
+                      if(!this.contains(query.GET,query.GROUP))
+                      { Log.trace("All keys in GET should be in either GROUP or APPLY.")
+                          return false;}
+                    }
+                    else
+                    { if (typeof query.APPLY !== 'undefined' && query.APPLY !== null&&!this.isEmpty(query.APPLY)
+                    && query.APPLY.length>0
+                    )
+                        if(!this.contains(query.GET,query.APPLY))
+                        {    Log.trace("All keys in GET should be in either GROUP or APPLY.")
+                        return false;}
+                    }}
+                    else
+                {  for (var s=0;s<query.GET.length;s++)
+                {if(query.GET[s].includes("_"))
+                    if(typeof query.GROUP !== 'undefined' && query.GROUP !== null&&!this.isEmpty(query.GROUP)
+                    && query.GROUP.length>0)
+                    { if(!(query.GROUP.includes(query.GET[s])))
+                    {  Log.trace("All keys in GET should be in either GROUP or APPLY.")
+                           return false; }}
+                    else
+                    {  if(typeof query.APPLY !== 'undefined' && query.APPLY !== null&&!this.isEmpty(query.APPLY)
+                    && query.APPLY.length>0)
+                        if(!(query.APPLY.includes(query.GET[s])))
+                        { Log.trace("All keys in GET should be in either GROUP or APPLY.")
+                        return false; }}}
+                }}
+
+          //Empty apply object should be accepted
+
+
+
 
 
                 //Malibu: APPLY rules should be unique.
@@ -332,11 +375,13 @@ export default class QueryController {
 
         //Log.trace("what is type of getArray:"  + Array.isArray(getArray))
         var resultArray: any = []
-
 // Check to see if GET is string or Array
         if (typeof GETInput === 'string') {
             for (var sectionX of sectionArray) {
                 var resultObj: any = {}
+              /*    if(sectionX[GETInput]===null||typeof sectionX[GETInput]==='undefined')
+                    throw Error
+                else  */
                 resultObj[GETInput] = sectionX[GETInput]
                 resultArray.push(resultObj)
             }
@@ -347,6 +392,9 @@ export default class QueryController {
                 var resultObj1: any = {}
                 for (var j = 0; j < Object.keys(GETInput).length; j++) {
                     var key = GETInput[j]
+                 /*   if(eachSection[GETInput]===null||typeof eachSection[GETInput]==='undefined')
+                        throw Error
+                    else  */
                     resultObj1[key] = eachSection[key];
                 }
                 resultArray.push(resultObj1)
@@ -362,19 +410,6 @@ export default class QueryController {
             var groupMap: any = {};
             var lastintermediates:any=[];
             var groupvalue:any={};
-       /*     for (var a=0;a<group.length;a++)
-            {  var lastintermediate:any;
-                lastintermediate=intermediate[intermediate.length-1][group[a]];
-                lastintermediates.push(lastintermediate);
-                groupvalue[group[a]]=intermediate[intermediate.length-1][group[a]];
-            }
-            sessions.push(groupvalue);
-            for (var i=intermediate.length-1;i>=0;i--)
-            {  if(this.checkGroupCorrect(group,intermediate[i],lastintermediates))
-            {   sessions.push(intermediate[i]);
-                //   Log.trace("session.length"+sessions.length);
-                intermediate.splice(i,1); }
-            }    */
 
             for (var a=0;a<group.length;a++)
             {  var lastintermediate:any;
@@ -425,7 +460,6 @@ export default class QueryController {
             var applytoken=Object.keys(applyvalue)[0];//AVG
             var applystring=applyvalue[Object.keys(applyvalue)[0]];//courses_avg
             if (applytoken === 'AVG') {
-                // Log.trace("jump into AVG")
                 if(!this.isvalidNumberKey(applystring))
                     throw Error;
                 else
@@ -641,9 +675,10 @@ export default class QueryController {
     }
 
     public contains(a:any, array:any):boolean{
+
             for (var i = 0; i < a.length; i++) {
                 if (array[i] === a) {
-                    return true;
+                  return true;
                 }
             }
             return false;
