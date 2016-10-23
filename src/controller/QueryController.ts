@@ -10,9 +10,9 @@ import {stringify} from "querystring";
 export interface QueryRequest {
     GET: string|string[];
     WHERE: {};
-    GROUP?:string[];
-    APPLY?:any[];
-    ORDER?: string|{};
+    GROUP:string[];
+    APPLY:any[];
+    ORDER: string|{};
     AS: string
 }
 
