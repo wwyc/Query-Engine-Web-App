@@ -10,9 +10,9 @@ import {stringify} from "querystring";
 export interface QueryRequest {
     GET: string|string[];
     WHERE: {};
-    GROUP:string[];
-    APPLY:any[];
-    ORDER: string|{};
+    GROUP?:string[];
+    APPLY?:any[];
+    ORDER?: string|{};
     AS: string
 }
 
@@ -180,22 +180,21 @@ export default class QueryController {
             intermediate = this.dealWithWhere(where, get[0])
         }
 
-        if(group!==null && apply!=null)
+        if(group!==null&&typeof group!=='undefined'&& group.length>0)
         {
             grouplist=this.dealWithGroup(group,intermediate);
-            intermediate=this.dealWithApply(apply,grouplist);
-        }
+            if(group!==null&&typeof apply!=='undefined'&&apply.length>0)
+            { intermediate=this.dealWithApply(apply,grouplist);
+        }}
 
 
         var finalResultObjArray: any = this.represent(get, intermediate);
 
-        //Do this if order was requested
         if (order !== null) {
             finalResultObjArray = this.sortArray(finalResultObjArray, order);
         }
 
         Log.trace("this is FINAL result:  " + JSON.stringify(finalResultObjArray))
-        //Log.trace("this is FINAL result:  " + JSON.stringify({render: format, result: finalResultObjArray}))
 
         return {render: format, result: finalResultObjArray};
     }
@@ -379,9 +378,7 @@ export default class QueryController {
         if (typeof GETInput === 'string') {
             for (var sectionX of sectionArray) {
                 var resultObj: any = {}
-              /*    if(sectionX[GETInput]===null||typeof sectionX[GETInput]==='undefined')
-                    throw Error
-                else  */
+
                 resultObj[GETInput] = sectionX[GETInput]
                 resultArray.push(resultObj)
             }
@@ -392,9 +389,7 @@ export default class QueryController {
                 var resultObj1: any = {}
                 for (var j = 0; j < Object.keys(GETInput).length; j++) {
                     var key = GETInput[j]
-                 /*   if(eachSection[GETInput]===null||typeof eachSection[GETInput]==='undefined')
-                        throw Error
-                    else  */
+               
                     resultObj1[key] = eachSection[key];
                 }
                 resultArray.push(resultObj1)
