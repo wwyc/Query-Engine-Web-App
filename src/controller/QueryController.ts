@@ -34,7 +34,7 @@ export default class QueryController {
             //•	Kanga: APPLY without GROUP should not be valid.
             //•	Jonah: Empty GROUP should not be valid.
             if (typeof query.APPLY !== 'undefined'&& query.APPLY !== null) {
-                if (typeof query.GROUP == 'undefined'||query.GROUP == null||query.GROUP.length == 0) {
+                if (typeof query.GROUP === 'undefined'||query.GROUP === null) {
                     Log.trace("APPLY without GROUP should not be valid.")
                     Log.trace("Empty GROUP should not be valid.")
                     return false
@@ -114,24 +114,34 @@ export default class QueryController {
                     { if (typeof query.APPLY !== 'undefined' && query.APPLY !== null&&!this.isEmpty(query.APPLY)
                     && query.APPLY.length>0
                     )
-                        if(!this.contains(query.GET,query.APPLY))
+                    { var applyarray:any=[]
+                        for(var applyObject of query.APPLY)
+                        {applyarray.push(Object.keys(applyObject)[0])}
+                        if(applyarray.length>1)
+                        { applyarray.sort();}
+                        if(!this.contains(query.GET,applyarray))
                         {    Log.trace("All keys in GET should be in either GROUP or APPLY.")
-                        return false;}
+                        return false;}}
                     }}
                     else
                 {  for (var s=0;s<query.GET.length;s++)
                 {if(query.GET[s].includes("_"))
-                    if(typeof query.GROUP !== 'undefined' && query.GROUP !== null&&!this.isEmpty(query.GROUP)
+                {if(typeof query.GROUP !== 'undefined' && query.GROUP !== null&&!this.isEmpty(query.GROUP)
                     && query.GROUP.length>0)
                     { if(!(query.GROUP.includes(query.GET[s])))
                     {  Log.trace("All keys in GET should be in either GROUP or APPLY.")
-                           return false; }}
+                           return false; }}}
                     else
                     {  if(typeof query.APPLY !== 'undefined' && query.APPLY !== null&&!this.isEmpty(query.APPLY)
                     && query.APPLY.length>0)
-                        if(!(query.APPLY.includes(query.GET[s])))
+                    { var applyarray1:any=[]
+                        for(var applyObject of query.APPLY)
+                        {applyarray1.push(Object.keys(applyObject)[0])}
+                        if(applyarray1.length>1)
+                        {  applyarray1.sort();}
+                            if(!(applyarray1.includes(query.GET[s])))
                         { Log.trace("All keys in GET should be in either GROUP or APPLY.")
-                        return false; }}}
+                        return false; }}}}
                 }}
 
           //Empty apply object should be accepted
@@ -378,7 +388,6 @@ export default class QueryController {
         if (typeof GETInput === 'string') {
             for (var sectionX of sectionArray) {
                 var resultObj: any = {}
-
                 resultObj[GETInput] = sectionX[GETInput]
                 resultArray.push(resultObj)
             }
@@ -389,7 +398,6 @@ export default class QueryController {
                 var resultObj1: any = {}
                 for (var j = 0; j < Object.keys(GETInput).length; j++) {
                     var key = GETInput[j]
-
                     resultObj1[key] = eachSection[key];
                 }
                 resultArray.push(resultObj1)
@@ -402,7 +410,6 @@ export default class QueryController {
         var groups:any=[];
         while(intermediate.length!=0)
         {   var sessions:any=[];
-            var groupMap: any = {};
             var lastintermediates:any=[];
             var groupvalue:any={};
 
