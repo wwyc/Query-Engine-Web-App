@@ -12,8 +12,8 @@ export interface QueryRequest {
     WHERE: {};
     GROUP:string[];
     APPLY:any[];
-    ORDER: string;
-    AS: string;
+    ORDER: string|{};
+    AS: string
 }
 
 export interface QueryResponse {
@@ -94,35 +94,28 @@ export default class QueryController {
                         Log.trace("GROUP & APPLY cannot have the same keys")
                         return false
                     }
-                }
+                }}
 
 
                 //Malibu: APPLY rules should be unique.
-                for (var applyOBJ1 of query.APPLY) {
-                    var duplicateinAPPLY = false
-
-                    var applykey1=Object.keys(applyOBJ1)[0]
-
-                    for (var applyOBJ2 of query.APPLY) {
-                        var applykey2=Object.keys(applyOBJ2)[0]
-                        {
-                            if (applykey1 == applykey2) {
-                                duplicateinAPPLY = true
-                            }
-                        }
-                    }
-                    if (duplicateinAPPLY){
-                        Log.trace("duplicate keys found in APPLY")
-                        return false
-                    }
-                }
+            if (typeof query.APPLY !== 'undefined'&& query.APPLY !== null)
+            {   var applyarray:any=[]
+                for(var applyObject of query.APPLY)
+                {applyarray.push(Object.keys(applyObject)[0])}
+                if(applyarray.length>1)
+                {  applyarray.sort();
+               for(var h=0; h<applyarray.length-1;h++)
+              {
+                 if(applyarray[h]===applyarray[h+1])
+                 { Log.trace("duplicate keys found in APPLY")
+                 return false;}
+             }}
             }
-        }
 
+        }
 
         return isValidResult;
     }
-
     public query(query: QueryRequest): QueryResponse {
         Log.trace('QueryController::query( ' + JSON.stringify(query) + ' )');//json string
 
@@ -136,14 +129,20 @@ export default class QueryController {
         var format = query.AS;
 
         var intermediate: any = [];
-
+        var grouplist:any=[];
         if (typeof get === 'string') {
+
             intermediate = this.dealWithWhere(where, get)
         } else {
             intermediate = this.dealWithWhere(where, get[0])
         }
 
-        var values: any = [];
+        if(group!==null && apply!=null)
+        {
+            grouplist=this.dealWithGroup(group,intermediate);
+            intermediate=this.dealWithApply(apply,grouplist);
+        }
+
 
         var finalResultObjArray: any = this.represent(get, intermediate);
 
@@ -173,27 +172,31 @@ export default class QueryController {
         for (var key in datasetRetrived) {
             sections = datasetRetrived[key]
 
-            /*   for (var key in sections) {
-             var section = sections[key]  */
             for (var section of sections) {
-                if (this.parserEBNF(where, section)) {
-                    //add section to list if it meets WHERE criteria in query
-                    selectedSections.push(section)
-                }
+                      if(where!=null&&Object.keys(where).length>0&& where!=undefined)
+                 { if (this.parserEBNF(where, section)) {
+                 //add section to list if it meets WHERE criteria in query
+                 selectedSections.push(section)}}
+                 else
+                 { selectedSections.push(section) }
+                 }
+               // selectedSections.push(section);
             }
-        }
+
+      //  if(where!=null&&Object.keys(where).length>0&& where!=undefined)
+     //   selectedSections.filter(this.parserEBNF,where)
         return selectedSections;
     }
 
     //helper function that returns prefix of string from GET
-/*    public stringPrefix(get: string) {
-        let prefix: any
-        prefix = get.split("_")[0];
-        //Log.trace(prefix);
-        return prefix;
-    }*/
+    /*    public stringPrefix(get: string) {
+     let prefix: any
+     prefix = get.split("_")[0];
+     //Log.trace(prefix);
+     return prefix;
+     }*/
 
-    public parserEBNF(where: any, section: any) {
+    public parserEBNF(where: any, section: any):boolean {
 
         let valid = true;
 
@@ -349,13 +352,203 @@ export default class QueryController {
                 resultArray.push(resultObj1)
             }
         }
-        return resultArray;
-
+        return resultArray
     }
-    public sortArray(resultArray: any, order: any) {
-        Log.trace("INSIDE sorting!")
-        resultArray.sort(function (a: any, b: any) {
 
+    public dealWithGroup(group:any,intermediate:any):any{
+        var groups:any=[];
+        while(intermediate.length!=0)
+        {   var sessions:any=[];
+            var groupMap: any = {};
+            var lastintermediates:any=[];
+            var groupvalue:any={};
+       /*     for (var a=0;a<group.length;a++)
+            {  var lastintermediate:any;
+                lastintermediate=intermediate[intermediate.length-1][group[a]];
+                lastintermediates.push(lastintermediate);
+                groupvalue[group[a]]=intermediate[intermediate.length-1][group[a]];
+            }
+            sessions.push(groupvalue);
+            for (var i=intermediate.length-1;i>=0;i--)
+            {  if(this.checkGroupCorrect(group,intermediate[i],lastintermediates))
+            {   sessions.push(intermediate[i]);
+                //   Log.trace("session.length"+sessions.length);
+                intermediate.splice(i,1); }
+            }    */
+
+            for (var a=0;a<group.length;a++)
+            {  var lastintermediate:any;
+                lastintermediate=intermediate[0][group[a]];
+                lastintermediates.push(lastintermediate);
+                groupvalue[group[a]]=intermediate[0][group[a]];
+            }
+            sessions.push(groupvalue);
+            for (var i=0;i<intermediate.length;i++)
+            {  if(this.checkGroupCorrect(group,intermediate[i],lastintermediates))
+            {   sessions.push(intermediate[i]);
+                intermediate.splice(i,1);
+                i--;
+            }
+            }
+            groups.push(sessions);
+        }
+        Log.trace("groups length"+groups.length);
+
+        return groups;
+    }
+
+    public checkGroupCorrect(group:any,intermediate:any,lastintermediates:any):boolean{
+        var validlist:any=[];
+        var valid:boolean=true;
+        for (var i=0;i< group.length;i++)
+        {
+            if(intermediate[group[i]]===lastintermediates[i])
+            {validlist.push(true);}
+            else
+            { validlist.push(false);}
+        }
+
+        for (var eachValid of validlist) {
+            if (eachValid === false)
+                valid = false;
+        }
+        return valid;
+    }
+
+    public dealWithApply(apply:any,grouplist:any):any {
+        var applylist:any=[];
+
+        Log.trace("jump into apply")
+        for (var applyobject of apply) {
+            var applynewkey=Object.keys(applyobject)[0];//coursesAvg
+            var applyvalue=applyobject[Object.keys(applyobject)[0]];
+            var applytoken=Object.keys(applyvalue)[0];//AVG
+            var applystring=applyvalue[Object.keys(applyvalue)[0]];//courses_avg
+            if (applytoken === 'AVG') {
+                // Log.trace("jump into AVG")
+                if(!this.isvalidNumberKey(applystring))
+                    throw Error;
+                else
+                    for (var i = 0; i < grouplist.length; i++) {
+                        var sessions = grouplist[i];
+                       // Log.trace("sessions"+JSON.stringify(sessions));
+                        var sum: number=0;
+                        var length:number=0;
+                        for (var j=1;j<sessions.length;j++)
+                        {
+                            if( sessions[j][applystring]!=='undefined')
+                                sum+=sessions[j][applystring];
+                            length++;
+                        }
+                        var averageValue: any;
+                        averageValue = parseFloat((sum / length).toFixed(2));
+                        grouplist[i][0][applynewkey]=averageValue;
+                    }
+            }
+
+            if (applytoken === 'MIN') {
+                if(!this.isvalidNumberKey(applystring))
+                    throw Error;
+                else
+                    for (var i = 0; i < grouplist.length; i++) {
+                        var sessions = grouplist[i];
+                        var minsession:any=[];
+                        for(var j=1;j<sessions.length;j++)
+                        { if(sessions[j][applystring]!='undefined'&&
+                            sessions[j][applystring]!=null)
+                            minsession.push( sessions[j][applystring])}
+                        var min:number=0;
+                        if(minsession.length==0)
+                            min=0;
+                        else{
+                            min=Math.min.apply(Math,minsession);
+                            if(min===null)
+                                min=0;}
+                        grouplist[i][0][applynewkey]=min;
+                    }
+            }
+
+            if (applytoken === 'MAX') {
+                if(!this.isvalidNumberKey(applystring))
+                    throw Error;
+                else
+                    for (var i = 0; i < grouplist.length; i++) {
+                        var sessions = grouplist[i];
+                      var maxsession:any=[];
+                        for(var j=1;j<sessions.length;j++)
+                        {  if(sessions[j][applystring]!='undefined'&&
+                        sessions[j][applystring]!=null)
+                            maxsession.push(sessions[j][applystring])}
+                            var max:number=0;
+                        if(maxsession.length==0)
+                            max=0;
+                       else{
+                           max=Math.max.apply(Math,maxsession)
+                        if(max===null)
+                            max=0;}
+                        grouplist[i][0][applynewkey]=max;
+                    }
+            }
+
+
+            if (applytoken === 'COUNT') {
+                for (var i = 0; i < grouplist.length; i++) {
+                    var sessions = grouplist[i];
+                    var count=0;
+                    var keysession:any=[]
+                    for (var j = 1; j < sessions.length; j++)
+
+                    {
+                        if(sessions[j][applystring]!='undefined'&&
+                        sessions[j][applystring]!=null
+                        )
+                        keysession.push(sessions[j][applystring])
+                    }
+                    count=keysession.length;
+                    grouplist[i][0][applynewkey]=count;
+
+                }
+
+            }
+        }
+        for (var i = 0; i < grouplist.length; i++){
+            applylist.push(grouplist[i][0]);
+        }
+        /*   for (var groupobject2 of grouplist){
+         if(this.checkArrayContain(groupobject2,applykeys))
+         applylist.push(groupobject2[0]);
+         }   */
+        //Log.trace("applylist"+applylist);
+        return applylist;
+    }
+
+/*
+    public checkArrayContain(groupobject2:any,applykeys:any):boolean{
+        Log.trace("jump into check")
+        var valid2:boolean;
+        var validlist:any=[];
+        var groupkeys:any=Object.keys(groupobject2[0])
+        for (var applykey12 in applykeys){
+            valid2=false;
+            for(var groupkey12 in groupkeys)
+            {   if(applykey12===groupkey12)
+            { valid2=true;
+                break;}
+            }
+            validlist.push(valid2)}
+
+        for (var eachValid1 of validlist) {
+            if (eachValid1 === false)
+                valid2 = false;
+        }
+        Log.trace("valid2"+valid2);
+        return valid2;
+
+    }*/
+
+    public sortArray(resultArray: any, order: any) {
+        // Log.trace("INSIDE sorting!")
+        resultArray.sort(function (a: any, b: any) {
             if (typeof order == "string") {
                 //orderkey is a string
                 var value1 = a[order];
@@ -371,19 +564,69 @@ export default class QueryController {
 
             }
 
+            else
+                var orderkey:any=order['keys'];//orderkey is an array
+            var i=0;
+            if(order['dir']==='UP')// lowers come first
+            {  while(i<orderkey.length)
+            {
+                var value1 = a[orderkey[i]];
+                var value2 = b[orderkey[i]];
+                //    Log.trace("value1,2up"+value1+ value2)
+                if (value1 < value2) {
+                    return -1;
+                }
+                if (value1 > value2) {
+                    return 1;
+                }
+                else
+                    i++; }
+                return 0;}
+
+            if(order['dir']==='DOWN')
+            {  while(i<orderkey.length)
+            {
+                var value1 = a[orderkey[i]];
+                var value2 = b[orderkey[i]];
+                //   Log.trace("value1,2down"+value1+ value2)
+                if (value1 < value2) {
+                    return 1;
+                }
+                if (value1 > value2) {
+                    return -1;
+                }
+                else
+                    i++; }
+                return 0;}
+
         });
         return resultArray;
     }
+
 
     public isvalidKey(key:any):any{
         var isvalidKeyResult:any
         if(key==="courses_dept"||key==="courses_id"||key==="courses_avg"||
             key==="courses_instructor"||key==="courses_title"||key==="courses_pass"||
-            key==="courses_fail"||key==="courses_audit"
+            key==="courses_fail"||key==="courses_audit"||key=="courses_uuid"
         ){
             isvalidKeyResult=true;
         }else{
             isvalidKeyResult=false;
+        }
+        return isvalidKeyResult;
+    }
+
+
+    public isvalidNumberKey(key: any): any {
+        var isvalidKeyResult: any
+        if (key === "courses_avg" ||
+            key === "courses_pass" ||
+            key === "courses_fail" || key === "courses_audit"
+        ) {
+            isvalidKeyResult = true;
+        } else {
+            isvalidKeyResult = false;
         }
         return isvalidKeyResult;
     }
@@ -397,5 +640,12 @@ export default class QueryController {
         return true;
     }
 
+    public contains(a:any, array:any):boolean{
+            for (var i = 0; i < a.length; i++) {
+                if (array[i] === a) {
+                    return true;
+                }
+            }
+            return false;
+        }
 }
-
