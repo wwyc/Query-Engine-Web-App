@@ -381,7 +381,7 @@ describe("InsightFacadeQuery", function () {
             GET: ["courses_id", "courses_avg"],
             WHERE: {"GT": {"courses_avg": 90}},
             GROUP: ["courses_avg", "courses_id"],
-            APPLY: [{"courses_abc": {}}, {"courses_id": {}}],
+            APPLY: [{"courseAverage": {"AVG": "courses_avg"}} ],
             ORDER: 'courses_avg',
             AS: 'table'
         };
@@ -452,8 +452,86 @@ describe("InsightFacadeQuery", function () {
         });
     });
 
+    it("All keys in GROUP should be presented in GET1", function () {
+        var that = this;
+        Log.trace("Starting test: " + that.test.title);
+        let query: QueryRequest = {
+            GET:   ["courses_id","courses_dept","courses_avg","courses_instructor","minFail","maxAudit"],
+            WHERE: {"IS": {"courses_dept": "*c"}},
+            GROUP: ["courses_id","courses_dept","courses_avg","courses_instructor"],
+            APPLY: [{"minFail": {"MIN": "courses_fail"}}, {"maxAudit": {"MAX": "courses_audit"}}],
+            ORDER: {"dir": "UP",
+                "keys": ["minFail","maxAudit"]},
+            AS: 'table'
+        };
+
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect(response.code).to.equal(200);
+        }).catch(function (response: InsightResponse) {
+            expect.fail('Should not happen');
+        });
+    });
+
+    it(" All keys in GET should be in either GROUP or APPLY.", function () {
+        var that = this;
+        Log.trace("Starting test: " + that.test.title);
+        let query: QueryRequest = {
+            GET:   ["courses_id","courses_dept","courses_avg","courses_instructor","courses_fail","minFail","maxAudit"],
+            WHERE: {"IS": {"courses_dept": "*c"}},
+            GROUP: ["courses_id","courses_dept","courses_avg","courses_instructor"],
+            APPLY: [{"minFail": {"MIN": "courses_fail"}}, {"maxAudit": {"MAX": "courses_audit"}}],
+            ORDER: {"dir": "UP",
+                "keys": ["minFail","maxAudit"]},
+            AS: 'table'
+        };
+
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect.fail('Should not happen');
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(400);
+        });
+    });
 
 
+    it("All keys in GROUP should be presented in GET2", function () {
+        var that = this;
+        Log.trace("Starting test: " + that.test.title);
+        let query: QueryRequest = {
+            GET:   ["courses_id","courses_dept","courses_avg","minFail","maxAudit"],
+            WHERE: {"IS": {"courses_dept": "*c"}},
+            GROUP: ["courses_id","courses_dept","courses_avg","courses_instructor"],
+            APPLY: [{"minFail": {"MIN": "courses_fail"}}, {"maxAudit": {"MAX": "courses_audit"}}],
+            ORDER: {"dir": "UP",
+                "keys": ["minFail","maxAudit"]},
+            AS: 'table'
+        };
+
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect.fail('Should not happen');
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(400);
+        });
+    });
+
+    it("If a key appears in GROUP or in APPLY, it cannot appear in the other one.", function () {
+        var that = this;
+        Log.trace("Starting test: " + that.test.title);
+        let query: QueryRequest = {
+            GET:   ["courses_id","courses_dept","courses_avg","minFail","maxAudit"],
+            WHERE: {"IS": {"courses_dept": "*c"}},
+            GROUP: ["courses_id","courses_dept","courses_avg","courses_instructor"],
+            APPLY: [{"minFail": {"MIN": "courses_avg"}}, {"maxAudit": {"MAX": "courses_audit"}}],
+            ORDER: {"dir": "UP",
+                "keys": ["minFail","maxAudit"]},
+            AS: 'table'
+        };
+
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect.fail('Should not happen');
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(400);
+        });
+    });
 
 
 
