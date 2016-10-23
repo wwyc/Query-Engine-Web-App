@@ -25,7 +25,7 @@ describe("InsightFacadeQuery", function () {
         try {
             // what you delete here is going to depend on your impl, just make sure
             // all of your temporary files and directories are deleted
-            fs.unlinkSync(process.cwd() +  "/data/courses.json");
+            fs.unlinkSync(process.cwd() + "/data/courses.json");
         } catch (err) {
             // silently fail, but don't crash; this is fine
             Log.warn('InsightController::before() - courses.json not removed (probably not present)');
@@ -52,7 +52,14 @@ describe("InsightFacadeQuery", function () {
     it("Should be able to perform a simple query (200)", function () {
         var that = this;
         Log.trace("Starting test: " + that.test.title);
-        let query: QueryRequest = {GET: 'courses_avg', WHERE: {"GT": {"courses_avg": 90}}, GROUP: null, APPLY: null, ORDER: 'courses_avg', AS: 'table'};
+        let query: QueryRequest = {
+            GET: 'courses_avg',
+            WHERE: {"GT": {"courses_avg": 90}},
+            GROUP: null,
+            APPLY: null,
+            ORDER: 'courses_avg',
+            AS: 'table'
+        };
 
         return facade.performQuery(query).then(function (response: InsightResponse) {
             expect(response.code).to.equal(200);
@@ -67,10 +74,10 @@ describe("InsightFacadeQuery", function () {
         let query: QueryRequest = {
             GET: ["courses_dept", "courses_id", "courseAverage", "maxFail"],
             WHERE: {},
-            GROUP: [ "courses_dept", "courses_id" ],
-            APPLY: [ {"courseAverage": {"AVG": "courses_avg"}}, {"maxFail": {"MAX": "courses_fail"}} ],
-            ORDER: { "dir": "UP", "keys": ["courseAverage", "maxFail", "courses_dept", "courses_id"]},
-            AS:"TABLE"
+            GROUP: ["courses_dept", "courses_id"],
+            APPLY: [{"courseAverage": {"AVG": "courses_avg"}}, {"maxFail": {"MAX": "courses_fail"}}],
+            ORDER: {"dir": "UP", "keys": ["courseAverage", "maxFail", "courses_dept", "courses_id"]},
+            AS: "TABLE"
         }
         return facade.performQuery(query).then(function (response: InsightResponse) {
             expect(response.code).to.equal(200);
@@ -80,11 +87,15 @@ describe("InsightFacadeQuery", function () {
     });
 
 
-
     it("Should be able to perform a >90 query (200)", function () {
         var that = this;
         Log.trace("Starting test: " + that.test.title);
-        let query: QueryRequest = {GET: ["courses_dept", "courses_avg"], WHERE: {"GT": {"courses_avg": 90}}, ORDER: 'courses_avg', AS: 'table'};
+        let query: QueryRequest = {
+            GET: ["courses_dept", "courses_avg"],
+            WHERE: {"GT": {"courses_avg": 90}},
+            ORDER: 'courses_avg',
+            AS: 'table'
+        };
 
         return facade.performQuery(query).then(function (response: InsightResponse) {
             expect(response.code).to.equal(200);
@@ -96,11 +107,101 @@ describe("InsightFacadeQuery", function () {
     it("Should be able to perform a query with only GROUP but empty APPLY (200)", function () {
         var that = this;
         Log.trace("Starting test: " + that.test.title);
-        let query: QueryRequest = {GET: ["courses_dept", "courses_avg"], WHERE: {"GT": {"courses_avg": 90}}, GROUP: ["courses_avg"], APPLY: [], ORDER: 'courses_avg', AS: 'table'};
+        let query: QueryRequest = {
+            GET: ["courses_avg"],
+            WHERE: {"GT": {"courses_avg": 90}},
+            GROUP: ["courses_avg"],
+            APPLY: [],
+            ORDER: 'courses_avg',
+            AS: 'table'
+        };
         return facade.performQuery(query).then(function (response: InsightResponse) {
             expect(response.code).to.equal(200);
         }).catch(function (response: InsightResponse) {
             expect.fail('Should not happen');
+
+        });
+    });
+
+    it("Should not be able to perform a query has key in GET is not in GROUP OR APPLY", function () {
+        var that = this;
+        Log.trace("Starting test: " + that.test.title);
+        let query: QueryRequest = {
+            GET: ["courses_dept", "courses_avg"],
+            WHERE: {"GT": {"courses_avg": 90}},
+            GROUP: ["courses_dept", "courses_id"],
+            APPLY: [],
+            ORDER: 'courses_avg',
+            AS: 'table'
+        };
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect.fail('Should not happen');
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(400);
+
+        });
+    });
+
+    it("Should not be able to perform a query with only GROUP without APPLY (400)", function () {
+        var that = this;
+        Log.trace("Starting test: " + that.test.title);
+        let query: QueryRequest = {
+            GET: ["courses_dept", "courses_avg"],
+            WHERE: {"GT": {"courses_avg": 90}},
+            GROUP: ["courses_avg"],
+            ORDER: 'courses_avg',
+            AS: 'table'
+        };
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect.fail('Should not happen');
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(400);
+        });
+    });
+
+    it("Should not be able to perform a query with only GROUP without APPLY (400)", function () {
+        var that = this;
+        Log.trace("Starting test: " + that.test.title);
+        let query: QueryRequest = {
+            GET: ["courses_dept", "courses_avg"],
+            WHERE: {"GT": {"courses_avg": 90}},
+            GROUP: ["courses_avg"],
+            ORDER: 'courses_avg',
+            AS: 'table'
+        };
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect.fail('Should not happen');
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(400);
+        });
+    });
+
+
+    it("All keys in GET that are not separated by an underscore should appear in APPLY.", function () {
+        var that = this;
+        Log.trace("Starting test: " + that.test.title);
+        let query: QueryRequest = {
+            GET: ["courses_dept", "courseAverage"], WHERE: {"GT": {"courses_avg": 90}}, GROUP: ["courses_dept"],
+            APPLY: [{"courseAverage": {"AVG": "courses_avg"}}], ORDER: 'courses_avg', AS: 'table'
+        };
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect(response.code).to.equal(200);
+        }).catch(function (response: InsightResponse) {
+            expect.fail('Should not happen');
+        });
+    });
+
+    it("All keys in GET that are not separated by not in APPLY should report 400.", function () {
+        var that = this;
+        Log.trace("Starting test: " + that.test.title);
+        let query: QueryRequest = {
+            GET: ["courses_dept", "MaxFail"], WHERE: {"GT": {"courses_avg": 90}}, GROUP: ["courses_dept"],
+            APPLY: [{"courseAverage": {"AVG": "courses_avg"}}], ORDER: 'courses_avg', AS: 'table'
+        };
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect.fail('Should not happen');
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(400);
 
         });
     });
@@ -122,7 +223,14 @@ describe("InsightFacadeQuery", function () {
     it("Should not be able to perform a query with only APPLY but null GROUP (400)", function () {
         var that = this;
         Log.trace("Starting test: " + that.test.title);
-        let query: QueryRequest = {GET: ["courses_dept", "courses_avg"], WHERE: {"GT": {"courses_avg": 90}}, GROUP: null, APPLY: ["courses_avg"], ORDER: 'courses_avg', AS: 'table'};
+        let query: QueryRequest = {
+            GET: ["courses_dept", "courses_avg"],
+            WHERE: {"GT": {"courses_avg": 90}},
+            GROUP: null,
+            APPLY: ["courses_avg"],
+            ORDER: 'courses_avg',
+            AS: 'table'
+        };
 
         return facade.performQuery(query).then(function (response: InsightResponse) {
             expect.fail('Should not happen');
@@ -135,7 +243,14 @@ describe("InsightFacadeQuery", function () {
     it("Should not be able to perform a query with only APPLY but empty GROUP (400)", function () {
         var that = this;
         Log.trace("Starting test: " + that.test.title);
-        let query: QueryRequest = {GET: ["courses_dept", "courses_avg"], WHERE: {"GT": {"courses_avg": 90}}, GROUP: [], APPLY: ["courses_avg"], ORDER: 'courses_avg', AS: 'table'};
+        let query: QueryRequest = {
+            GET: ["courses_dept", "courses_avg"],
+            WHERE: {"GT": {"courses_avg": 90}},
+            GROUP: [],
+            APPLY: ["courses_avg"],
+            ORDER: 'courses_avg',
+            AS: 'table'
+        };
 
         return facade.performQuery(query).then(function (response: InsightResponse) {
             expect.fail('Should not happen');
@@ -148,7 +263,14 @@ describe("InsightFacadeQuery", function () {
     it("Should not be able to perform a query with only GROUP but not APPLY (400)", function () {
         var that = this;
         Log.trace("Starting test: " + that.test.title);
-        let query: QueryRequest = {GET: ["courses_dept", "courses_avg"], WHERE: {"GT": {"courses_avg": 90}}, GROUP: ["courses_avg"], APPLY: null, ORDER: 'courses_avg', AS: 'table'};
+        let query: QueryRequest = {
+            GET: ["courses_dept", "courses_avg"],
+            WHERE: {"GT": {"courses_avg": 90}},
+            GROUP: ["courses_avg"],
+            APPLY: null,
+            ORDER: 'courses_avg',
+            AS: 'table'
+        };
 
         return facade.performQuery(query).then(function (response: InsightResponse) {
             expect.fail('Should not happen');
@@ -162,7 +284,14 @@ describe("InsightFacadeQuery", function () {
     it("Should not be able to perform a query with GROUP keys that are all valid (400)", function () {
         var that = this;
         Log.trace("Starting test: " + that.test.title);
-        let query: QueryRequest = {GET: ["courses_dept", "courses_avg"], WHERE: {"GT": {"courses_avg": 90}}, GROUP: ["sdfsdf", "courses_id"], APPLY: [], ORDER: 'courses_avg', AS: 'table'};
+        let query: QueryRequest = {
+            GET: ["courses_dept", "courses_avg"],
+            WHERE: {"GT": {"courses_avg": 90}},
+            GROUP: ["sdfsdf", "courses_id"],
+            APPLY: [],
+            ORDER: 'courses_avg',
+            AS: 'table'
+        };
 
         return facade.performQuery(query).then(function (response: InsightResponse) {
             expect.fail('Should not happen');
@@ -175,7 +304,14 @@ describe("InsightFacadeQuery", function () {
     it("Should not be able to perform a query with only GROUP keys not in GET Array (400)", function () {
         var that = this;
         Log.trace("Starting test: " + that.test.title);
-        let query: QueryRequest = {GET: ["courses_dept", "courses_avg"], WHERE: {"GT": {"courses_avg": 90}}, GROUP: ["courses_dept", "courses_avg", "courses_id"], APPLY: [], ORDER: 'courses_avg', AS: 'table'};
+        let query: QueryRequest = {
+            GET: ["courses_dept", "courses_avg"],
+            WHERE: {"GT": {"courses_avg": 90}},
+            GROUP: ["courses_dept", "courses_avg", "courses_id"],
+            APPLY: [],
+            ORDER: 'courses_avg',
+            AS: 'table'
+        };
 
         return facade.performQuery(query).then(function (response: InsightResponse) {
             expect.fail('Should not happen');
@@ -188,7 +324,14 @@ describe("InsightFacadeQuery", function () {
     it("Should not be able to perform a query with only GROUP keys not in GET String (400)", function () {
         var that = this;
         Log.trace("Starting test: " + that.test.title);
-        let query: QueryRequest = {GET: "courses_dept", WHERE: {"GT": {"courses_avg": 90}}, GROUP: ["courses_id"], APPLY: [], ORDER: 'courses_avg', AS: 'table'};
+        let query: QueryRequest = {
+            GET: "courses_dept",
+            WHERE: {"GT": {"courses_avg": 90}},
+            GROUP: ["courses_id"],
+            APPLY: [],
+            ORDER: 'courses_avg',
+            AS: 'table'
+        };
 
         return facade.performQuery(query).then(function (response: InsightResponse) {
             expect.fail('Should not happen');
@@ -201,7 +344,14 @@ describe("InsightFacadeQuery", function () {
     it("Should not be able to perform a query with only GET keys not in GROUP or APPLY  (400)", function () {
         var that = this;
         Log.trace("Starting test: " + that.test.title);
-        let query: QueryRequest = {GET: "courses_dept", WHERE: {"GT": {"courses_avg": 90}}, GROUP: ["courses_id"], APPLY: [], ORDER: 'courses_avg', AS: 'table'};
+        let query: QueryRequest = {
+            GET: "courses_dept",
+            WHERE: {"GT": {"courses_avg": 90}},
+            GROUP: ["courses_id"],
+            APPLY: [],
+            ORDER: 'courses_avg',
+            AS: 'table'
+        };
 
         return facade.performQuery(query).then(function (response: InsightResponse) {
             expect.fail('Should not happen');
@@ -227,7 +377,14 @@ describe("InsightFacadeQuery", function () {
     it("Should not be able to perform a query with same GROUP and APPLY keys (400)", function () {
         var that = this;
         Log.trace("Starting test: " + that.test.title);
-        let query: QueryRequest = {GET: ["courses_id", "courses_avg"], WHERE: {"GT": {"courses_avg": 90}}, GROUP: ["courses_avg", "courses_id"], APPLY: [{"courses_abc":{}},{"courses_id":{}}], ORDER: 'courses_avg', AS: 'table'};
+        let query: QueryRequest = {
+            GET: ["courses_id", "courses_avg"],
+            WHERE: {"GT": {"courses_avg": 90}},
+            GROUP: ["courses_avg", "courses_id"],
+            APPLY: [{"courses_abc": {}}, {"courses_id": {}}],
+            ORDER: 'courses_avg',
+            AS: 'table'
+        };
 
         return facade.performQuery(query).then(function (response: InsightResponse) {
             expect.fail('Should not happen');
@@ -240,38 +397,61 @@ describe("InsightFacadeQuery", function () {
     it("Should not be able to perform a query with same APPLY keys (400)", function () {
         var that = this;
         Log.trace("Starting test: " + that.test.title);
-        let query: QueryRequest = {GET: ["courses_id", "courses_avg"],
+        let query: QueryRequest = {
+            GET: ["courses_id", "courses_avg"],
             WHERE: {"GT": {"courses_avg": 90}},
             GROUP: ["courses_avg"],
-            APPLY: [{"courses_abc":{}},{"courses_id":{}}, {"courses_dept":{}},{"courses_id":{}}],
-            ORDER: 'courses_avg', AS: 'table'};
+            APPLY: [{"courses_abc": {}}, {"courses_id": {}}, {"courses_dept": {}}, {"courses_id": {}}],
+            ORDER: 'courses_avg', AS: 'table'
+        };
 
         return facade.performQuery(query).then(function (response: InsightResponse) {
             expect.fail('Should not happen');
         }).catch(function (response: InsightResponse) {
             expect(response.code).to.equal(400);
         });
-
-
-     /*   it("xxx")
-        {
-
-               return facade.performQuery(query).then(function (response: InsightResponse) {
-
-        log.any()
-        let temp=JSON.parse(JSON.stringify())
-        expect(temp).to.be.deep.equal(response)
-    }).
-});
-
-
-}
-
-*/
-
-
-
     });
+
+
+    it("Should not be able to perform a query with same APPLY keys2 (400)", function () {
+        var that = this;
+        Log.trace("Starting test: " + that.test.title);
+        let query: QueryRequest = {
+            GET: ["courses_id", "courses_avg"],
+            WHERE: {"GT": {"courses_avg": 90}},
+            GROUP: ["courses_avg"],
+            APPLY: [{"courseAverage": {"AVG": "courses_avg"}}, {"courseAverage": {"MAX": "courses_fail"}}],
+            ORDER: 'courses_avg', AS: 'table'
+        };
+
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect.fail('Should not happen');
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(400);
+        });
+    });
+
+
+    it("Should be able to perform a correct query3", function () {
+        var that = this;
+        Log.trace("Starting test: " + that.test.title);
+        let query: QueryRequest = {
+            GET:   ["courses_id","courses_dept","minFail","maxAudit"],
+            WHERE: {"IS": {"courses_dept": "*c"}},
+            GROUP: ["courses_id","courses_dept"],
+            APPLY: [{"minFail": {"MIN": "courses_fail"}}, {"maxAudit": {"MAX": "courses_audit"}}],
+            ORDER: {"dir": "UP",
+                "keys": ["minFail","maxAudit"]},
+            AS: 'table'
+        };
+
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect(response.code).to.equal(200);
+        }).catch(function (response: InsightResponse) {
+            expect.fail('Should not happen');
+        });
+    });
+
 
 
 
