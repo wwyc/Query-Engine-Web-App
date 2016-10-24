@@ -101,22 +101,23 @@ export default class InsightFacade implements IInsightFacade {
             try {
                 let dcontroller = new DatasetController();
                 let datasets1 = dcontroller.getDatasets();
-                if(typeof datasets1==='undefined'){
+            /*    if(typeof datasets1==='undefined'){
                     //Log.error('RouteHandler::postQuery(..)-ERROR:'+'datasetnotfound');
                     reject({code: 424, body: ["InsightFascade: performQuery Failed:  dataset with " +id1+ " missing"]})
                     //res.json(424,{missing:[id]});
-                }
+                }     */
                         //dataset with id exits
                         //call query function and return results or catch error
                         try {
                             let qcontroller = new QueryController(datasets1);
                             let isValid = qcontroller.isValid(query);
                             var idsession:any=[]
-                            if (isValid == true) {
+                            if (isValid === true) {
                                 var id1: string
                                 var id2: string
                                 var GETKey = query.GET;
-                                if (typeof GETKey === 'string' && GETKey.includes("_")) {
+                                if (typeof query.APPLY ==='undefined')
+                                { if (typeof GETKey === 'string' && GETKey.includes("_")) {
                                     id1 = GETKey.split("_")[0];
                                     if(typeof datasets1[id1]==='undefined')
                                         idsession.push(id1) }
@@ -126,10 +127,10 @@ export default class InsightFacade implements IInsightFacade {
                                         id2 = getObject.split("_")[0];
                                     if(typeof datasets1[id2]==='undefined')
                                         idsession.push(id2)   }
-                                }
+                                }}
                                 if (idsession.length>0)
                                 {  //Log.error('RouteHandler::postQuery(..)-ERROR:'+'datasetnotfound');
-                                    reject({code: 424, body: ["InsightFascade: performQuery Failed:  dataset with " +id1+ " missing"]})
+                                    reject({code: 424, body: ["InsightFascade: performQuery Failed:  dataset with " +idsession+ " missing"]})
                                     //res.json(424,{missing:[id]});
                                 }
                                 else
