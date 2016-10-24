@@ -58,7 +58,7 @@ export default class QueryController {
 
 
                 //•	Kryptonite: All keys in GROUP should be presented in GET.
-             for (var a = 0; a < query.GROUP.length; a++) {
+           for (var a = 0; a < query.GROUP.length; a++) {
                     //if GET is a string
                     if (typeof query.GET ==='string') {
                         if (!(query.GROUP[a] === query.GET)) {
@@ -79,7 +79,7 @@ export default class QueryController {
                         }
                     }
                 }
-   
+
 
                 //•	Laguna: If a key appears in GROUP or in APPLY, it cannot appear in the other one.
                 for (var p = 0; p < query.GROUP.length; p++) {
