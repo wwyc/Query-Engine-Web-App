@@ -58,7 +58,7 @@ export default class QueryController {
 
 
                 //•	Kryptonite: All keys in GROUP should be presented in GET.
-           for (var a = 0; a < query.GROUP.length; a++) {
+                for (var a = 0; a < query.GROUP.length; a++) {
                     //if GET is a string
                     if (typeof query.GET ==='string') {
                         if (!(query.GROUP[a] === query.GET)) {
@@ -99,56 +99,56 @@ export default class QueryController {
                     }
                 }}
 
-              //Kwyjibo: All keys in GET should be in either GROUP or APPLY.
+            //Kwyjibo: All keys in GET should be in either GROUP or APPLY.
             // Lorax: All keys in GET that are not separated by an underscore should appe
 
-          if (typeof query.GET !== 'undefined'&& query.GET !== null)
+            if (typeof query.GET !== 'undefined'&& query.GET !== null)
             {
                 if (typeof query.GET === 'string') {
                     if(this.isvalidKey(query.GET))
                     {  if (typeof query.GROUP !== 'undefined' && query.GROUP !== null&&
-                    query.GROUP.length>0
+                        query.GROUP.length>0
                     )
-                      if(!this.contains(query.GET,query.GROUP))
-                      { Log.trace("All keys in GET should be in either GROUP or APPLY.")
-                          return false;}
+                        if(!this.contains(query.GET,query.GROUP))
+                        { Log.trace("All keys in GET should be in either GROUP or APPLY.")
+                            return false;}
                     }
                     else
-                    return false;
+                        return false;
                 }
-                    else if(Array.isArray(query.GET))
+                else if(Array.isArray(query.GET))
                 {  for (var s=0;s<query.GET.length;s++)
                 {if(query.GET[s].includes("_"))
                 {if(typeof query.GROUP !== 'undefined' && query.GROUP !== null
                     && query.GROUP.length>0)
-                    { if(!(query.GROUP.includes(query.GET[s])))
-                    {  Log.trace("All keys in GET should be in either GROUP or APPLY.")
-                           return false; }}}
-                    else
-                    {  if(typeof query.APPLY !== 'undefined' && query.APPLY !== null&&
-                     query.APPLY.length>0)
-                    { var applyarray1:any=[]
-                        for(var applyObject of query.APPLY)
-                        {applyarray1.push(Object.keys(applyObject)[0])}
-                            if(!(applyarray1.includes(query.GET[s])))
-                        { Log.trace("All keys in GET should be in either GROUP or APPLY.")
+                { if(!(query.GROUP.includes(query.GET[s])))
+                {  Log.trace("All keys in GET should be in either GROUP or APPLY.")
+                    return false; }}}
+                else
+                {  if(typeof query.APPLY !== 'undefined' && query.APPLY !== null&&
+                    query.APPLY.length>0)
+                { var applyarray1:any=[]
+                    for(var applyObject of query.APPLY)
+                    {applyarray1.push(Object.keys(applyObject)[0])}
+                    if(!(applyarray1.includes(query.GET[s])))
+                    { Log.trace("All keys in GET should be in either GROUP or APPLY.")
                         return false; }}}}
                 }}
 
-          //Empty apply object should be accepted
-                //Malibu: APPLY rules should be unique.
+            //Empty apply object should be accepted
+            //Malibu: APPLY rules should be unique.
             if (typeof query.APPLY !== 'undefined'&& query.APPLY !== null)
             {   var applyarray:any=[]
                 for(var applyObject of query.APPLY)
                 {applyarray.push(Object.keys(applyObject)[0])}
                 if(applyarray.length>1)
                 {  applyarray.sort();
-               for(var h=0; h<applyarray.length-1;h++)
-              {
-                 if(applyarray[h]===applyarray[h+1])
-                 { Log.trace("duplicate keys found in APPLY")
-                 return false;}
-             }}
+                    for(var h=0; h<applyarray.length-1;h++)
+                    {
+                        if(applyarray[h]===applyarray[h+1])
+                        { Log.trace("duplicate keys found in APPLY")
+                            return false;}
+                    }}
             }
 
         }
@@ -178,13 +178,17 @@ export default class QueryController {
 
         if(group!==null&&typeof group!=='undefined'&& group.length>0)
         {
-            intermediate=this.dealWithGroup(group,intermediate);
+            intermediate=this.dealWithGroup(group,intermediate)
             if(apply!==null&&typeof apply!=='undefined'&&apply.length>0)
-            { intermediate=this.dealWithApply(apply,intermediate);
-        }}
+            { intermediate=this.dealWithApply(apply,intermediate)}
+            else
+            { for(var h=0;h<intermediate.length;h++ )
+                intermediate[h]=intermediate[h][0]
+            }
+        }
 
+        var finalResultObjArray: any = this.represent(get, intermediate)
 
-        var finalResultObjArray: any = this.represent(get, intermediate);
 
         if (order !== null) {
             finalResultObjArray = this.sortArray(finalResultObjArray, order);
@@ -211,15 +215,15 @@ export default class QueryController {
             sections = datasetRetrived[key]
 
             for (var section of sections) {
-                      if(where!=null&&Object.keys(where).length>0&& where!=undefined)
-                 { if (this.parserEBNF(where, section)) {
-                 //add section to list if it meets WHERE criteria in query
-                 selectedSections.push(section)}}
-                 else
-                 { selectedSections.push(section) }
-                 }
-               // selectedSections.push(section);
+                if(where!=null&&Object.keys(where).length>0&& where!=undefined)
+                { if (this.parserEBNF(where, section)) {
+                    //add section to list if it meets WHERE criteria in query
+                    selectedSections.push(section)}}
+                else
+                { selectedSections.push(section) }
             }
+            // selectedSections.push(section);
+        }
         return selectedSections;
     }
 
@@ -451,8 +455,8 @@ export default class QueryController {
                         for (var j=1;j<sessions.length;j++)
                         {
                             /*if( sessions[j][applystring]!=='undefined'&&
-                                sessions[j][applystring]!=null)   */
-                                sum+=sessions[j][applystring];
+                             sessions[j][applystring]!=null)   */
+                            sum+=sessions[j][applystring];
                             length++;
                         }
                         var averageValue: any;
@@ -471,9 +475,9 @@ export default class QueryController {
                         var min:number=sessions[1][applystring];
                         for(var j=1;j<sessions.length;j++)
                         {   /*if(sessions[j][applystring]!='undefined'&&
-                            sessions[j][applystring]!=null)  */
-                        if (sessions[j][applystring]<min)
-                            min=sessions[1][applystring]}
+                         sessions[j][applystring]!=null)  */
+                            if (sessions[j][applystring]<min)
+                                min=sessions[1][applystring]}
 
                         grouplist[i][0][applynewkey]=min;
                     }
@@ -485,13 +489,13 @@ export default class QueryController {
                 else
                     for (var i = 0; i < grouplist.length; i++) {
                         var sessions = grouplist[i];
-                      var maxsession:any=[];
+                        var maxsession:any=[];
                         var max:number=sessions[1][applystring];
                         for(var j=1;j<sessions.length;j++)
                         { /* if(sessions[j][applystring]!='undefined'&&
-                        sessions[j][applystring]!=null)  */
-                        if(sessions[j][applystring]>max)
-                            max=sessions[j][applystring]}
+                         sessions[j][applystring]!=null)  */
+                            if(sessions[j][applystring]>max)
+                                max=sessions[j][applystring]}
 
                         grouplist[i][0][applynewkey]=max;
                     }
@@ -505,9 +509,9 @@ export default class QueryController {
                         var count = 0;
                         var keysession: any = []
                         for (var j = 1; j < sessions.length; j++) {
-                         /*   if (sessions[j][applystring] != 'undefined' &&
-                                sessions[j][applystring] != null)  */
-                                keysession.push(sessions[j][applystring])
+                            /*   if (sessions[j][applystring] != 'undefined' &&
+                             sessions[j][applystring] != null)  */
+                            keysession.push(sessions[j][applystring])
                         }
                         if (keysession.length > 1) {
                             keysession.sort();
@@ -557,29 +561,29 @@ export default class QueryController {
         return applylist;
     }
 
-/*
-    public checkArrayContain(groupobject2:any,applykeys:any):boolean{
-        Log.trace("jump into check")
-        var valid2:boolean;
-        var validlist:any=[];
-        var groupkeys:any=Object.keys(groupobject2[0])
-        for (var applykey12 in applykeys){
-            valid2=false;
-            for(var groupkey12 in groupkeys)
-            {   if(applykey12===groupkey12)
-            { valid2=true;
-                break;}
-            }
-            validlist.push(valid2)}
+    /*
+     public checkArrayContain(groupobject2:any,applykeys:any):boolean{
+     Log.trace("jump into check")
+     var valid2:boolean;
+     var validlist:any=[];
+     var groupkeys:any=Object.keys(groupobject2[0])
+     for (var applykey12 in applykeys){
+     valid2=false;
+     for(var groupkey12 in groupkeys)
+     {   if(applykey12===groupkey12)
+     { valid2=true;
+     break;}
+     }
+     validlist.push(valid2)}
 
-        for (var eachValid1 of validlist) {
-            if (eachValid1 === false)
-                valid2 = false;
-        }
-        Log.trace("valid2"+valid2);
-        return valid2;
+     for (var eachValid1 of validlist) {
+     if (eachValid1 === false)
+     valid2 = false;
+     }
+     Log.trace("valid2"+valid2);
+     return valid2;
 
-    }*/
+     }*/
 
     public sortArray(resultArray: any, order: any) {
         // Log.trace("INSIDE sorting!")
@@ -689,11 +693,11 @@ export default class QueryController {
 
     public contains(a:any, array:any):boolean{
 
-            for (var i = 0; i < a.length; i++) {
-                if (array[i] === a) {
-                  return true;
-                }
+        for (var i = 0; i < a.length; i++) {
+            if (array[i] === a) {
+                return true;
             }
-            return false;
         }
+        return false;
+    }
 }
