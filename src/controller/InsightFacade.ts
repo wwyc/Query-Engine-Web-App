@@ -101,18 +101,14 @@ export default class InsightFacade implements IInsightFacade {
             try {
                 let dcontroller = new DatasetController();
                 let datasets1 = dcontroller.getDatasets();
-            /*    if(typeof datasets1==='undefined'){
-                    //Log.error('RouteHandler::postQuery(..)-ERROR:'+'datasetnotfound');
-                    reject({code: 424, body: ["InsightFascade: performQuery Failed:  dataset with " +id1+ " missing"]})
-                    //res.json(424,{missing:[id]});
-                }     */
+
                         //dataset with id exits
                         //call query function and return results or catch error
-                        try {
+
                             let qcontroller = new QueryController(datasets1);
                             let isValid = qcontroller.isValid(query);
                             var idsession:any=[]
-                            if (isValid === true) {
+                            if (isValid == true) {
                                 var id1: string
                                 var id2: string
                                 var GETKey = query.GET;
@@ -144,10 +140,7 @@ export default class InsightFacade implements IInsightFacade {
                             reject({code: 400})
                             Log.trace('InsightFascade::performQuery Failed(..) - ERROR: invalid Query' );
                         }
-            }catch (e) {
-                Log.trace('InsightFascade::performQuery Failed(..) - ERROR: ' + e.message);
-                reject({code: 400, err: "InsightFascade: performQuery Failed:  invalid query"})
-            }
+
         })
 
 
