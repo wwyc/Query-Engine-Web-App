@@ -381,7 +381,7 @@ describe("InsightFacadeQuery", function () {
             GET: ["courses_id", "courses_avg"],
             WHERE: {"GT": {"courses_avg": 90}},
             GROUP: ["courses_avg", "courses_id"],
-            APPLY: [{"courseAverage": {"AVG": "courses_avg"}} ],
+            APPLY: [{"courseAverage": {"AVG": "courses_avg"}}],
             ORDER: 'courses_avg',
             AS: 'table'
         };
@@ -436,12 +436,14 @@ describe("InsightFacadeQuery", function () {
         var that = this;
         Log.trace("Starting test: " + that.test.title);
         let query: QueryRequest = {
-            GET:   ["courses_id","courses_dept","minFail","maxAudit"],
+            GET: ["courses_id", "courses_dept", "minFail", "maxAudit"],
             WHERE: {"IS": {"courses_dept": "*c"}},
-            GROUP: ["courses_id","courses_dept"],
+            GROUP: ["courses_id", "courses_dept"],
             APPLY: [{"minFail": {"MIN": "courses_fail"}}, {"maxAudit": {"MAX": "courses_audit"}}],
-            ORDER: {"dir": "UP",
-                "keys": ["minFail","maxAudit"]},
+            ORDER: {
+                "dir": "UP",
+                "keys": ["minFail", "maxAudit"]
+            },
             AS: 'table'
         };
 
@@ -456,12 +458,14 @@ describe("InsightFacadeQuery", function () {
         var that = this;
         Log.trace("Starting test: " + that.test.title);
         let query: QueryRequest = {
-            GET:   ["courses_id","courses_dept","courses_avg","courses_instructor","minFail","maxAudit"],
+            GET: ["courses_id", "courses_dept", "courses_avg", "courses_instructor", "minFail", "maxAudit"],
             WHERE: {"IS": {"courses_dept": "*c"}},
-            GROUP: ["courses_id","courses_dept","courses_avg","courses_instructor"],
+            GROUP: ["courses_id", "courses_dept", "courses_avg", "courses_instructor"],
             APPLY: [{"minFail": {"MIN": "courses_fail"}}, {"maxAudit": {"MAX": "courses_audit"}}],
-            ORDER: {"dir": "UP",
-                "keys": ["minFail","maxAudit"]},
+            ORDER: {
+                "dir": "UP",
+                "keys": ["minFail", "maxAudit"]
+            },
             AS: 'table'
         };
 
@@ -476,12 +480,14 @@ describe("InsightFacadeQuery", function () {
         var that = this;
         Log.trace("Starting test: " + that.test.title);
         let query: QueryRequest = {
-            GET:   ["courses_id","courses_dept","courses_avg","courses_instructor","courses_fail","minFail","maxAudit"],
+            GET: ["courses_id", "courses_dept", "courses_avg", "courses_instructor", "courses_fail", "minFail", "maxAudit"],
             WHERE: {"IS": {"courses_dept": "*c"}},
-            GROUP: ["courses_id","courses_dept","courses_avg","courses_instructor"],
+            GROUP: ["courses_id", "courses_dept", "courses_avg", "courses_instructor"],
             APPLY: [{"minFail": {"MIN": "courses_fail"}}, {"maxAudit": {"MAX": "courses_audit"}}],
-            ORDER: {"dir": "UP",
-                "keys": ["minFail","maxAudit"]},
+            ORDER: {
+                "dir": "UP",
+                "keys": ["minFail", "maxAudit"]
+            },
             AS: 'table'
         };
 
@@ -497,12 +503,14 @@ describe("InsightFacadeQuery", function () {
         var that = this;
         Log.trace("Starting test: " + that.test.title);
         let query: QueryRequest = {
-            GET:   ["courses_id","courses_dept","courses_avg","minFail","maxAudit"],
+            GET: ["courses_id", "courses_dept", "courses_avg", "minFail", "maxAudit"],
             WHERE: {"IS": {"courses_dept": "*c"}},
-            GROUP: ["courses_id","courses_dept","courses_avg","courses_instructor"],
+            GROUP: ["courses_id", "courses_dept", "courses_avg", "courses_instructor"],
             APPLY: [{"minFail": {"MIN": "courses_fail"}}, {"maxAudit": {"MAX": "courses_audit"}}],
-            ORDER: {"dir": "UP",
-                "keys": ["minFail","maxAudit"]},
+            ORDER: {
+                "dir": "UP",
+                "keys": ["minFail", "maxAudit"]
+            },
             AS: 'table'
         };
 
@@ -517,12 +525,14 @@ describe("InsightFacadeQuery", function () {
         var that = this;
         Log.trace("Starting test: " + that.test.title);
         let query: QueryRequest = {
-            GET:   ["courses_id","courses_dept","courses_avg","minFail","maxAudit"],
+            GET: ["courses_id", "courses_dept", "courses_avg", "minFail", "maxAudit"],
             WHERE: {"IS": {"courses_dept": "*c"}},
-            GROUP: ["courses_id","courses_dept","courses_avg","courses_instructor"],
+            GROUP: ["courses_id", "courses_dept", "courses_avg", "courses_instructor"],
             APPLY: [{"minFail": {"MIN": "courses_avg"}}, {"maxAudit": {"MAX": "courses_audit"}}],
-            ORDER: {"dir": "UP",
-                "keys": ["minFail","maxAudit"]},
+            ORDER: {
+                "dir": "UP",
+                "keys": ["minFail", "maxAudit"]
+            },
             AS: 'table'
         };
 
@@ -534,7 +544,129 @@ describe("InsightFacadeQuery", function () {
     });
 
 
+    it("accept multiple rules of group", function () {
+        var that = this;
+        Log.trace("Starting test: " + that.test.title);
+        let query: QueryRequest = {
+            GET: ["courses_id", "courses_dept", "minFail", "maxAudit"],
+            WHERE: {"IS": {"courses_dept": "*c"}},
+            GROUP: ["courses_id", "courses_dept"],
+            APPLY: [{"minFail": {"MIN": "courses_avg"}}, {"maxAudit": {"MAX": "courses_audit"}}, {"courseAverage": {"AVG": "courses_avg"}},
+                {"instructorCount": {"COUNT": "courses_instructor"}}, {"minPass": {"MIN": "courses_pass"}}
+            ],
+            ORDER: {
+                "dir": "UP",
+                "keys": ["minFail", "maxAudit"]
+            },
+            AS: 'table'
+        };
 
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect(response.code).to.equal(200);
+        }).catch(function (response: InsightResponse) {
+            expect.fail('Should not happen');
+        });
+    });
+
+
+    it("accept empty where", function () {
+        var that = this;
+        Log.trace("Starting test: " + that.test.title);
+        let query: QueryRequest = {
+
+              GET:["courses_dept", "courses_id"],
+                  WHERE: {},
+            ORDER: { "dir": "UP", "keys": ["courses_dept"]},
+            AS:"TABLE"
+
+        };
+
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect(response.code).to.equal(200);
+        }).catch(function (response: InsightResponse) {
+            expect.fail('Should not happen');
+        });
+
+    });
+
+    it("accept multiple rules of apply", function () {
+        var that = this;
+        Log.trace("Starting test: " + that.test.title);
+        let query: QueryRequest = {
+            GET: ["minFail","courses_id", "courses_dept","maxAudit"],
+            WHERE: {"IS": {"courses_dept": "*c"}},
+            GROUP: ["courses_id", "courses_dept"],
+            APPLY: [{"minFail": {"MIN": "courses_avg"}}, {"maxAudit": {"MAX": "courses_audit"}}, {"courseAverage": {"AVG": "courses_avg"}},
+                {"instructorCount": {"COUNT": "courses_instructor"}}, {"minPass": {"MIN": "courses_pass"}}
+            ],
+            ORDER: {
+                "dir": "UP",
+                "keys": ["minFail", "maxAudit"]
+            },
+            AS: 'table'
+        };
+
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect(response.code).to.equal(200);
+        }).catch(function (response: InsightResponse) {
+            expect.fail('Should not happen');
+        });
+    });
+
+
+
+    it("accept multiple rules of apply", function () {
+        var that = this;
+        Log.trace("Starting test: " + that.test.title);
+        let query: QueryRequest = {
+            GET: ["minFail","courses_id", "courses_dept","maxAudit"],
+            WHERE: {"IS": {"courses_dept": "*c"}},
+            GROUP: ["courses_id", "courses_dept"],
+            APPLY: [{"minFail": {"MIN": "courses_avg"}},
+                {"maxAudit": {"MAX": "courses_audit"}},
+                {"courseAverage": {"AVG": "courses_avg"}},
+                {"instructorCount": {"COUNT": "courses_instructor"}},
+                {"minPass": {"MIN": "courses_pass"}}
+            ],
+            ORDER: {
+                "dir": "UP",
+                "keys": ["minFail", "maxAudit"]
+            },
+            AS: 'table'
+        };
+
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect(response.code).to.equal(200);
+        }).catch(function (response: InsightResponse) {
+            expect.fail('Should not happen');
+        });
+    });
+
+    it("accept multiple rules of apply", function () {
+        var that = this;
+        Log.trace("Starting test: " + that.test.title);
+        let query: QueryRequest = {
+            GET: ["minFail","courses_id", "courses_dept","maxAudit","instructorCount","minPass"],
+            WHERE: {"IS": {"courses_dept": "*c"}},
+            GROUP: ["courses_id", "courses_dept"],
+            APPLY: [{"minFail": {"MIN": "courses_avg"}},
+                {"maxAudit": {"MAX": "courses_audit"}},
+                {"courseAverage": {"AVG": "courses_avg"}},
+                {"instructorCount": {"COUNT": "courses_instructor"}},
+                {"minPass": {"MIN": "courses_pass"}}
+            ],
+            ORDER: {
+                "dir": "UP",
+                "keys": ["minFail", "maxAudit","instructorCount"]
+            },
+            AS: 'table'
+        };
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect(response.code).to.equal(200);
+        }).catch(function (response: InsightResponse) {
+            expect.fail('Should not happen');
+        });
+    });
 
 
 
