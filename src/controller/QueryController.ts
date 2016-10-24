@@ -10,9 +10,9 @@ import {stringify} from "querystring";
 export interface QueryRequest {
     GET: string|string[];
     WHERE: {};
-    GROUP?:string[];
-    APPLY?:any[];
-    ORDER?: string|{};
+    GROUP:string[];
+    APPLY:any[];
+    ORDER: string|{};
     AS: string
 }
 
@@ -375,7 +375,7 @@ export default class QueryController {
 
             for (var eachSection of sectionArray) {
                 var resultObj1: any = {}
-                for (var j = 0; j < Object.keys(GETInput).length; j++) {
+                for (var j = 0; j < GETInput.length; j++) {
                     var key = GETInput[j]
                     resultObj1[key] = eachSection[key];
                 }
@@ -499,7 +499,7 @@ export default class QueryController {
 
 
             if (applytoken === 'COUNT') {
-                if (this.isvalidNumberKey(applystring)) {
+                if (this.isvalidKey(applystring)) {
                     for (var i = 0; i < grouplist.length; i++) {
                         var sessions = grouplist[i];
                         var count = 0;
@@ -522,7 +522,7 @@ export default class QueryController {
                         grouplist[i][0][applynewkey] = count;
                     }
                 }
-                else if (this.isvalidStringKey(applystring)) {
+            /*    else if (this.isvalidStringKey(applystring)) {
                     for (var i = 0; i < grouplist.length; i++) {
                         var sessions = grouplist[i];
                         var count = 0;
@@ -545,7 +545,7 @@ export default class QueryController {
                         count = keysession.length;
                         grouplist[i][0][applynewkey] = count;
                     }
-                }
+                }  */
                 else
                     throw Error
             }
