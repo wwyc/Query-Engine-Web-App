@@ -43,7 +43,7 @@ export default class QueryController {
 
             //•	Kodiak: GROUP without APPLY should not be valid.
             if (typeof query.GROUP !== 'undefined' && query.GROUP !== null) {
-                if (typeof query.APPLY === 'undefined'|| query.APPLY === null ) {
+                if (typeof query.APPLY === 'undefined' ) {
                     Log.trace("GROUP without APPLY should not be valid.")
                     return false
                 }
@@ -61,7 +61,7 @@ export default class QueryController {
                 for (var a = 0; a < query.GROUP.length; a++) {
                     //if GET is a string
                     if (typeof query.GET ==='string') {
-                        if (!(query.GROUP[a] == query.GET)) {
+                        if (!(query.GROUP[a] === query.GET)) {
                             Log.trace("All keys in GROUP should be presented in GET.")
                             return false
                         }
@@ -69,7 +69,7 @@ export default class QueryController {
                         // check if all keys in GROUP are presented in GET Array
                         var ISinGetKey = false
                         for (var j = 0; j < query.GET.length; j++) {
-                            if (query.GROUP[a] == query.GET[j]) {
+                            if (query.GROUP[a] === query.GET[j]) {
                                 ISinGetKey = true
                             }
                         }
@@ -102,21 +102,20 @@ export default class QueryController {
               //Kwyjibo: All keys in GET should be in either GROUP or APPLY.
             // Lorax: All keys in GET that are not separated by an underscore should appe
 
-          if (typeof query.GET !== 'undefined'&& query.GET !== null&&query.GET.length>0)
+          if (typeof query.GET !== 'undefined'&& query.GET !== null)
             {
                 if (typeof query.GET === 'string') {
                     if(query.GET.includes("_"))
-                    {  if (typeof query.GROUP !== 'undefined' && query.GROUP !== null&&!this.isEmpty(query.GROUP)&&
+                    {  if (typeof query.GROUP !== 'undefined' && query.GROUP !== null&&
                     query.GROUP.length>0
                     )
                       if(!this.contains(query.GET,query.GROUP))
                       { Log.trace("All keys in GET should be in either GROUP or APPLY.")
                           return false;}
                     }
-                    else
-                    { if (typeof query.APPLY !== 'undefined' && query.APPLY !== null&&!this.isEmpty(query.APPLY)
-                    && query.APPLY.length>0
-                    )
+                    else if(Array.isArray(query.GET))
+                    { if (typeof query.APPLY !== 'undefined' && query.APPLY !== null&&
+                     query.APPLY.length>0)
                     { var applyarray:any=[]
                         for(var applyObject of query.APPLY)
                         {applyarray.push(Object.keys(applyObject)[0])}
@@ -127,14 +126,14 @@ export default class QueryController {
                     else
                 {  for (var s=0;s<query.GET.length;s++)
                 {if(query.GET[s].includes("_"))
-                {if(typeof query.GROUP !== 'undefined' && query.GROUP !== null&&!this.isEmpty(query.GROUP)
+                {if(typeof query.GROUP !== 'undefined' && query.GROUP !== null
                     && query.GROUP.length>0)
                     { if(!(query.GROUP.includes(query.GET[s])))
                     {  Log.trace("All keys in GET should be in either GROUP or APPLY.")
                            return false; }}}
                     else
-                    {  if(typeof query.APPLY !== 'undefined' && query.APPLY !== null&&!this.isEmpty(query.APPLY)
-                    && query.APPLY.length>0)
+                    {  if(typeof query.APPLY !== 'undefined' && query.APPLY !== null&&
+                     query.APPLY.length>0)
                     { var applyarray1:any=[]
                         for(var applyObject of query.APPLY)
                         {applyarray1.push(Object.keys(applyObject)[0])}
@@ -322,9 +321,8 @@ export default class QueryController {
                 var whereValue3 = where['LT'][Object.keys(where['LT'])[0]]
                 if(this.isvalidKey(whereKey3)===false){
                     throw Error
-                };
+                }
                 valid = valid && (section[whereKey3] < whereValue3);
-
             }
         }
 
