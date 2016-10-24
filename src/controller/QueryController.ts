@@ -54,13 +54,13 @@ export default class QueryController {
                     if (!this.isvalidKey(query.GROUP[i])) {
                         Log.trace("some keys in GROUP are not valid")
                         return false
-                    }
-                }
+                    }}
+
 
                 //•	Kryptonite: All keys in GROUP should be presented in GET.
                 for (var a = 0; a < query.GROUP.length; a++) {
                     //if GET is a string
-                    if (typeof query.GET == 'string') {
+                    if (typeof query.GET ==='string') {
                         if (!(query.GROUP[a] == query.GET)) {
                             Log.trace("All keys in GROUP should be presented in GET.")
                             return false
@@ -186,9 +186,9 @@ export default class QueryController {
 
         if(group!==null&&typeof group!=='undefined'&& group.length>0)
         {
-            grouplist=this.dealWithGroup(group,intermediate);
+            intermediate=this.dealWithGroup(group,intermediate);
             if(apply!==null&&typeof apply!=='undefined'&&apply.length>0)
-            { intermediate=this.dealWithApply(apply,grouplist);
+            { intermediate=this.dealWithApply(apply,intermediate);
         }}
 
 
@@ -459,8 +459,8 @@ export default class QueryController {
                         var length:number=0;
                         for (var j=1;j<sessions.length;j++)
                         {
-                            if( sessions[j][applystring]!=='undefined'&&
-                                sessions[j][applystring]!=null)
+                            /*if( sessions[j][applystring]!=='undefined'&&
+                                sessions[j][applystring]!=null)   */
                                 sum+=sessions[j][applystring];
                             length++;
                         }
@@ -477,19 +477,13 @@ export default class QueryController {
                     for (var i = 0; i < grouplist.length; i++) {
                         var sessions = grouplist[i];
                         var minsession:any=[];
+                        var min:number=sessions[1][applystring];
                         for(var j=1;j<sessions.length;j++)
-                        { if(sessions[j][applystring]!='undefined'&&
-                            sessions[j][applystring]!=null)
+                        {   /*if(sessions[j][applystring]!='undefined'&&
+                            sessions[j][applystring]!=null)  */
+                        if (sessions[j][applystring]<min)
+                            min=sessions[1][applystring]}
 
-
-                            minsession.push( sessions[j][applystring])}
-                        var min:number=0;
-                        if(minsession.length==0)
-                            min=0;
-                        else{
-                            min=Math.min.apply(Math,minsession);
-                            if(min===null)
-                                min=0;}
                         grouplist[i][0][applynewkey]=min;
                     }
             }
@@ -501,18 +495,13 @@ export default class QueryController {
                     for (var i = 0; i < grouplist.length; i++) {
                         var sessions = grouplist[i];
                       var maxsession:any=[];
+                        var max:number=sessions[1][applystring];
                         for(var j=1;j<sessions.length;j++)
-                        {  if(sessions[j][applystring]!='undefined'&&
-                        sessions[j][applystring]!=null)
+                        { /* if(sessions[j][applystring]!='undefined'&&
+                        sessions[j][applystring]!=null)  */
+                        if(sessions[j][applystring]>max)
+                            max=sessions[j][applystring]}
 
-                            maxsession.push(sessions[j][applystring])}
-                            var max:number=0;
-                        if(maxsession.length==0)
-                            max=0;
-                       else{
-                           max=Math.max.apply(Math,maxsession)
-                        if(max===null)
-                            max=0;}
                         grouplist[i][0][applynewkey]=max;
                     }
             }
@@ -525,8 +514,8 @@ export default class QueryController {
                         var count = 0;
                         var keysession: any = []
                         for (var j = 1; j < sessions.length; j++) {
-                            if (sessions[j][applystring] != 'undefined' &&
-                                sessions[j][applystring] != null)
+                         /*   if (sessions[j][applystring] != 'undefined' &&
+                                sessions[j][applystring] != null)  */
                                 keysession.push(sessions[j][applystring])
                         }
                         if (keysession.length > 1) {
@@ -574,11 +563,6 @@ export default class QueryController {
         for (var i = 0; i < grouplist.length; i++){
             applylist.push(grouplist[i][0]);
         }
-        /*   for (var groupobject2 of grouplist){
-         if(this.checkArrayContain(groupobject2,applykeys))
-         applylist.push(groupobject2[0]);
-         }   */
-        //Log.trace("applylist"+applylist);
         return applylist;
     }
 
