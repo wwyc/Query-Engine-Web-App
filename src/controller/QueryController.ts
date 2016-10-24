@@ -105,7 +105,7 @@ export default class QueryController {
           if (typeof query.GET !== 'undefined'&& query.GET !== null)
             {
                 if (typeof query.GET === 'string') {
-                    if(query.GET.includes("_"))
+                    if(this.isvalidKey(query.GET))
                     {  if (typeof query.GROUP !== 'undefined' && query.GROUP !== null&&
                     query.GROUP.length>0
                     )
@@ -113,17 +113,10 @@ export default class QueryController {
                       { Log.trace("All keys in GET should be in either GROUP or APPLY.")
                           return false;}
                     }
-                    else if(Array.isArray(query.GET))
-                    { if (typeof query.APPLY !== 'undefined' && query.APPLY !== null&&
-                     query.APPLY.length>0)
-                    { var applyarray:any=[]
-                        for(var applyObject of query.APPLY)
-                        {applyarray.push(Object.keys(applyObject)[0])}
-                        if(!this.contains(query.GET,applyarray))
-                        {    Log.trace("All keys in GET should be in either GROUP or APPLY.")
-                        return false;}}
-                    }}
                     else
+                    return false;
+                }
+                    else if(Array.isArray(query.GET))
                 {  for (var s=0;s<query.GET.length;s++)
                 {if(query.GET[s].includes("_"))
                 {if(typeof query.GROUP !== 'undefined' && query.GROUP !== null
