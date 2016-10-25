@@ -1,0 +1,15 @@
+Winnie Chan's Contribution to D2
+
+- implementation of insight facade interface & insight facade class
+- debugged funcationalities & previous tests to ensure old funcationality still works
+- implementation of keys checking for new functionalities in the isValid method in Query Controller
+
+Testing:
+- ensure all previous unit and public tests passes for new interface
+- wrote all tests for insight facade (with 85.21% coverage)
+- wrote all tests for dataset controller (with 97.27% coverage)
+- wrote some test for Query Controller (with 65% coverage) and left remainder coverage for partner(Alicia) to work on
+
+achieved autotests results of 65.7 % on Oct 19th
+*record of commmit with autotest
+https://github.com/CS310-2016Fall/cpsc310project_team34/commit/1a29facbcad2755b98f8f2175171c73980ca1783
