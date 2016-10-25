@@ -12,4 +12,5 @@ Testing:
 
 achieved autotests results of 65.7 % on Oct 19th
 *record of commmit with autotest
+link to major commit:
 https://github.com/CS310-2016Fall/cpsc310project_team34/commit/1a29facbcad2755b98f8f2175171c73980ca1783
