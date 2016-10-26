@@ -1,7 +1,7 @@
 D2 autotest  (71.4%)
 
 Test Coverage 
-Statements Test coverage 81.93%
+Statements Test coverage 93%
 
 Winnie Chan's Contribution to D2
 
