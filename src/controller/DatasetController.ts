@@ -175,7 +175,7 @@ export default class DatasetController {
                                         session.courses_pass = obj["Pass"]
                                         session.courses_fail = obj["Fail"]
                                         session.courses_audit = obj["Audit"]
-                                        session.courses_uuid=obj["id"]
+                                        session.courses_uuid=obj["id"].toString();
                                         sessions.push(session)
                                     }
                                 }

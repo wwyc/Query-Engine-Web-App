@@ -106,5 +106,4 @@ describe("QueryController", function () {
         });
     });
 
-
 });
