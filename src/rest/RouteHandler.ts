@@ -11,11 +11,12 @@ import QueryController from '../controller/QueryController';
 import {QueryRequest} from "../controller/QueryController";
 import Log from '../Util';
 import InsightFacade from "../controller/InsightFacade";
+import {InsightResponse} from "../controller/IInsightFacade";
 
 export default class RouteHandler {
 
     //private static datasetController = new DatasetController();
-    //private static UBCInsightFacade = new InsightFacade();
+    private static UBCInsightFacade = new InsightFacade();
 
 
     public static getHomepage(req: restify.Request, res: restify.Response, next: restify.Next) {
@@ -50,30 +51,35 @@ export default class RouteHandler {
                 req.body = concated.toString('base64');
                 Log.trace('RouteHandler::postDataset(..) on end; total length: ' + req.body.length);
 
-                let UBCfascade1 = new InsightFacade()
-
-                return UBCfascade1.addDataset(id, req.body).then(function(response){
+                return RouteHandler.UBCInsightFacade.addDataset(id, req.body).then(function(response: InsightResponse){
                         if (response.code == 204){
                             res.send(204)
-                            return next();
+                            Log.trace('RouteHandler::putDataset(..) : 204 SUCCESS added new Dataset');
+                            next();
                         } else if (response.code == 201){
                             res.send(201);
-                            return next();
+                            Log.trace('RouteHandler::putDataset(..) : 201 SUCCESS updated existing Dataset');
+                            next();
                         } else if (response.code == 400){
+                            Log.trace('RouteHandler::putDataset(..) : 400 FAILED');
                             res.send(400);
-                            return next();
+                            next();
                         }
                     }
-                )
+                ).catch(function(err:Error){
+                    Log.trace('RouteHandler::putDataset(..) : ERROR' + err.message);
+                    res.json(400, {err:err.message});
+                    next();
+                })
 
             });
 
         } catch (err) {
             Log.error('RouteHandler::postDataset(..) - ERROR: ' + err.message);
-            res.send(400, {err: err.message});
+            res.json(400, {err: err.message});
             return next();
         }
-        return next();
+        //return next();
     }
 //add 424(check if on memory)
     public static postQuery(req:restify.Request,res:restify.Response,next:restify.Next){
@@ -84,26 +90,30 @@ export default class RouteHandler {
 
             Log.trace(typeof req.params)
 
-            let UBCfacade2 = new InsightFacade()
+            //let UBCfacade2 = new InsightFacade()
 
-            return UBCfacade2.performQuery(query).then(function(response){
+            return RouteHandler.UBCInsightFacade.performQuery(query).then(function(response: InsightResponse){
                 if (response.code == 200){
                     res.json(200, response.body);
-                    return next();
+                     //next();
                 } else if (response.code == 424){
-                    res.send(424);
-                    return next();
+                    res.json(424, {err: " missing dataset "});
+                    //next();
                 } else if (response.code == 400){
-                    res.send(400);
-                    return next();
+                    res.json(400, {err: "400"});
+                    //next();
                 }
-                    }
-            )
+                next()
+                    }).catch(function(err:Error){
+                Log.error('RouteHandler::postQuery(..)-ERROR:'+err.message);
+                res.json(400, {err: "400"});
+                next();
+            })
 
-        }catch(e){
-            Log.error('RouteHandler::postQuery(..)-ERROR:'+e.message);
-            res.send(403);
-            return next();
+        }catch(err){
+            Log.error('RouteHandler::postQuery(..)-ERROR:'+err.message);
+            res.send(400);
+            next();
         }
         //return next();
     }
@@ -114,23 +124,29 @@ export default class RouteHandler {
 
             var id: string = req.params.id;
 
-            let UBCfacade3 = new InsightFacade()
+            //let UBCfacade3 = new InsightFacade()
 
-            return UBCfacade3.removeDataset(id).then(function(response){
+            return RouteHandler.UBCInsightFacade.removeDataset(id).then(function(response: InsightResponse){
                     if (response.code == 204){
+                        Log.error('RouteHandler::deleteQuery(..) - SUCCESS:');
                         res.send(204)
-                        return next();
+                        next();
                     }  else if (response.code == 404){
+                        Log.error('RouteHandler::deleteQuery(..) - FAILED 404 :');
                         res.send(404);
-                        return next();
+                        next();
                     }else if (response.code == 400){
+                        Log.error('RouteHandler::deleteQuery(..) - FAILED 400 :');
                         res.send(400);
-                        return next();
+                        next();
                     }
-                }
-            )
+                }). catch(function(err:Error){
+                Log.error('RouteHandler::deleteQuery(..) - ERROR:' + err.message);
+                res.send(400);
+                return next();
+            })
         } catch (err) {
-            Log.error('RouteHandler::deleteQuery(..) - ERROR: dataset with given not found   ' + err.message);
+            Log.error('RouteHandler::deleteQuery(..) - ERROR:' + err.message);
             res.send(400);
             return next();
         }
