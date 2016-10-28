@@ -81,7 +81,7 @@ describe("InsightFacadeQuery", function () {
 
 
 
-    it("Should be able to perform a >90 query (200)", function () {
+/*    it("Should be able to perform a >90 query (200)", function () {
         var that = this;
         Log.trace("Starting test: " + that.test.title);
         let query: QueryRequest = {GET: ["courses_dept", "courses_avg"], WHERE: {"GT": {"courses_avg": 90}}, ORDER: 'courses_avg', AS: 'table'};
@@ -91,7 +91,7 @@ describe("InsightFacadeQuery", function () {
         }).catch(function (response: InsightResponse) {
             expect.fail('Should not happen');
         });
-    });
+    });*/
 
     it("Should be able to perform a query with only GROUP but empty APPLY (200)", function () {
         var that = this;
@@ -159,7 +159,7 @@ describe("InsightFacadeQuery", function () {
     });
 
 
-    it("Should not be able to perform a query with GROUP keys that are all valid (400)", function () {
+    it("Should not be able to perform a query with GROUP keys that are invalid (400)", function () {
         var that = this;
         Log.trace("Starting test: " + that.test.title);
         let query: QueryRequest = {GET: ["courses_dept", "courses_avg"], WHERE: {"GT": {"courses_avg": 90}}, GROUP: ["sdfsdf", "courses_id"], APPLY: [], ORDER: 'courses_avg', AS: 'table'};

@@ -41,24 +41,27 @@ export default class RouteHandler {
             // adapted from: https://github.com/restify/node-restify/issues/880#issuecomment-133485821
             let buffer: any = [];
             req.on('data', function onRequestData(chunk: any) {
-                //Log.trace('RouteHandler::postDataset(..) on data; chunk length: ' + chunk.length);
+                Log.trace('RouteHandler::postDataset(..) on data; chunk length: ' + chunk.length);
                 buffer.push(chunk);
             });
 
             req.once('end', function () {
                 let concated = Buffer.concat(buffer);
                 req.body = concated.toString('base64');
-                //Log.trace('RouteHandler::postDataset(..) on end; total length: ' + req.body.length);
+                Log.trace('RouteHandler::postDataset(..) on end; total length: ' + req.body.length);
 
                 let UBCfascade1 = new InsightFacade()
 
-                UBCfascade1.addDataset(id, req.body).then(function(response){
+                return UBCfascade1.addDataset(id, req.body).then(function(response){
                         if (response.code == 204){
                             res.send(204)
+                            return next();
                         } else if (response.code == 201){
                             res.send(201);
+                            return next();
                         } else if (response.code == 400){
                             res.send(400);
+                            return next();
                         }
                     }
                 )
@@ -68,6 +71,7 @@ export default class RouteHandler {
         } catch (err) {
             Log.error('RouteHandler::postDataset(..) - ERROR: ' + err.message);
             res.send(400, {err: err.message});
+            return next();
         }
         return next();
     }
@@ -82,13 +86,16 @@ export default class RouteHandler {
 
             let UBCfacade2 = new InsightFacade()
 
-            UBCfacade2.performQuery(query).then(function(response){
+            return UBCfacade2.performQuery(query).then(function(response){
                 if (response.code == 200){
                     res.json(200, response.body);
+                    return next();
                 } else if (response.code == 424){
                     res.send(424);
+                    return next();
                 } else if (response.code == 400){
                     res.send(400);
+                    return next();
                 }
                     }
             )
@@ -96,8 +103,9 @@ export default class RouteHandler {
         }catch(e){
             Log.error('RouteHandler::postQuery(..)-ERROR:'+e.message);
             res.send(403);
+            return next();
         }
-        return next();
+        //return next();
     }
 
     public static deleteQuery(req: restify.Request, res: restify.Response, next: restify.Next) {
@@ -109,13 +117,16 @@ export default class RouteHandler {
             let UBCfacade3 = new InsightFacade()
 
 
-            UBCfacade3.removeDataset(id).then(function(response){
+            return UBCfacade3.removeDataset(id).then(function(response){
                     if (response.code == 204){
                         res.send(204)
+                        return next();
                     }  else if (response.code == 404){
                         res.send(404);
+                        return next();
                     }else if (response.code == 400){
                         res.send(400);
+                        return next();
                     }
                 }
             )
@@ -123,6 +134,7 @@ export default class RouteHandler {
         } catch (err) {
             Log.error('RouteHandler::deleteQuery(..) - ERROR: dataset with given not found   ' + err.message);
             res.send(400);
+            return next();
         }
     }
 }

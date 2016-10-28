@@ -19,7 +19,7 @@ export default class InsightFacade implements IInsightFacade {
     // TODO: need to implement this
 
 
-    addDataset(id:string, content: string): Promise<InsightResponse> {
+    addDataset(id: string, content: string): Promise<InsightResponse> {
         return new Promise(function (fulfill, reject) {
 
             try {
@@ -35,71 +35,71 @@ export default class InsightFacade implements IInsightFacade {
 
                 dcontroller.process(id, content).then(function (result: Boolean) {
 
-                    Log.trace("what is result   "  + result)
+                    Log.trace("what is result   " + result)
 
                     if (result == true) {
                         if (datasetexists) {
                             // Dataset is not in disk
-                            fulfill({code: 204, body: [result]});
                             Log.trace('InsightFacade::addDataset(..) - : dataset with this ID is new');
+
+                            return fulfill({code: 204, body: {}});
                         } else {
-                            fulfill({code: 201, body: [result]});
                             Log.trace('InsightFacade::addDataset(..) - : dataset with this ID already exists');
+                            return fulfill({code: 201, body: {}});
                         }
                     } else {
                         Log.trace('InsightFacade::addDataset(..) - processed dataset ERROR: Result is FALSE');
-                        reject({code: 400, err: ["failed"]});
+                        return reject({code: 400, body: {}});
 
                     }
 
                 }).catch(function (err: Error) {
                     Log.trace('InsightFacade::addDataset(..) - ERROR: ' + err.message);
-                    reject({code: 400, err: [err.message]});
+                    return reject({code: 400, body: {}});
                 });
-            }catch (e) {
+            } catch (e) {
                 Log.trace('InsightFascade::addDataset Failed(..) - ERROR: ' + e.message);
-                reject({code: 400, err: [e.message]});
+                return reject({code: 400, body: {}});
             }
 
         })
     }
 
-    removeDataset(id: string): Promise<InsightResponse>{
+    removeDataset(id: string): Promise<InsightResponse> {
 
-            return new Promise(function (fulfill, reject) {
-                Log.trace('InsightFacade::deleteDataset(..) - params: ' + id);
+        return new Promise(function (fulfill, reject) {
+            Log.trace('InsightFacade::deleteDataset(..) - params: ' + id);
 
-                try {
+            try {
 
-                    let dcontroller = new DatasetController();
+                let dcontroller = new DatasetController();
 
-                    var datasetToDelete = dcontroller.getDataset(id)
+                var datasetToDelete = dcontroller.getDataset(id)
 
-                    //  check if dataset is empty in memory or disk
-                    if (!(dcontroller.isEmpty(datasetToDelete) || (datasetToDelete == null))) {
+                //  check if dataset is empty in memory or disk
+                if (!(dcontroller.isEmpty(datasetToDelete) || (datasetToDelete == null))) {
 
-                        delete dcontroller.getDatasets()[id];
-                        fs.unlinkSync(dcontroller.relativePath + "/data/" + id + ".json")
+                    delete dcontroller.getDatasets()[id];
+                    fs.unlinkSync(dcontroller.relativePath + "/data/" + id + ".json")
 
-                        Log.trace('InsightFacade::deleteQuery(..) - successful');
-                        fulfill({code: 204})
+                    Log.trace('InsightFacade::removeDataset(..) - successful');
+                    return fulfill({code: 204, body: {}})
 
-                    } else {
-                        // produce error if not found in both memory or disk
-                        Log.trace('InsightFacade::deleteQuery(..) - failed');
-                        reject({code: 404, err: "InsightFascade: deleteDataset Failed:  dataset does not exist"})
-                    }
-                }catch (err) {
-                    reject({code: 400, err: "InsightFascade: deleteDataset Failed: " + err.message})
-                    Log.trace('InsightFascade::performQuery Failed(..) - ERROR: ' + err.message );
-
+                } else {
+                    // reject if not found in both memory or disk
+                    Log.trace('InsightFacade::removeDataset(..) - failed');
+                    return reject({code: 404, body: {}})
                 }
+            } catch (err) {
+                Log.trace('InsightFascade::removeDataset Failed(..) - ERROR: ' + err.message);
+                return reject({code: 400, body: {}})
+            }
 
-            });
+        });
     }
 
-    performQuery(query: QueryRequest): Promise<InsightResponse>{
-        Log.trace("Inside InsightFascade: performQuery")
+    performQuery(query: QueryRequest): Promise<InsightResponse> {
+        Log.trace("Inside InsightFascade: performQuery START")
         return new Promise(function (fulfill, reject) {
 
             try {
@@ -108,50 +108,55 @@ export default class InsightFacade implements IInsightFacade {
 
                 let datasets1 = dcontroller.getDatasets();
 
-                if(typeof datasets1=='undefined'){
+                if (typeof datasets1 == 'undefined') {
                     //Log.error('RouteHandler::postQuery(..)-ERROR:'+'datasetnotfound');
-                    reject({code: 424, body: ["InsightFascade: performQuery Failed:  dataset with " +id+ " missing"]})
+                    return reject({code: 424, body: {}})
                     //res.json(424,{missing:[id]});
                 }
 
-                        //dataset with id exits
-                        //call query function and return results or catch error
-                        try {
-                            let qcontroller = new QueryController(datasets1);
-                            let isValid = qcontroller.isValid(query);
-                            if (isValid == true) {
+                //dataset with id exits
+                //call query function and return results or catch error
+                //try {
+                    let qcontroller = new QueryController(datasets1);
+                    let isValid = qcontroller.isValid(query);
+                    if (isValid == true) {
 
-                                var id: string
+                        var id: string
 
-                                var GETKey = query.GET;
+                        var GETKey = query.GET;
 
-                                if (typeof GETKey === 'string' && GETKey.includes("_")) {
-                                    id = GETKey.split("_")[0];
-                                } else if (Array.isArray(GETKey) && GETKey[0].includes("_")) {
-                                    id = GETKey[0].split("_")[0];
-                                }
-
-                                if(typeof datasets1[id]=='undefined'){
-                                    //Log.error('RouteHandler::postQuery(..)-ERROR:'+'datasetnotfound');
-                                    reject({code: 424, body: ["InsightFascade: performQuery Failed:  dataset with " +id+ " missing"]})
-                                    //res.json(424,{missing:[id]});
-                                }
-
-                                let qresult = qcontroller.query(query);
-                                fulfill({code: 200, body: qresult})
-                            } else {
-                                reject({code: 400, err: "InsightFascade: performQuery Failed:  invalid query"})
-                            }
-                        } catch (err) {
-                            reject({code: 400})
-                            Log.trace('InsightFascade::performQuery Failed(..) - ERROR: invalid Query' );
-
+                        if (typeof GETKey === 'string' && GETKey.includes("_")) {
+                            id = GETKey.split("_")[0];
+                        } else if (Array.isArray(GETKey) && GETKey[0].includes("_")) {
+                            id = GETKey[0].split("_")[0];
                         }
 
+                        if (typeof datasets1[id] == 'undefined') {
+                            //Log.error('RouteHandler::postQuery(..)-ERROR:'+'datasetnotfound');
+                            return reject({code: 424,body: {}
+                            })
+                            //res.json(424,{missing:[id]});
+                        }
 
-            }catch (e) {
+                        let queryResult = qcontroller.query(query);
+                        Log.trace('InsightFascade::performQuery(..) - SUCCESS')
+
+                        return fulfill({code: 200, body: queryResult})
+                    } else {
+                        Log.trace('InsightFascade::performQuery(..) - FAILED')
+
+                        return reject({code: 400, body: {}})
+                    }
+/*                } catch (err) {
+                    reject({code: 400})
+                    Log.trace('InsightFascade::performQuery Failed(..) - ERROR: error in performQuery');
+
+                }*/
+
+
+            } catch (e) {
                 Log.trace('InsightFascade::performQuery Failed(..) - ERROR: ' + e.message);
-                reject({code: 400, err: "InsightFascade: performQuery Failed:  invalid query"})
+                return reject({code: 400, body: {}})
             }
         })
 
