@@ -129,7 +129,6 @@ export default class RouteHandler {
                     }
                 }
             )
-
         } catch (err) {
             Log.error('RouteHandler::deleteQuery(..) - ERROR: dataset with given not found   ' + err.message);
             res.send(400);
