@@ -115,8 +115,7 @@ export default class RouteHandler {
             var id: string = req.params.id;
 
             let UBCfacade3 = new InsightFacade()
-
-
+            
             return UBCfacade3.removeDataset(id).then(function(response){
                     if (response.code == 204){
                         res.send(204)
