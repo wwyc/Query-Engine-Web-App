@@ -24,57 +24,58 @@ export default class QueryController {
         this.datasets = datasets;
     }
 
-    public isValid(query:QueryRequest):boolean{
+    public isValid(query: QueryRequest): boolean {
 
         var dcontroller = new DatasetController()
 
-        var isValidResult=false
+        var isValidResult = false
 
-        if((typeof query=='undefined')
-            ||(query==null)
-            ||(Object.keys(query).length<2)
-            //||(query.AS!=="TABLE")
-            ||!(query.AS=="TABLE")
-            ||dcontroller.isEmpty(query)
-
-
-        ){
+        if ((typeof query == 'undefined')
+            || (query == null)
+            || (dcontroller.isEmpty(query))
+            || (query.AS == null || typeof query.AS == 'undefined')
+            || (query.GET == null || typeof query.GET == 'undefined')
+            || (query.WHERE == null || typeof query.WHERE == 'undefined')
+        /*            ||(Object.keys(query).length<2)
+         ||(!(query.AS=="TABLE"))*/
+        ) {
             return false;
         }
 
-        //checkifWHEREexistsorisitempty
-        if((typeof query.WHERE=='undefined')||query.WHERE==null){
+        //check if WHERE exists or is it empty
+        if ((typeof query.WHERE == 'undefined') || query.WHERE == null) {
             return false
-        }else if(Object.keys(query.WHERE).length<1){
+        } else if (Object.keys(query.WHERE).length < 1) {
             return false
         }
 
 
-        if(typeof query.GET==='string'){
+        if (typeof query.GET === 'string') {
             //check if GET key is valid & check if ORDER is equal in GET key
-            if(this.isvalidKey(query.GET)&&(query.ORDER==null||query.ORDER==query.GET)){
-                isValidResult=true}
-
-        }else if(Array.isArray(query.GET)){
-
+            if (this.isvalidKey(query.GET) && (query.ORDER == null || query.ORDER == query.GET)) {
+                isValidResult = true
+            }
+        } else if (Array.isArray(query.GET)) {
             //gothrougheachelementofarrayandcheckifGETkeyisvalid
-            for(var j=0;j<Object.keys(query.GET).length;j++){
-                if(!this.isvalidKey(query.GET[j])){
+            for (var j = 0; j < Object.keys(query.GET).length; j++) {
+                if (!this.isvalidKey(query.GET[j])) {
                     return false
                 }
             }
 
             //try to find GET key in ORDER
-            if(query.ORDER!==null || typeof query.ORDER !== 'undefined'){
-                isValidResult=false
-                for(var j=0;j<Object.keys(query.GET).length;j++){
-                    if(query.ORDER==null||query.GET[j]==query.ORDER){
-                        isValidResult=true
+            if (query.ORDER !== null || typeof query.ORDER !== 'undefined') {
+                isValidResult = false
+                for (var j = 0; j < Object.keys(query.GET).length; j++) {
+                    if (query.ORDER == null || query.GET[j] == query.ORDER) {
+                        isValidResult = true
                     }
                 }
             }
 
-        }else{isValidResult=false}
+        } else {
+            return false
+        }
 
         return isValidResult;
     }
@@ -151,14 +152,16 @@ export default class QueryController {
 
         let valid = true;
 
-        if((typeof where['AND']=='undefined')
-            &&(typeof where['OR']=='undefined')
-            &&(typeof where['GT']=='undefined')
-            &&(typeof where['LT']=='undefined')
-            &&(typeof where['EQ']=='undefined')
-            &&(typeof where['IS']=='undefined')
-            &&(typeof where['NOT']=='undefined')){
-            throw Error};
+        if ((typeof where['AND'] == 'undefined')
+            && (typeof where['OR'] == 'undefined')
+            && (typeof where['GT'] == 'undefined')
+            && (typeof where['LT'] == 'undefined')
+            && (typeof where['EQ'] == 'undefined')
+            && (typeof where['IS'] == 'undefined')
+            && (typeof where['NOT'] == 'undefined')) {
+            throw Error
+        }
+        ;
 
         if (typeof where['AND'] !== 'undefined' || typeof where['OR'] !== 'undefined') {
             //  Log.trace("type1!!!")
@@ -209,8 +212,10 @@ export default class QueryController {
                 var whereKey1 = Object.keys(where['GT']).toString()
                 var whereValue1 = where['GT'][Object.keys(where['GT'])[0]]
 
-                if(this.isvalidKey(whereKey1)===false){
-                    throw Error};
+                if (this.isvalidKey(whereKey1) === false) {
+                    throw Error
+                }
+                ;
 
                 valid = valid && (section[whereKey1] > whereValue1);
             }
@@ -218,8 +223,10 @@ export default class QueryController {
             if (typeof where['EQ'] !== 'undefined') {
                 var whereKey2 = Object.keys(where['EQ']).toString()
                 var whereValue2 = where['EQ'][Object.keys(where['EQ'])[0]]
-                if(this.isvalidKey(whereKey2)===false){
-                    throw Error};
+                if (this.isvalidKey(whereKey2) === false) {
+                    throw Error
+                }
+                ;
                 valid = valid && (((section[whereKey2])) === whereValue2);
 
             }
@@ -228,8 +235,10 @@ export default class QueryController {
 
                 var whereKey3 = Object.keys(where['LT']).toString()
                 var whereValue3 = where['LT'][Object.keys(where['LT'])[0]]
-                if(this.isvalidKey(whereKey3)===false){
-                    throw Error};
+                if (this.isvalidKey(whereKey3) === false) {
+                    throw Error
+                }
+                ;
                 valid = valid && (section[whereKey3] < whereValue3);
 
             }
@@ -239,8 +248,10 @@ export default class QueryController {
 
             var whereKey4 = Object.keys(where['IS']).toString();
             var whereValue4 = where['IS'][Object.keys(where['IS'])[0]];
-            if(this.isvalidKey(whereKey4)===false){
-                throw Error};
+            if (this.isvalidKey(whereKey4) === false) {
+                throw Error
+            }
+            ;
             var sectionWhere = section[whereKey4];
             if (sectionWhere !== "") {
                 if (whereValue4.substring(0, 1) === "*" && whereValue4.substring(whereValue4.length - 1, whereValue4.length) === "*") {
@@ -269,6 +280,7 @@ export default class QueryController {
 
         return valid;
     }
+
     /**
      * Find the value from each section given key in GET
      *
@@ -319,15 +331,15 @@ export default class QueryController {
         return resultArray;
     }
 
-    public isvalidKey(key:any):any{
-        var isvalidKeyResult:any
-        if(key==="courses_dept"||key==="courses_id"||key==="courses_avg"||
-            key==="courses_instructor"||key==="courses_title"||key==="courses_pass"||
-            key==="courses_fail"||key==="courses_audit"
-        ){
-            isvalidKeyResult=true;
-        }else{
-            isvalidKeyResult=false;
+    public isvalidKey(key: any): any {
+        var isvalidKeyResult: any
+        if (key === "courses_dept" || key === "courses_id" || key === "courses_avg" ||
+            key === "courses_instructor" || key === "courses_title" || key === "courses_pass" ||
+            key === "courses_fail" || key === "courses_audit"
+        ) {
+            isvalidKeyResult = true;
+        } else {
+            isvalidKeyResult = false;
         }
         return isvalidKeyResult;
     }

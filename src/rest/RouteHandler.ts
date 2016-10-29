@@ -95,7 +95,7 @@ export default class RouteHandler {
                     res.json(200, response.body);
                      //next();
                 } else if (response.code == 424){
-                    res.json(424, {err: " missing dataset "});
+                    res.json(424, {missing: ['courses']});
                     //next();
                 } /*else if (response.code == 400){
                  res.json(400, {err: "400"});
@@ -104,7 +104,7 @@ export default class RouteHandler {
                 next();
                     }).catch(function(err:Error){
                 Log.error('RouteHandler::postQuery(..)-ERROR:'+err.message);
-                res.json(400, {err: "400"});
+                res.json(400, {error: "Invalid Query"});
                 next();
             })
 

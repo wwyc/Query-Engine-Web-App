@@ -90,8 +90,8 @@ export default class InsightFacade implements IInsightFacade {
                     return reject({code: 404, body: {}});
                 }
             } catch (err) {
-                Log.trace('InsightFascade::removeDataset Failed(..) - 400 ERROR: ' + err.message);
-                reject({code: 404, body: {}});
+                Log.trace('InsightFascade::removeDataset Failed(..) - 404 ERROR: ' + err.message);
+                return reject({code: 404, body: {}});
             }
 
         });
@@ -161,13 +161,16 @@ export default class InsightFacade implements IInsightFacade {
                         Log.trace('InsightFascade::performQuery(..) - SUCCESS')
                         /*return*/ fulfill({code: 200, body: queryResult})
                     } else {
-                        Log.trace('InsightFascade::performQuery(..) - INVALID QUERY')
-                        /*return*/ reject({code: 400, body: {}})
-                    }
+                        throw Error
 
+                        /*Log.trace('InsightFascade::performQuery(..) - INVALID QUERY')
+                        /!*return*!/ reject({code: 400, body: {error: "invalid query"}})*/
+
+
+                    }
             } catch (err) {
                 Log.trace('InsightFascade::performQuery Failed(..) - ERROR: ' + err.message);
-                reject({code: 400, body: {}})
+                reject({code: 400, body: {error: "invalid query"}})
             }
         })
     }
