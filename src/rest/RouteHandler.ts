@@ -97,7 +97,10 @@ export default class RouteHandler {
                 } else if (response.code == 424){
                     res.json(424, {missing: ['courses']});
                     //next();
-                } /*else if (response.code == 400){
+                } else {throw Error}
+
+
+                /*else if (response.code == 400){
                  res.json(400, {err: "400"});
                  //next();
                  }*/

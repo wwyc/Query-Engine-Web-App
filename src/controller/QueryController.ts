@@ -36,6 +36,7 @@ export default class QueryController {
             || (dcontroller.isEmpty(query))
             || (query.AS == null || typeof query.AS == 'undefined')
             || (query.GET == null || typeof query.GET == 'undefined')
+            || (dcontroller.isEmpty(query.GET))
             || (query.WHERE == null || typeof query.WHERE == 'undefined')
         /*            ||(Object.keys(query).length<2)
          ||(!(query.AS=="TABLE"))*/
