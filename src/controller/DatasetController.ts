@@ -52,16 +52,17 @@ export default class DatasetController {
             //check if dataset is in disk
             var fs = require('fs');
 
-            Log.trace("inside getdataset(id)    " + this.relativePath)
-
-            Log.trace(process.cwd())
+            //Log.trace(process.cwd())
             this.relativePath = process.cwd()
+            Log.trace("inside getdataset(id)    " + this.relativePath)
+            Log.trace("inside getdataset(id)    " + this.relativePath + "/data/courses.json")
+
 
             try {var data = fs.readFileSync(this.relativePath + "/data/courses.json")
                 Log.trace("dataset is in disk")
             }
             catch (err){
-                Log.trace("inside getDataset:  dataset with given id Not Found")
+                Log.trace("inside getDataset:  dataset with given id:  "  + id+ " - Not Found")
                 return null;
             }
 

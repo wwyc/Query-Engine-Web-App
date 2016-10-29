@@ -75,7 +75,7 @@ export default class InsightFacade implements IInsightFacade {
                 var datasetToDelete = dcontroller.getDataset(id)
 
                 //  check if dataset is empty in memory or disk
-                if (!(dcontroller.isEmpty(datasetToDelete) || (datasetToDelete == null))) {
+                if (!(datasetToDelete == null)) {
 
                     delete dcontroller.getDatasets()[id];
                     fs.unlinkSync(dcontroller.relativePath + "/data/" + id + ".json")
@@ -86,11 +86,11 @@ export default class InsightFacade implements IInsightFacade {
                 } else {
                     // reject if not found in both memory or disk
                     Log.trace('InsightFacade::removeDataset(..) - 404 failed');
-                    reject({code: 404, body: {}});
+                    return reject({code: 404, body: {}});
                 }
             } catch (err) {
                 Log.trace('InsightFascade::removeDataset Failed(..) - 400 ERROR: ' + err.message);
-                reject({code: 400, body: {}});
+                reject({code: 404, body: {}});
             }
 
         });
@@ -103,33 +103,37 @@ export default class InsightFacade implements IInsightFacade {
             try {
                 let dcontroller = new DatasetController();
                 let datasets1 = dcontroller.getDatasets();
+                let qcontroller = new QueryController(datasets1);
+                let isValid = qcontroller.isValid(query);
 
-                if (typeof datasets1 == 'undefined') {
+
+/*                if (typeof datasets1 == 'undefined') {
                     Log.error('RouteHandler::postQuery(..)-ERROR: dataset with id not found');
+
                     return fulfill({code: 424, body: {}});
                     //res.json(424,{missing:[id]});
-                }
+                }*/
 
                 //dataset with id exits
                 //call query function and return results or catch error
                 //try {
-                    let qcontroller = new QueryController(datasets1);
-                    let isValid = qcontroller.isValid(query);
-                    if (isValid == true) {
 
-                        var id: string
-
-                        var GETKey = query.GET;
-
+                    if (isValid) {
+                        //var id: string
+/*                        var GETKey = query.GET;
                         if (typeof GETKey === 'string' && GETKey.includes("_")) {
                             id = GETKey.split("_")[0];
                         } else if (Array.isArray(GETKey) && GETKey[0].includes("_")) {
                             id = GETKey[0].split("_")[0];
-                        }
+                        }*/
 
-                        if (typeof datasets1[id] == 'undefined') {
-                            //Log.error('RouteHandler::postQuery(..)-ERROR:'+'datasetnotfound');
-                            return fulfill({code: 424,body: {}
+                        //if (typeof datasets1[id] == 'undefined') {
+
+                        Log.trace((dcontroller.isEmpty(datasets1)).toString())
+
+                        if (datasets1 == null||dcontroller.isEmpty(datasets1)) {
+                            Log.error('RouteHandler::postQuery(..)-ERROR:'+'datasetnotfound');
+                            return reject({code: 424,body: {}
                             })
                             //res.json(424,{missing:[id]});
                         }
@@ -139,7 +143,6 @@ export default class InsightFacade implements IInsightFacade {
                         return fulfill({code: 200, body: queryResult})
                     } else {
                         Log.trace('InsightFascade::performQuery(..) - FAILED')
-
                         return reject({code: 400, body: {}})
                     }
 /*                } catch (err) {

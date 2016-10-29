@@ -148,4 +148,18 @@ describe("InsightFacadeDataset", function () {
             expect.fail('Should not happen');
         });
     });
+
+    it("Deleting a non-existing dataset should return a 404. (404)", function () {
+        var that = this;
+        Log.trace("Starting test: " + that.test.title);
+
+        var zipFileContents1 = new Buffer(fs.readFileSync('file.txt')).toString('base64');
+
+
+        return facade.removeDataset('courses123').then(function (response: InsightResponse) {
+            expect.fail('Should not happen');
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(404);
+        });
+    });
 })

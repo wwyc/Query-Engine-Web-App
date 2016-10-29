@@ -26,14 +26,17 @@ export default class QueryController {
 
     public isValid(query:QueryRequest):boolean{
 
+        var dcontroller = new DatasetController()
+
         var isValidResult=false
-
-
 
         if((typeof query=='undefined')
             ||(query==null)
             ||(Object.keys(query).length<2)
-            ||(query.AS!=="TABLE")
+            //||(query.AS!=="TABLE")
+            ||!(query.AS=="TABLE")
+            ||dcontroller.isEmpty(query)
+
 
         ){
             return false;
