@@ -128,12 +128,12 @@ export default class InsightFacade implements IInsightFacade {
                         }*/
 
                         //if (typeof datasets1[id] == 'undefined') {
-
                         Log.trace((dcontroller.isEmpty(datasets1)).toString())
+
 
                         if (datasets1 == null||dcontroller.isEmpty(datasets1)) {
                             Log.error('RouteHandler::postQuery(..)-ERROR:'+'datasetnotfound');
-                            return reject({code: 424,body: {}
+                            return fulfill({code: 424,body: {}
                             })
                             //res.json(424,{missing:[id]});
                         }
@@ -142,14 +142,10 @@ export default class InsightFacade implements IInsightFacade {
                         Log.trace('InsightFascade::performQuery(..) - SUCCESS')
                         return fulfill({code: 200, body: queryResult})
                     } else {
-                        Log.trace('InsightFascade::performQuery(..) - FAILED')
+                        Log.trace('InsightFascade::performQuery(..) - INVALID QUERY')
                         return reject({code: 400, body: {}})
                     }
-/*                } catch (err) {
-                    reject({code: 400})
-                    Log.trace('InsightFascade::performQuery Failed(..) - ERROR: error in performQuery');
 
-                }*/
             } catch (err) {
                 Log.trace('InsightFascade::performQuery Failed(..) - ERROR: ' + err.message);
                 reject({code: 400, body: {}})

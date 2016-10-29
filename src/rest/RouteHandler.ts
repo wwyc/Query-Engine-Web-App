@@ -83,14 +83,12 @@ export default class RouteHandler {
     }
 //add 424(check if on memory)
     public static postQuery(req:restify.Request,res:restify.Response,next:restify.Next){
-        try{
+       // try{
             Log.trace('RouteHandler::postQuery(..)-params:'+JSON.stringify(req.params));
 
             let query:QueryRequest=req.params;
 
             Log.trace(typeof req.params)
-
-            //let UBCfacade2 = new InsightFacade()
 
             return RouteHandler.UBCInsightFacade.performQuery(query).then(function(response: InsightResponse){
                 if (response.code == 200){
@@ -103,18 +101,18 @@ export default class RouteHandler {
                     res.json(400, {err: "400"});
                     //next();
                 }
-                next()
+                next();
                     }).catch(function(err:Error){
                 Log.error('RouteHandler::postQuery(..)-ERROR:'+err.message);
                 res.json(400, {err: "400"});
                 next();
             })
 
-        }catch(err){
+/*        }catch(err){
             Log.error('RouteHandler::postQuery(..)-ERROR:'+err.message);
-            res.send(400);
+            res.json(400, {err: "400"});
             next();
-        }
+        }*/
         //return next();
     }
 
@@ -137,12 +135,12 @@ export default class RouteHandler {
                         next();
                     }else if (response.code == 400){
                         Log.error('RouteHandler::deleteQuery(..) - FAILED 400 :');
-                        res.send(400);
+                        res.send(404);
                         next();
                     }
                 }). catch(function(err:Error){
                 Log.error('RouteHandler::deleteQuery(..) - ERROR:' + err.message);
-                res.send(400);
+                res.send(404);
                 return next();
             })
         } catch (err) {

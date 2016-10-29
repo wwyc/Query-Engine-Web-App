@@ -42,9 +42,10 @@ describe("InsightFacadeQuery", function () {
         Log.trace("Starting test: " + that.test.title);
         let query: QueryRequest = {GET: 'courses_avg', WHERE: {"GT": {"courses_avg": 90}}, ORDER: 'courses_avg', AS: "TABLE"};
         return facade.performQuery(query).then(function (response: InsightResponse) {
-            expect.fail('Should not happen');
-        }).catch(function (response: InsightResponse) {
             expect(response.code).to.equal(424);
+        }).catch(function (response: InsightResponse) {
+            expect.fail('Should not happen');
+
         });
 
     });
