@@ -97,10 +97,10 @@ export default class RouteHandler {
                 } else if (response.code == 424){
                     res.json(424, {err: " missing dataset "});
                     //next();
-                } else if (response.code == 400){
-                    res.json(400, {err: "400"});
-                    //next();
-                }
+                } /*else if (response.code == 400){
+                 res.json(400, {err: "400"});
+                 //next();
+                 }*/
                 next();
                     }).catch(function(err:Error){
                 Log.error('RouteHandler::postQuery(..)-ERROR:'+err.message);

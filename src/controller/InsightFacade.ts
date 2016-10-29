@@ -11,6 +11,7 @@ import {QueryRequest, default as QueryController} from "./QueryController";
 import Log from "../Util";
 import fs = require('fs');
 import DatasetController from "./DatasetController";
+import {Datasets} from "./DatasetController";
 
 export default class InsightFacade implements IInsightFacade {
 
@@ -102,9 +103,27 @@ export default class InsightFacade implements IInsightFacade {
 
             try {
                 let dcontroller = new DatasetController();
-                let datasets1 = dcontroller.getDatasets();
+                let datasets1: Datasets = dcontroller.getDatasets();
+
+/*                Log.trace("what is in datasets1" + datasets1);
+                Log.trace("what is type datasets1" + typeof datasets1);
+                Log.trace((typeof datasets1 == 'undefined').toString());
+                Log.trace((datasets1 == null).toString());
+                Log.trace((dcontroller.isEmpty(datasets1).toString()));*/
+
+
+                if (typeof datasets1 == 'undefined'||(datasets1 == null)||dcontroller.isEmpty(datasets1)){
+                        let qcontroller = new QueryController(datasets1);
+                        if (qcontroller.isValid){
+                            return fulfill({code: 424, body: {}})
+                        } else {
+                            return reject({code: 400, body: {}})
+                        }
+                    }
+
+
+
                 let qcontroller = new QueryController(datasets1);
-                let isValid = qcontroller.isValid(query);
 
 
 /*                if (typeof datasets1 == 'undefined') {
@@ -117,7 +136,7 @@ export default class InsightFacade implements IInsightFacade {
                 //dataset with id exits
                 //call query function and return results or catch error
                 //try {
-
+                let isValid = qcontroller.isValid(query);
                     if (isValid) {
                         //var id: string
 /*                        var GETKey = query.GET;
@@ -128,22 +147,22 @@ export default class InsightFacade implements IInsightFacade {
                         }*/
 
                         //if (typeof datasets1[id] == 'undefined') {
-                        Log.trace((dcontroller.isEmpty(datasets1)).toString())
+                        //Log.trace((dcontroller.isEmpty(datasets1)).toString())
 
 
-                        if (datasets1 == null||dcontroller.isEmpty(datasets1)) {
+/*                        if (datasets1 == null||dcontroller.isEmpty(datasets1)) {
                             Log.error('RouteHandler::postQuery(..)-ERROR:'+'datasetnotfound');
                             return fulfill({code: 424,body: {}
                             })
                             //res.json(424,{missing:[id]});
-                        }
+                        }*/
 
                         let queryResult = qcontroller.query(query);
                         Log.trace('InsightFascade::performQuery(..) - SUCCESS')
-                        return fulfill({code: 200, body: queryResult})
+                        /*return*/ fulfill({code: 200, body: queryResult})
                     } else {
                         Log.trace('InsightFascade::performQuery(..) - INVALID QUERY')
-                        return reject({code: 400, body: {}})
+                        /*return*/ reject({code: 400, body: {}})
                     }
 
             } catch (err) {
