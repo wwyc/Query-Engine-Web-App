@@ -30,6 +30,7 @@ export default class QueryController {
 
         var isValidResult = false
 
+        //Check QUERY
         if ((typeof query == 'undefined')
             || (query == null)
             || (dcontroller.isEmpty(query))
@@ -42,14 +43,7 @@ export default class QueryController {
             return false;
         }
 
-        //check if WHERE exists or is it empty
-        if ((typeof query.WHERE == 'undefined') || query.WHERE == null) {
-            return false
-        } else if (Object.keys(query.WHERE).length < 1) {
-            return false
-        }
-
-
+        //Check GET keys
         if (typeof query.GET === 'string') {
             //check if GET key is valid & check if ORDER is equal in GET key
             if (this.isvalidKey(query.GET) && (query.ORDER == null || query.ORDER == query.GET)) {
@@ -62,7 +56,6 @@ export default class QueryController {
                     return false
                 }
             }
-
             //try to find GET key in ORDER
             if (query.ORDER !== null || typeof query.ORDER !== 'undefined') {
                 isValidResult = false
@@ -72,10 +65,17 @@ export default class QueryController {
                     }
                 }
             }
-
         } else {
             return false
         }
+
+        //check WHERE key
+        if (Object.keys(query.WHERE).length < 1) {
+            return false
+        }
+
+
+
 
         return isValidResult;
     }

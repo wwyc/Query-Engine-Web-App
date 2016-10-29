@@ -105,29 +105,21 @@ export default class InsightFacade implements IInsightFacade {
                 let dcontroller = new DatasetController();
                 let datasets1: Datasets = dcontroller.getDatasets();
 
-/*                Log.trace("what is in datasets1" + datasets1);
-                Log.trace("what is type datasets1" + typeof datasets1);
-                Log.trace((typeof datasets1 == 'undefined').toString());
-                Log.trace((datasets1 == null).toString());
-                Log.trace((dcontroller.isEmpty(datasets1).toString()));*/
-
-
                 if (typeof datasets1 == 'undefined'||(datasets1 == null)||dcontroller.isEmpty(datasets1)){
                         let qcontroller = new QueryController(datasets1);
                         if (qcontroller.isValid){
+                            Log.error('RouteHandler::postQuery(..)-ERROR: dataset with id not found');
                             return fulfill({code: 424, body: {}})
                         } else {
+                            // throw Error?
                             return reject({code: 400, body: {}})
                         }
                     }
-
-
 
                 let qcontroller = new QueryController(datasets1);
 
 
 /*                if (typeof datasets1 == 'undefined') {
-                    Log.error('RouteHandler::postQuery(..)-ERROR: dataset with id not found');
 
                     return fulfill({code: 424, body: {}});
                     //res.json(424,{missing:[id]});
@@ -146,26 +138,11 @@ export default class InsightFacade implements IInsightFacade {
                             id = GETKey[0].split("_")[0];
                         }*/
 
-                        //if (typeof datasets1[id] == 'undefined') {
-                        //Log.trace((dcontroller.isEmpty(datasets1)).toString())
-
-
-/*                        if (datasets1 == null||dcontroller.isEmpty(datasets1)) {
-                            Log.error('RouteHandler::postQuery(..)-ERROR:'+'datasetnotfound');
-                            return fulfill({code: 424,body: {}
-                            })
-                            //res.json(424,{missing:[id]});
-                        }*/
-
                         let queryResult = qcontroller.query(query);
                         Log.trace('InsightFascade::performQuery(..) - SUCCESS')
                         /*return*/ fulfill({code: 200, body: queryResult})
                     } else {
                         throw Error
-
-                        /*Log.trace('InsightFascade::performQuery(..) - INVALID QUERY')
-                        /!*return*!/ reject({code: 400, body: {error: "invalid query"}})*/
-
 
                     }
             } catch (err) {
