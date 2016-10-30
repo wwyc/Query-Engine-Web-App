@@ -30,7 +30,6 @@ export default class QueryController {
     private static GAhandler = new GAhandler();
     private static ResultsHandler = new ResultsHandler();
 
-
     constructor(datasets: Datasets) {
         this.datasets = datasets;
     }
@@ -38,7 +37,6 @@ export default class QueryController {
     public isValid(query: QueryRequest): boolean {
 
         var dcontroller = new DatasetController()
-
         var isValidResult = false
 
         //Check QUERY
@@ -61,7 +59,6 @@ export default class QueryController {
 
         //Check GET keys
         if (typeof query.GET === 'string') {
-
             if (!QueryController.ValidKeyChecker.isvalidKey(query.GET)){
                 return false
             }
@@ -70,7 +67,6 @@ export default class QueryController {
                 isValidResult = true
             }
         } else if (Array.isArray(query.GET)) {
-            //Metro: REST POST 400
             if (query.GET.length == 0){
                 return false
             }
@@ -80,9 +76,8 @@ export default class QueryController {
                 if (query.GET[j].includes("_")) {
                     if (!QueryController.ValidKeyChecker.isvalidKey(query.GET[j])) {
                         return false
-                    }
-                }
-            }
+                    }}}
+
             //try to find GET key in ORDER
             if (query.ORDER !== null && !(typeof query.ORDER == 'undefined')) {
                 isValidResult = false
@@ -90,20 +85,13 @@ export default class QueryController {
                     for (var j = 0; j < Object.keys(query.GET).length; j++) {
                         if (query.ORDER == null || query.GET[j] == query.ORDER) {
                             isValidResult = true
-                        }
-                    }
+                        }}
                 } else if (typeof query.ORDER == 'object') {
-
                     isValidResult = true
-                }
-            } else {
-                isValidResult = true
-            }
-
-
-
-        } else {
-            isValidResult = true
+                }} else
+                    {isValidResult = true
+            }} else
+                {isValidResult = true
         }
 
         //•	Kanga: APPLY without GROUP should not be valid.
@@ -175,12 +163,11 @@ export default class QueryController {
 
         //Kwyjibo: All keys in GET should be in either GROUP or APPLY.
         // Lorax: All keys in GET that are not separated by an underscore should be in apply
-
         if (typeof query.GET !== 'undefined'&& query.GET !== null)
         {
             if (typeof query.GET === 'string') {
-                if(QueryController.ValidKeyChecker.isvalidKey(query.GET))
-                {  if (typeof query.GROUP !== 'undefined' && query.GROUP !== null&&
+                if(QueryController.ValidKeyChecker.isvalidKey(query.GET)){
+                    if (typeof query.GROUP !== 'undefined' && query.GROUP !== null&&
                     query.GROUP.length>0
                 )
                     if(!QueryController.ValidKeyChecker.contains(query.GET,query.GROUP))
@@ -191,25 +178,22 @@ export default class QueryController {
                             if (!QueryController.ValidKeyChecker.contains(query.GET, query.GROUP)) {
                                 Log.trace("All keys in GET without underscore should be in APPLY.")
                                 return false;
-                            }
-                        }
-                }
-                else
-                    return false;
-            }
-            else if(Array.isArray(query.GET))
-            {  for (var s=0;s<query.GET.length;s++) {
+                            }}} else
+                {return false}
+            } else if(Array.isArray(query.GET)){
+                for (var s=0;s<query.GET.length;s++) {
                 if (query.GET[s].includes("_")) {
                     if (typeof query.GROUP !== 'undefined' && query.GROUP !== null
                         && query.GROUP.length > 0) {
                         if (!(query.GROUP.includes(query.GET[s]))) {
                             Log.trace("All keys in GET with underscore should be in GROUP.")
                             return false;
-                        }
-                    }
-                }  else if (!query.GET[s].includes("_")) {
 
-                    if(query.APPLY.length < 0){return false}
+                        }}}  else if (!query.GET[s].includes("_")) {
+
+                    if(query.APPLY.length < 0){
+                        return false
+                    }
 
                         if (typeof query.APPLY !== 'undefined' && query.APPLY !== null /*&&
                             query.APPLY.length > 0*/) {
@@ -220,12 +204,9 @@ export default class QueryController {
                             if (!(applyarray1.includes(query.GET[s]))) {
                                 Log.trace("All keys in GET without underscore should be in APPLY.")
                                 return false;
-                            }
-                        }
-
-                }
-            }
+                            }}}
             }}
+        }
 
         //Empty apply object should be accepted
         //Malibu: APPLY rules should be unique.
@@ -248,8 +229,6 @@ export default class QueryController {
             Log.trace(Object.keys(query.WHERE).toString())
             for(var key of Object.keys(query.WHERE)){
 
-                Log.trace(key.toString())
-
                 if ((!(key == "AND"))
                     && (!(key == "OR"))
                     && (!(key == "GT"))
@@ -258,11 +237,8 @@ export default class QueryController {
                     && (!(key == "IS"))
                     && (!(key == "NOT"))
                 ) {return false}
-
             }
-
                 }
-
         return isValidResult;
     }
 
@@ -286,8 +262,6 @@ export default class QueryController {
             intermediate = this.dealWithWhere(where, get[0])
         }
 
-        //var values: any = [];
-
         if(group!==null&&typeof group!=='undefined'&& group.length>0)
         {
             intermediate=QueryController.GAhandler.dealWithGroup(group,intermediate)
@@ -306,7 +280,6 @@ export default class QueryController {
             finalResultObjArray = QueryController.ResultsHandler.sortArray(finalResultObjArray, order);
         }
 
-        // Log.trace("this is FINAL result:  " + JSON.stringify(finalResultObjArray))
         // Log.trace("this is FINAL result:  " + JSON.stringify({render: format, result: finalResultObjArray}))
 
         return {render: format, result: finalResultObjArray};

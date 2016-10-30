@@ -52,7 +52,6 @@ describe("QueryController", function () {
             AS:'TABLE'
         };
         return facade.performQuery(query).then(function(response:InsightResponse){
-        //Log.trace(JSON.stringify(response.body))
             let expectresult=JSON.parse(fs.readFileSync("./test/result/q1.json",'utf8'))
             expect(response.body).to.be.deep.equal(expectresult)
         });
