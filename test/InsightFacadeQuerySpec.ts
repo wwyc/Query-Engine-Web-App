@@ -63,7 +63,31 @@ describe("InsightFacadeQuery", function () {
         });
     });
 
-        it("Should not be able to perform a query with GROUP keys without unscore not in APPLY (200)", function () {
+    it("Should not be able to perform a query with empty GET Array(400)", function () {
+        var that = this;
+        Log.trace("Starting test: " + that.test.title);
+        let query: QueryRequest = {GET: [], WHERE: {"GT": {"courses_avg": 90}}, AS: 'table'};
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect.fail('Should not happen');
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(400);
+
+        });
+    });
+
+    it("Should not be able to perform a query with empty GET String(400)", function () {
+        var that = this;
+        Log.trace("Starting test: " + that.test.title);
+        let query: QueryRequest = {GET: "", WHERE: {"GT": {"courses_avg": 90}}, AS: 'table'};
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect.fail('Should not happen');
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(400);
+
+        });
+    });
+
+        it("Should not be able to perform a query with GROUP keys without unscore not in APPLY (400)", function () {
      var that = this;
      Log.trace("Starting test: " + that.test.title);
      let query: QueryRequest = {GET: ["courses_avg", "courseAverage"], WHERE: {"GT": {"courses_avg": 90}}, GROUP: ["courses_avg"], APPLY: [], ORDER: 'courses_avg', AS: 'table'};

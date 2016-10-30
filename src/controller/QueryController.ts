@@ -327,7 +327,6 @@ export default class QueryController {
         for (var key in datasetRetrived) {
             sections = datasetRetrived[key]
 
-
             for (var section of sections) {
                 if(where!=null&&Object.keys(where).length>0&& where!=undefined)
                 { if (QueryController.EBNFParser.parseEBNF(where, section)) {
