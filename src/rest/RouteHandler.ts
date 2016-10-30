@@ -101,12 +101,6 @@ export default class RouteHandler {
                     Log.error('RouteHandler::postQuery(..)-ERROR: 400');
                     res.json(400, {error: "Invalid Query"});
                 }
-
-
-                /*else if (response.code == 400){
-                 res.json(400, {err: "400"});
-                 //next();
-                 }*/
                 next();
                     }).catch(function(err:Error){
                 Log.error('RouteHandler::postQuery(..)-ERROR:'+err.message);

@@ -118,36 +118,19 @@ export default class InsightFacade implements IInsightFacade {
 
                 let qcontroller = new QueryController(datasets1);
 
-
-/*                if (typeof datasets1 == 'undefined') {
-
-                    return fulfill({code: 424, body: {}});
-                    //res.json(424,{missing:[id]});
-                }*/
-
-                //dataset with id exits
-                //call query function and return results or catch error
-                //try {
                 let isValid = qcontroller.isValid(query);
                     if (isValid) {
-                        //var id: string
-/*                        var GETKey = query.GET;
-                        if (typeof GETKey === 'string' && GETKey.includes("_")) {
-                            id = GETKey.split("_")[0];
-                        } else if (Array.isArray(GETKey) && GETKey[0].includes("_")) {
-                            id = GETKey[0].split("_")[0];
-                        }*/
-
                         let queryResult = qcontroller.query(query);
                         Log.trace('InsightFascade::performQuery(..) - SUCCESS')
                         /*return*/ fulfill({code: 200, body: queryResult})
                     } else {
                         Log.trace('InsightFascade::performQuery Failed(..) - ERROR: ');
-                        return reject({code: 400, body: {error: "invalid query"}})
+                        return reject({code: 400, error: "invalid query"})
                     }
+
             } catch (err) {
                 Log.trace('InsightFascade::performQuery Failed(..) - ERROR: ' + err.message);
-                return reject({code: 400, body: {error: "invalid query"}})
+                return reject({code: 400, error: "invalid query"})
             }
         })
     }
