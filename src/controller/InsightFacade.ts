@@ -105,7 +105,7 @@ export default class InsightFacade implements IInsightFacade {
                 let dcontroller = new DatasetController();
                 let datasets1: Datasets = dcontroller.getDatasets();
 
-                if (typeof datasets1 == 'undefined'||(datasets1 == null)||dcontroller.isEmpty(datasets1)){
+/*                if (typeof datasets1 == 'undefined'||(datasets1 == null)||dcontroller.isEmpty(datasets1)){
                         let qcontroller = new QueryController(datasets1);
                         if (qcontroller.isValid){
                             Log.error('RouteHandler::postQuery(..)-ERROR: dataset with id not found');
@@ -114,12 +114,20 @@ export default class InsightFacade implements IInsightFacade {
                             // throw Error?
                             return reject({code: 400, body: {}})
                         }
-                    }
+                    }*/
 
                 let qcontroller = new QueryController(datasets1);
 
                 let isValid = qcontroller.isValid(query);
                     if (isValid) {
+
+                        if (typeof datasets1 == 'undefined'||(datasets1 == null)||dcontroller.isEmpty(datasets1)){
+                            let qcontroller = new QueryController(datasets1);
+
+                                Log.error('RouteHandler::postQuery(..)-ERROR: dataset with id not found');
+                                return fulfill({code: 424, body: {}})
+                            } 
+
                         let queryResult = qcontroller.query(query);
                         Log.trace('InsightFascade::performQuery(..) - SUCCESS')
                         /*return*/ fulfill({code: 200, body: queryResult})
