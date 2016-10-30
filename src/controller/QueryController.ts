@@ -47,8 +47,7 @@ export default class QueryController {
             || (dcontroller.isEmpty(query))
             || (query.AS == null || typeof query.AS == 'undefined')
             || (query.GET == null || typeof query.GET == 'undefined')
-            || (query.WHERE == null || typeof query.WHERE == 'undefined')
-        ) {
+            || (query.WHERE == null || typeof query.WHERE == 'undefined')) {
             return false;
         }
 
