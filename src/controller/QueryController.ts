@@ -10,6 +10,8 @@ import {stringify} from "querystring";
 export interface QueryRequest {
     GET: string|string[];
     WHERE: {};
+    GROUP?:string[];
+    APPLY?:any[];
     ORDER?: string|{};
     AS: string;
 }
@@ -57,8 +59,10 @@ export default class QueryController {
 
             //gothrougheachelementofarrayandcheckifGETkeyisvalid
             for (var j = 0; j < Object.keys(query.GET).length; j++) {
-                if (!this.isvalidKey(query.GET[j])) {
-                    return false
+                if (query.GET[j].includes("_")) {
+                    if (!this.isvalidKey(query.GET[j])) {
+                        return false
+                    }
                 }
             }
             //try to find GET key in ORDER
@@ -91,9 +95,9 @@ export default class QueryController {
         }
 
         //check WHERE key
-        if (Object.keys(query.WHERE).length < 1) {
+/*        if (Object.keys(query.WHERE).length < 1) {
             return false
-        }
+        }*/
 
 
 
@@ -108,6 +112,8 @@ export default class QueryController {
         //parse the json query to string
         var get = query.GET;                            // can be string or array of string
         var where = query.WHERE;                        //json object or json array
+        var group = query.GROUP;
+        var apply = query.APPLY;
         var order = query.ORDER;
         var format = query.AS;
 
@@ -119,7 +125,18 @@ export default class QueryController {
             intermediate = this.dealWithWhere(where, get[0])
         }
 
-        var values: any = [];
+        //var values: any = [];
+
+        if(group!==null&&typeof group!=='undefined'&& group.length>0)
+        {
+            intermediate=this.dealWithGroup(group,intermediate)
+            if(apply!==null&&typeof apply!=='undefined'&&apply.length>0)
+            { intermediate=this.dealWithApply(apply,intermediate)}
+            else
+            { for(var h=0;h<intermediate.length;h++ )
+                intermediate[h]=intermediate[h][0]
+            }
+        }
 
         var finalResultObjArray: any = this.represent(get, intermediate);
 
@@ -149,25 +166,35 @@ export default class QueryController {
         for (var key in datasetRetrived) {
             sections = datasetRetrived[key]
 
+
+            for (var section of sections) {
+                if(where!=null&&Object.keys(where).length>0&& where!=undefined)
+                { if (this.parserEBNF(where, section)) {
+                    //add section to list if it meets WHERE criteria in query
+                    selectedSections.push(section)}}
+                else
+                { selectedSections.push(section) }
+            }
+
             /*   for (var key in sections) {
              var section = sections[key]  */
-            for (var section of sections) {
+/*            for (var section of sections) {
                 if (this.parserEBNF(where, section)) {
                     //add section to list if it meets WHERE criteria in query
                     selectedSections.push(section)
                 }
-            }
+            }*/
         }
         return selectedSections;
     }
-
+/*
     //helper function that returns prefix of string from GET
     public stringPrefix(get: string) {
         let prefix: any
         prefix = get.split("_")[0];
         //Log.trace(prefix);
         return prefix;
-    }
+    }*/
 
     public parserEBNF(where: any, section: any) {
 
@@ -335,22 +362,22 @@ export default class QueryController {
 
     }
 
-/*    public sortArray(resultArray: any, order: any) {
-        //Log.trace("INSIDE sorting!")
-        resultArray.sort(function (a: any, b: any) {
-            var value1 = a[order];
-            //Log.trace("value1  " + value1)
-            var value2 = b[order];
-            if (value1 < value2) {
-                return -1;
-            }
-            if (value1 > value2) {
-                return 1;
-            }
-            return 0;
-        });
-        return resultArray;
-    }*/
+    /*    public sortArray(resultArray: any, order: any) {
+     //Log.trace("INSIDE sorting!")
+     resultArray.sort(function (a: any, b: any) {
+     var value1 = a[order];
+     //Log.trace("value1  " + value1)
+     var value2 = b[order];
+     if (value1 < value2) {
+     return -1;
+     }
+     if (value1 > value2) {
+     return 1;
+     }
+     return 0;
+     });
+     return resultArray;
+     }*/
 
     public sortArray(resultArray: any, order: any) {
         // Log.trace("INSIDE sorting!")
@@ -372,42 +399,42 @@ export default class QueryController {
 
             else if (typeof order == "object"){
                 var orderkey: any = order['keys'];//orderkey is an array
-            var i = 0;
-            if (order['dir'] === 'UP')// lowers come first
-            {
-                while (i < orderkey.length) {
-                    var value1 = a[orderkey[i]];
-                    var value2 = b[orderkey[i]];
-                    //    Log.trace("value1,2up"+value1+ value2)
-                    if (value1 < value2) {
-                        return -1;
+                var i = 0;
+                if (order['dir'] === 'UP')// lowers come first
+                {
+                    while (i < orderkey.length) {
+                        var value1 = a[orderkey[i]];
+                        var value2 = b[orderkey[i]];
+                        //    Log.trace("value1,2up"+value1+ value2)
+                        if (value1 < value2) {
+                            return -1;
+                        }
+                        if (value1 > value2) {
+                            return 1;
+                        }
+                        else
+                            i++;
                     }
-                    if (value1 > value2) {
-                        return 1;
-                    }
-                    else
-                        i++;
+                    return 0;
                 }
-                return 0;
-            }
 
-            if (order['dir'] === 'DOWN') {
-                while (i < orderkey.length) {
-                    var value1 = a[orderkey[i]];
-                    var value2 = b[orderkey[i]];
-                    //   Log.trace("value1,2down"+value1+ value2)
-                    if (value1 < value2) {
-                        return 1;
+                if (order['dir'] === 'DOWN') {
+                    while (i < orderkey.length) {
+                        var value1 = a[orderkey[i]];
+                        var value2 = b[orderkey[i]];
+                        //   Log.trace("value1,2down"+value1+ value2)
+                        if (value1 < value2) {
+                            return 1;
+                        }
+                        if (value1 > value2) {
+                            return -1;
+                        }
+                        else
+                            i++;
                     }
-                    if (value1 > value2) {
-                        return -1;
-                    }
-                    else
-                        i++;
+                    return 0;
                 }
-                return 0;
             }
-        }
         });
         return resultArray;
     }
@@ -416,6 +443,19 @@ export default class QueryController {
         var isvalidKeyResult: any
         if (key === "courses_dept" || key === "courses_id" || key === "courses_avg" ||
             key === "courses_instructor" || key === "courses_title" || key === "courses_pass" ||
+            key === "courses_fail" || key === "courses_audit"||key=="courses_uuid"
+        ) {
+            isvalidKeyResult = true;
+        } else {
+            isvalidKeyResult = false;
+        }
+        return isvalidKeyResult;
+    }
+
+    public isvalidNumberKey(key: any): any {
+        var isvalidKeyResult: any
+        if (key === "courses_avg" ||
+            key === "courses_pass" ||
             key === "courses_fail" || key === "courses_audit"
         ) {
             isvalidKeyResult = true;
@@ -423,6 +463,201 @@ export default class QueryController {
             isvalidKeyResult = false;
         }
         return isvalidKeyResult;
+    }
+    public isvalidStringKey(key: any): any {
+        var isvalidKeyResult: any
+        if (key === "courses_dept" ||
+            key === "courses_id" ||
+            key === "courses_instructor" || key === "courses_title"||key==="courses_uuid"
+        ) {
+            isvalidKeyResult = true;
+        } else {
+            isvalidKeyResult = false;
+        }
+        return isvalidKeyResult;
+    }
+
+
+    public contains(a:any, array:any):boolean{
+
+        for (var i = 0; i < a.length; i++) {
+            if (array[i] === a) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public dealWithGroup(group:any,intermediate:any):any{
+        var groups:any=[];
+        while(intermediate.length!=0)
+        {   var sessions:any=[];
+            var lastintermediates:any=[];
+            var groupvalue:any={};
+
+            for (var a=0;a<group.length;a++)
+            {  var lastintermediate:any;
+                lastintermediate=intermediate[0][group[a]];
+                lastintermediates.push(lastintermediate);
+                groupvalue[group[a]]=intermediate[0][group[a]];
+            }
+            sessions.push(groupvalue);
+            for (var i=0;i<intermediate.length;i++)
+            {  if(this.checkGroupCorrect(group,intermediate[i],lastintermediates))
+            {   sessions.push(intermediate[i]);
+                intermediate.splice(i,1);
+                i--;
+            }
+            }
+            groups.push(sessions);
+        }
+        Log.trace("groups length"+groups.length);
+        return groups;
+    }
+
+    public checkGroupCorrect(group:any,intermediate:any,lastintermediates:any):boolean{
+        var validlist:any=[];
+        var valid:boolean=true;
+        for (var i=0;i< group.length;i++)
+        {
+            if(intermediate[group[i]]===lastintermediates[i])
+            {validlist.push(true);}
+            else
+            { validlist.push(false);}
+        }
+
+        for (var eachValid of validlist) {
+            if (eachValid === false)
+                valid = false;
+        }
+        return valid;
+    }
+
+    public dealWithApply(apply:any,grouplist:any):any {
+        var applylist:any=[];
+
+        Log.trace("jump into apply")
+        for (var applyobject of apply) {
+            var applynewkey=Object.keys(applyobject)[0];//coursesAvg
+            var applyvalue=applyobject[Object.keys(applyobject)[0]];
+            var applytoken=Object.keys(applyvalue)[0];//AVG
+            var applystring=applyvalue[Object.keys(applyvalue)[0]];//courses_avg
+            if (applytoken === 'AVG') {
+                if(!this.isvalidNumberKey(applystring))
+                    throw Error;
+                else
+                    for (var i = 0; i < grouplist.length; i++) {
+                        var sessions = grouplist[i];
+
+                        var sum: number=0;
+                        var length:number=0;
+                        for (var j=1;j<sessions.length;j++)
+                        {
+                            /*if( sessions[j][applystring]!=='undefined'&&
+                             sessions[j][applystring]!=null)   */
+                            sum+=sessions[j][applystring];
+                            length++;
+                        }
+                        var averageValue: any;
+                        averageValue = parseFloat((sum / length).toFixed(2));
+                        grouplist[i][0][applynewkey]=averageValue;
+                    }
+            }
+
+            if (applytoken === 'MIN') {
+                if(!this.isvalidNumberKey(applystring))
+                    throw Error;
+                else
+                    for (var i = 0; i < grouplist.length; i++) {
+                        var sessions = grouplist[i];
+                        var minsession:any=[];
+                        var min:number=sessions[1][applystring];
+                        for(var j=1;j<sessions.length;j++)
+                        {   /*if(sessions[j][applystring]!='undefined'&&
+                         sessions[j][applystring]!=null)  */
+                            if (sessions[j][applystring]<min)
+                                min=sessions[1][applystring]}
+
+                        grouplist[i][0][applynewkey]=min;
+                    }
+            }
+
+            if (applytoken === 'MAX') {
+                if(!this.isvalidNumberKey(applystring))
+                    throw Error;
+                else
+                    for (var i = 0; i < grouplist.length; i++) {
+                        var sessions = grouplist[i];
+                        var maxsession:any=[];
+                        var max:number=sessions[1][applystring];
+                        for(var j=1;j<sessions.length;j++)
+                        { /* if(sessions[j][applystring]!='undefined'&&
+                         sessions[j][applystring]!=null)  */
+                            if(sessions[j][applystring]>max)
+                                max=sessions[j][applystring]}
+
+                        grouplist[i][0][applynewkey]=max;
+                    }
+            }
+
+
+            if (applytoken === 'COUNT') {
+                if (this.isvalidNumberKey(applystring)) {
+                    for (var i = 0; i < grouplist.length; i++) {
+                        var sessions = grouplist[i];
+                        var count = 0;
+                        var keysession: any = []
+                        for (var j = 1; j < sessions.length; j++) {
+                            /*   if (sessions[j][applystring] != 'undefined' &&
+                             sessions[j][applystring] != null)  */
+                            keysession.push(sessions[j][applystring])
+                        }
+                        if (keysession.length > 1) {
+                            keysession.sort();
+                            for (var h = 0; h < keysession.length - 1; h++) {
+                                if (keysession[h] === keysession[h + 1]) {
+                                    keysession.splice(h, 1)
+                                    h--;
+                                }
+                            }
+                        }
+                        count = keysession.length;
+                        grouplist[i][0][applynewkey] = count;
+                    }
+                }
+                else if (this.isvalidStringKey(applystring)) {
+                    for (var i = 0; i < grouplist.length; i++) {
+                        var sessions = grouplist[i];
+                        var count = 0;
+                        var keysession: any = []
+                        for (var j = 1; j < sessions.length; j++) {
+                            if (sessions[j][applystring] != 'undefined' &&
+                                sessions[j][applystring] != null &&
+                                sessions[j][applystring].length > 0)
+                                keysession.push(sessions[j][applystring])
+                        }
+                        if (keysession.length > 1) {
+                            keysession.sort();
+                            for (var h = 0; h < keysession.length - 1; h++) {
+                                if (keysession[h] === keysession[h + 1]) {
+                                    keysession.splice(h, 1)
+                                    h--;
+                                }
+                            }
+                        }
+                        count = keysession.length;
+                        grouplist[i][0][applynewkey] = count;
+                    }
+                }
+                else
+                    throw Error
+            }
+
+        }
+        for (var i = 0; i < grouplist.length; i++){
+            applylist.push(grouplist[i][0]);
+        }
+        return applylist;
     }
 
 }
