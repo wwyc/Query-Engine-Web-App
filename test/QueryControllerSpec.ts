@@ -14,7 +14,7 @@ import {QueryRequest, default as QueryController} from "../src/controller/QueryC
 var fs = require('fs');
 
 describe("QueryController", function () {
-            this.timeout(10000);
+            this.timeout(100000);
 
             var zipFileContents: string = null;
             var facade: InsightFacade = null;
@@ -37,7 +37,6 @@ describe("QueryController", function () {
                 facade = new InsightFacade();
             });
 
-/*
     it ("should be able to Find the average for all cpsc courses in up order", function() {
         var that = this;
         Log.trace("Starting test: " + that.test.title);
@@ -104,6 +103,5 @@ describe("QueryController", function () {
             });
         });
     });
-*/
 
 });

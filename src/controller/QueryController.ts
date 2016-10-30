@@ -6,6 +6,7 @@ import {Datasets, default as DatasetController} from "./DatasetController";
 import Log from "../Util";
 import {bodyParser} from "restify";
 import {stringify} from "querystring";
+import ValidKeyChecker from "../ValidKeyChecker";
 
 export interface QueryRequest {
     GET: string|string[];
@@ -21,6 +22,8 @@ export interface QueryResponse {
 
 export default class QueryController {
     private datasets: Datasets = null;
+    private static ValidKeyChecker = new ValidKeyChecker();
+
 
     constructor(datasets: Datasets) {
         this.datasets = datasets;
@@ -48,7 +51,7 @@ export default class QueryController {
         //Check GET keys
         if (typeof query.GET === 'string') {
             //check if GET key is valid & check if ORDER is equal in GET key
-            if (this.isvalidKey(query.GET) && (query.ORDER == null || query.ORDER == query.GET)) {
+            if (QueryController.ValidKeyChecker.isvalidKey(query.GET) && (query.ORDER == null || query.ORDER == query.GET)) {
                 isValidResult = true
             }
         } else if (Array.isArray(query.GET)) {
@@ -60,7 +63,7 @@ export default class QueryController {
             //gothrougheachelementofarrayandcheckifGETkeyisvalid
             for (var j = 0; j < Object.keys(query.GET).length; j++) {
                 if (query.GET[j].includes("_")) {
-                    if (!this.isvalidKey(query.GET[j])) {
+                    if (!QueryController.ValidKeyChecker.isvalidKey(query.GET[j])) {
                         return false
                     }
                 }
@@ -75,8 +78,6 @@ export default class QueryController {
                         }
                     }
                 } else if (typeof query.ORDER == 'object') {
-                    Log.trace(Object.keys(query.ORDER).toString())
-                    Log.trace(query.ORDER.hasOwnProperty("keys").toString())
 
                     isValidResult = true
                 }
@@ -89,12 +90,6 @@ export default class QueryController {
         } else {
             isValidResult = true
         }
-
-        //check WHERE key
-/*        if (Object.keys(query.WHERE).length < 1) {
-            return false
-        }*/
-
 
         //•	Kanga: APPLY without GROUP should not be valid.
         //•	Jonah: Empty GROUP should not be valid.
@@ -116,11 +111,10 @@ export default class QueryController {
             //•	Liberation: Group should contains only valid keys (separated by underscore).
             for (var i = 0; i < query.GROUP.length; i++) {
                 // check if all keys in GROUP are presented in GET String
-                if (!this.isvalidKey(query.GROUP[i])) {
+                if (!QueryController.ValidKeyChecker.isvalidKey(query.GROUP[i])) {
                     Log.trace("some keys in GROUP are not valid")
                     return false
                 }}
-
 
             //•	Kryptonite: All keys in GROUP should be presented in GET.
             for (var a = 0; a < query.GROUP.length; a++) {
@@ -158,18 +152,6 @@ export default class QueryController {
                     if((applyarray1.includes(query.GROUP[p])))
                     { ISKeyinbothGROUPandAPPLY = true }}
 
-               /* for (var applyOBJ of query.APPLY) {
-                    for (var q = 0; q < query.APPLY.length; q++) {
-
-                        var applynewkey = Object.keys(applyOBJ)[q];//coursesAvg
-                        var applyvalue = applyOBJ[Object.keys(applyOBJ)[q]];
-                        var applytoken = Object.keys(applyvalue)[q];//AVG
-                        var applystring = applyvalue[Object.keys(applyvalue)[q]];//courses_avg
-                        if (query.GROUP[p] == applystring) {
-                            ISKeyinbothGROUPandAPPLY = true
-                        }
-                    }
-                }*/
                 if (ISKeyinbothGROUPandAPPLY){
                     Log.trace("GROUP & APPLY cannot have the same keys")
                     return false
@@ -182,16 +164,16 @@ export default class QueryController {
         if (typeof query.GET !== 'undefined'&& query.GET !== null)
         {
             if (typeof query.GET === 'string') {
-                if(this.isvalidKey(query.GET))
+                if(QueryController.ValidKeyChecker.isvalidKey(query.GET))
                 {  if (typeof query.GROUP !== 'undefined' && query.GROUP !== null&&
                     query.GROUP.length>0
                 )
-                    if(!this.contains(query.GET,query.GROUP))
+                    if(!QueryController.ValidKeyChecker.contains(query.GET,query.GROUP))
                     { Log.trace("All keys in GET should be in either GROUP or APPLY.")
                         return false;}
 
                         if (!query.GET.includes("_")) {
-                            if (!this.contains(query.GET, query.GROUP)) {
+                            if (!QueryController.ValidKeyChecker.contains(query.GET, query.GROUP)) {
                                 Log.trace("All keys in GET without underscore should be in APPLY.")
                                 return false;
                             }
@@ -292,8 +274,8 @@ export default class QueryController {
             finalResultObjArray = this.sortArray(finalResultObjArray, order);
         }
 
-        Log.trace("this is FINAL result:  " + JSON.stringify(finalResultObjArray))
-        Log.trace("this is FINAL result:  " + JSON.stringify({render: format, result: finalResultObjArray}))
+        // Log.trace("this is FINAL result:  " + JSON.stringify(finalResultObjArray))
+        // Log.trace("this is FINAL result:  " + JSON.stringify({render: format, result: finalResultObjArray}))
 
         return {render: format, result: finalResultObjArray};
     }
@@ -323,14 +305,6 @@ export default class QueryController {
                 { selectedSections.push(section) }
             }
 
-            /*   for (var key in sections) {
-             var section = sections[key]  */
-/*            for (var section of sections) {
-                if (this.parserEBNF(where, section)) {
-                    //add section to list if it meets WHERE criteria in query
-                    selectedSections.push(section)
-                }
-            }*/
         }
         return selectedSections;
     }
@@ -381,12 +355,6 @@ export default class QueryController {
                 for (var ORfilter of where['OR']) {
                     validList2.push(this.parserEBNF(ORfilter, section));
                 }
-                //    Log.trace("validList2:" + validList2);
-                /*     var ORfilter:any;
-                 for (var key in where['OR'])
-                 {
-                 ORfilter=  where['OR'][key];
-                 validList1.push(this.parserEBNF(ORfilter, section));}  */
 
                 valid = false;
 
@@ -407,7 +375,7 @@ export default class QueryController {
                 var whereKey1 = Object.keys(where['GT']).toString()
                 var whereValue1 = where['GT'][Object.keys(where['GT'])[0]]
 
-                if (this.isvalidKey(whereKey1) === false) {
+                if (QueryController.ValidKeyChecker.isvalidKey(whereKey1) === false) {
                     throw Error
                 }
                 ;
@@ -418,7 +386,7 @@ export default class QueryController {
             if (typeof where['EQ'] !== 'undefined') {
                 var whereKey2 = Object.keys(where['EQ']).toString()
                 var whereValue2 = where['EQ'][Object.keys(where['EQ'])[0]]
-                if (this.isvalidKey(whereKey2) === false) {
+                if (QueryController.ValidKeyChecker.isvalidKey(whereKey2) === false) {
                     throw Error
                 }
                 ;
@@ -430,7 +398,7 @@ export default class QueryController {
 
                 var whereKey3 = Object.keys(where['LT']).toString()
                 var whereValue3 = where['LT'][Object.keys(where['LT'])[0]]
-                if (this.isvalidKey(whereKey3) === false) {
+                if (QueryController.ValidKeyChecker.isvalidKey(whereKey3) === false) {
                     throw Error
                 }
                 ;
@@ -443,7 +411,7 @@ export default class QueryController {
 
             var whereKey4 = Object.keys(where['IS']).toString();
             var whereValue4 = where['IS'][Object.keys(where['IS'])[0]];
-            if (this.isvalidKey(whereKey4) === false) {
+            if (QueryController.ValidKeyChecker.isvalidKey(whereKey4) === false) {
                 throw Error
             }
             ;
@@ -509,23 +477,6 @@ export default class QueryController {
 
     }
 
-    /*    public sortArray(resultArray: any, order: any) {
-     //Log.trace("INSIDE sorting!")
-     resultArray.sort(function (a: any, b: any) {
-     var value1 = a[order];
-     //Log.trace("value1  " + value1)
-     var value2 = b[order];
-     if (value1 < value2) {
-     return -1;
-     }
-     if (value1 > value2) {
-     return 1;
-     }
-     return 0;
-     });
-     return resultArray;
-     }*/
-
     public sortArray(resultArray: any, order: any) {
         // Log.trace("INSIDE sorting!")
         resultArray.sort(function (a: any, b: any) {
@@ -585,7 +536,7 @@ export default class QueryController {
         });
         return resultArray;
     }
-
+/*
     public isvalidKey(key: any): any {
         var isvalidKeyResult: any
         if (key === "courses_dept" || key === "courses_id" || key === "courses_avg" ||
@@ -633,7 +584,7 @@ export default class QueryController {
             }
         }
         return false;
-    }
+    }*/
 
     public dealWithGroup(group:any,intermediate:any):any{
         var groups:any=[];
@@ -690,7 +641,7 @@ export default class QueryController {
             var applytoken=Object.keys(applyvalue)[0];//AVG
             var applystring=applyvalue[Object.keys(applyvalue)[0]];//courses_avg
             if (applytoken === 'AVG') {
-                if(!this.isvalidNumberKey(applystring))
+                if(!QueryController.ValidKeyChecker.isvalidNumberKey(applystring))
                     throw Error;
                 else
                     for (var i = 0; i < grouplist.length; i++) {
@@ -712,7 +663,7 @@ export default class QueryController {
             }
 
             if (applytoken === 'MIN') {
-                if(!this.isvalidNumberKey(applystring))
+                if(!QueryController.ValidKeyChecker.isvalidNumberKey(applystring))
                     throw Error;
                 else
                     for (var i = 0; i < grouplist.length; i++) {
@@ -730,7 +681,7 @@ export default class QueryController {
             }
 
             if (applytoken === 'MAX') {
-                if(!this.isvalidNumberKey(applystring))
+                if(!QueryController.ValidKeyChecker.isvalidNumberKey(applystring))
                     throw Error;
                 else
                     for (var i = 0; i < grouplist.length; i++) {
@@ -749,7 +700,7 @@ export default class QueryController {
 
 
             if (applytoken === 'COUNT') {
-                if (this.isvalidNumberKey(applystring)) {
+                if (QueryController.ValidKeyChecker.isvalidNumberKey(applystring)) {
                     for (var i = 0; i < grouplist.length; i++) {
                         var sessions = grouplist[i];
                         var count = 0;
@@ -772,7 +723,7 @@ export default class QueryController {
                         grouplist[i][0][applynewkey] = count;
                     }
                 }
-                else if (this.isvalidStringKey(applystring)) {
+                else if (QueryController.ValidKeyChecker.isvalidStringKey(applystring)) {
                     for (var i = 0; i < grouplist.length; i++) {
                         var sessions = grouplist[i];
                         var count = 0;

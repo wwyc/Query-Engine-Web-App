@@ -142,12 +142,12 @@ export default class InsightFacade implements IInsightFacade {
                         Log.trace('InsightFascade::performQuery(..) - SUCCESS')
                         /*return*/ fulfill({code: 200, body: queryResult})
                     } else {
-                        throw Error
-
+                        Log.trace('InsightFascade::performQuery Failed(..) - ERROR: ');
+                        return reject({code: 400, body: {error: "invalid query"}})
                     }
             } catch (err) {
                 Log.trace('InsightFascade::performQuery Failed(..) - ERROR: ' + err.message);
-                reject({code: 400, body: {error: "invalid query"}})
+                return reject({code: 400, body: {error: "invalid query"}})
             }
         })
     }

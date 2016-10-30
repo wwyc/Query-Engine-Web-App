@@ -83,7 +83,7 @@ export default class RouteHandler {
     }
 //add 424(check if on memory)
     public static postQuery(req:restify.Request,res:restify.Response,next:restify.Next){
-       // try{
+        try{
             Log.trace('RouteHandler::postQuery(..)-params:'+JSON.stringify(req.params));
 
             let query:QueryRequest=req.params;
@@ -97,7 +97,10 @@ export default class RouteHandler {
                 } else if (response.code == 424){
                     res.json(424, {missing: ['courses']});
                     //next();
-                } else {throw Error}
+                } else {
+                    Log.error('RouteHandler::postQuery(..)-ERROR: 400');
+                    res.json(400, {error: "Invalid Query"});
+                }
 
 
                 /*else if (response.code == 400){
@@ -111,11 +114,11 @@ export default class RouteHandler {
                 next();
             })
 
-/*        }catch(err){
+        }catch(err){
             Log.error('RouteHandler::postQuery(..)-ERROR:'+err.message);
-            res.json(400, {err: "400"});
+            res.json(400, {error: "Invalid Query"});
             next();
-        }*/
+        }
         //return next();
     }
 

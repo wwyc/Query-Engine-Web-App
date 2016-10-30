@@ -243,8 +243,6 @@ export default class DatasetController {
         }
     }
 
-
-
     public isEmpty(myObject: any) {
         for(var key in myObject) {
             if (myObject.hasOwnProperty(key)) {
