@@ -177,7 +177,7 @@ export default class QueryController {
             }}
 
         //Kwyjibo: All keys in GET should be in either GROUP or APPLY.
-        // Lorax: All keys in GET that are not separated by an underscore should appe
+        // Lorax: All keys in GET that are not separated by an underscore should be in apply
 
         if (typeof query.GET !== 'undefined'&& query.GET !== null)
         {
@@ -189,27 +189,45 @@ export default class QueryController {
                     if(!this.contains(query.GET,query.GROUP))
                     { Log.trace("All keys in GET should be in either GROUP or APPLY.")
                         return false;}
+
+                        if (!query.GET.includes("_")) {
+                            if (!this.contains(query.GET, query.GROUP)) {
+                                Log.trace("All keys in GET without underscore should be in APPLY.")
+                                return false;
+                            }
+                        }
                 }
                 else
                     return false;
             }
             else if(Array.isArray(query.GET))
-            {  for (var s=0;s<query.GET.length;s++)
-            {if(query.GET[s].includes("_"))
-            {if(typeof query.GROUP !== 'undefined' && query.GROUP !== null
-                && query.GROUP.length>0)
-            { if(!(query.GROUP.includes(query.GET[s])))
-            {  Log.trace("All keys in GET should be in either GROUP or APPLY.")
-                return false; }}}
-            else
-            {  if(typeof query.APPLY !== 'undefined' && query.APPLY !== null&&
-                query.APPLY.length>0)
-            { var applyarray1:any=[]
-                for(var applyObject of query.APPLY)
-                {applyarray1.push(Object.keys(applyObject)[0])}
-                if(!(applyarray1.includes(query.GET[s])))
-                { Log.trace("All keys in GET should be in either GROUP or APPLY.")
-                    return false; }}}}
+            {  for (var s=0;s<query.GET.length;s++) {
+                if (query.GET[s].includes("_")) {
+                    if (typeof query.GROUP !== 'undefined' && query.GROUP !== null
+                        && query.GROUP.length > 0) {
+                        if (!(query.GROUP.includes(query.GET[s]))) {
+                            Log.trace("All keys in GET with underscore should be in GROUP.")
+                            return false;
+                        }
+                    }
+                }  else if (!query.GET[s].includes("_")) {
+
+                    if(query.APPLY.length < 0){return false}
+
+                        if (typeof query.APPLY !== 'undefined' && query.APPLY !== null /*&&
+                            query.APPLY.length > 0*/) {
+                            var applyarray1: any = []
+                            for (var applyObject of query.APPLY) {
+                                applyarray1.push(Object.keys(applyObject)[0])
+                            }
+                            if (!(applyarray1.includes(query.GET[s]))) {
+                                Log.trace("All keys in GET without underscore should be in APPLY.")
+                                return false;
+                            }
+                        }
+
+                }
+            }
             }}
 
         //Empty apply object should be accepted
