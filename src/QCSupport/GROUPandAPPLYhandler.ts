@@ -96,7 +96,7 @@ export default class GAhandler {
                         {   /*if(sessions[j][applystring]!='undefined'&&
                          sessions[j][applystring]!=null)  */
                             if (sessions[j][applystring]<min)
-                                min=sessions[1][applystring]}
+                                min=sessions[i][applystring]}
 
                         grouplist[i][0][applynewkey]=min;
                     }

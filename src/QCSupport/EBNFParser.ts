@@ -20,7 +20,7 @@ export default class EBNFParser {
             && (typeof where['NOT'] == 'undefined')) {
             throw Error
         }
-        ;
+
 
         if (typeof where['AND'] !== 'undefined' || typeof where['OR'] !== 'undefined') {
             //  Log.trace("type1!!!")

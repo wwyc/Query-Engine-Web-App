@@ -52,8 +52,20 @@ export default class QueryController {
             return false;
         }
 
+        if (!(query.AS == "TABLE")){
+            return false
+        }
+
+        if ((dcontroller.isEmpty(query.AS))||(dcontroller.isEmpty(query.GET))||(dcontroller.isEmpty(query.AS))){
+            return false
+        }
+
         //Check GET keys
         if (typeof query.GET === 'string') {
+
+            if (!QueryController.ValidKeyChecker.isvalidKey(query.GET)){
+                return false
+            }
             //check if GET key is valid & check if ORDER is equal in GET key
             if (QueryController.ValidKeyChecker.isvalidKey(query.GET) && (query.ORDER == null || query.ORDER == query.GET)) {
                 isValidResult = true
@@ -232,8 +244,25 @@ export default class QueryController {
                 }}
         }
 
+        // Check WHERE keys
+        if (!dcontroller.isEmpty(query.WHERE)){
+            Log.trace(Object.keys(query.WHERE).toString())
+            for(var key of Object.keys(query.WHERE)){
 
+                Log.trace(key.toString())
 
+                if ((!(key == "AND"))
+                    && (!(key == "OR"))
+                    && (!(key == "GT"))
+                    && (!(key == "LT"))
+                    && (!(key == "EQ"))
+                    && (!(key == "IS"))
+                    && (!(key == "NOT"))
+                ) {return false}
+
+            }
+
+                }
 
         return isValidResult;
     }
