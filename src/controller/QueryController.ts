@@ -66,10 +66,6 @@ export default class QueryController {
                 }
             }
             //try to find GET key in ORDER
-            Log.trace("what is null order?   "  + (query.ORDER !== null).toString())
-
-            Log.trace("what is typeof order?   "  + (typeof query.ORDER == 'undefined').toString())
-
             if (query.ORDER !== null && !(typeof query.ORDER == 'undefined')) {
                 isValidResult = false
                 if (typeof query.ORDER == 'string') {
@@ -98,6 +94,139 @@ export default class QueryController {
 /*        if (Object.keys(query.WHERE).length < 1) {
             return false
         }*/
+
+
+        //•	Kanga: APPLY without GROUP should not be valid.
+        //•	Jonah: Empty GROUP should not be valid.
+        if (typeof query.APPLY !== 'undefined'/*&& query.APPLY !== null*/) {
+            if (typeof query.GROUP === 'undefined'||query.GROUP === null||query.GROUP.length===0) {
+                Log.trace("APPLY without GROUP should not be valid.")
+                Log.trace("Empty GROUP should not be valid.")
+                return false
+            }
+        }
+
+        //•	Kodiak: GROUP without APPLY should not be valid.
+        if (typeof query.GROUP !== 'undefined' /*&& query.GROUP !== null*/) {
+            if (typeof query.APPLY === 'undefined' ) {
+                Log.trace("GROUP without APPLY should not be valid.")
+                return false
+            }
+
+            //•	Liberation: Group should contains only valid keys (separated by underscore).
+            for (var i = 0; i < query.GROUP.length; i++) {
+                // check if all keys in GROUP are presented in GET String
+                if (!this.isvalidKey(query.GROUP[i])) {
+                    Log.trace("some keys in GROUP are not valid")
+                    return false
+                }}
+
+
+            //•	Kryptonite: All keys in GROUP should be presented in GET.
+            for (var a = 0; a < query.GROUP.length; a++) {
+                //if GET is a string
+                if (typeof query.GET ==='string') {
+                    if (!(query.GROUP[a] === query.GET)) {
+                        Log.trace("All keys in GROUP should be presented in GET.")
+                        return false
+                    }
+                } else {
+                    // check if all keys in GROUP are presented in GET Array
+                    var ISinGetKey = false
+                    for (var j = 0; j < query.GET.length; j++) {
+                        if (query.GROUP[a] === query.GET[j]) {
+                            ISinGetKey = true
+                        }
+                    }
+                    if (!ISinGetKey) {
+                        Log.trace("All keys in GROUP should be presented in GET.")
+                        return false
+                    }
+                }
+            }
+
+
+            //•	Laguna: If a key appears in GROUP or in APPLY, it cannot appear in the other one.
+            for (var p = 0; p < query.GROUP.length; p++) {
+                var ISKeyinbothGROUPandAPPLY = false
+
+                if(typeof query.APPLY !== 'undefined' && query.APPLY !== null&&
+                    query.APPLY.length>0)
+                { var applyarray1:any=[]
+                    for(var applyObject of query.APPLY)
+                    {applyarray1.push(Object.keys(applyObject)[0])}
+                    if((applyarray1.includes(query.GROUP[p])))
+                    { ISKeyinbothGROUPandAPPLY = true }}
+
+               /* for (var applyOBJ of query.APPLY) {
+                    for (var q = 0; q < query.APPLY.length; q++) {
+
+                        var applynewkey = Object.keys(applyOBJ)[q];//coursesAvg
+                        var applyvalue = applyOBJ[Object.keys(applyOBJ)[q]];
+                        var applytoken = Object.keys(applyvalue)[q];//AVG
+                        var applystring = applyvalue[Object.keys(applyvalue)[q]];//courses_avg
+                        if (query.GROUP[p] == applystring) {
+                            ISKeyinbothGROUPandAPPLY = true
+                        }
+                    }
+                }*/
+                if (ISKeyinbothGROUPandAPPLY){
+                    Log.trace("GROUP & APPLY cannot have the same keys")
+                    return false
+                }
+            }}
+
+        //Kwyjibo: All keys in GET should be in either GROUP or APPLY.
+        // Lorax: All keys in GET that are not separated by an underscore should appe
+
+        if (typeof query.GET !== 'undefined'&& query.GET !== null)
+        {
+            if (typeof query.GET === 'string') {
+                if(this.isvalidKey(query.GET))
+                {  if (typeof query.GROUP !== 'undefined' && query.GROUP !== null&&
+                    query.GROUP.length>0
+                )
+                    if(!this.contains(query.GET,query.GROUP))
+                    { Log.trace("All keys in GET should be in either GROUP or APPLY.")
+                        return false;}
+                }
+                else
+                    return false;
+            }
+            else if(Array.isArray(query.GET))
+            {  for (var s=0;s<query.GET.length;s++)
+            {if(query.GET[s].includes("_"))
+            {if(typeof query.GROUP !== 'undefined' && query.GROUP !== null
+                && query.GROUP.length>0)
+            { if(!(query.GROUP.includes(query.GET[s])))
+            {  Log.trace("All keys in GET should be in either GROUP or APPLY.")
+                return false; }}}
+            else
+            {  if(typeof query.APPLY !== 'undefined' && query.APPLY !== null&&
+                query.APPLY.length>0)
+            { var applyarray1:any=[]
+                for(var applyObject of query.APPLY)
+                {applyarray1.push(Object.keys(applyObject)[0])}
+                if(!(applyarray1.includes(query.GET[s])))
+                { Log.trace("All keys in GET should be in either GROUP or APPLY.")
+                    return false; }}}}
+            }}
+
+        //Empty apply object should be accepted
+        //Malibu: APPLY rules should be unique.
+        if (typeof query.APPLY !== 'undefined'&& query.APPLY !== null)
+        {   var applyarray:any=[]
+            for(var applyObject of query.APPLY)
+            {applyarray.push(Object.keys(applyObject)[0])}
+            if(applyarray.length>1)
+            {  applyarray.sort();
+                for(var h=0; h<applyarray.length-1;h++)
+                {
+                    if(applyarray[h]===applyarray[h+1])
+                    { Log.trace("duplicate keys found in APPLY")
+                        return false;}
+                }}
+        }
 
 
 
