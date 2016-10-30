@@ -6,7 +6,10 @@ import {Datasets, default as DatasetController} from "./DatasetController";
 import Log from "../Util";
 import {bodyParser} from "restify";
 import {stringify} from "querystring";
-import ValidKeyChecker from "../ValidKeyChecker";
+import ValidKeyChecker from "../QCSupport/ValidKeyChecker";
+import EBNFParser from "../QCSupport/EBNFParser";
+import GAhandler from "../QCSupport/GROUPandAPPLYhandler";
+import ResultsHandler from "../QCSupport/ResultsHandler";
 
 export interface QueryRequest {
     GET: string|string[];
@@ -22,7 +25,10 @@ export interface QueryResponse {
 
 export default class QueryController {
     private datasets: Datasets = null;
-    private static ValidKeyChecker = new ValidKeyChecker();
+    public static ValidKeyChecker = new ValidKeyChecker();
+    private static EBNFParser = new EBNFParser();
+    private static GAhandler = new GAhandler();
+    private static ResultsHandler = new ResultsHandler();
 
 
     constructor(datasets: Datasets) {
@@ -42,8 +48,6 @@ export default class QueryController {
             || (query.AS == null || typeof query.AS == 'undefined')
             || (query.GET == null || typeof query.GET == 'undefined')
             || (query.WHERE == null || typeof query.WHERE == 'undefined')
-        /*            ||(Object.keys(query).length<2)
-         ||(!(query.AS=="TABLE"))*/
         ) {
             return false;
         }
@@ -258,20 +262,20 @@ export default class QueryController {
 
         if(group!==null&&typeof group!=='undefined'&& group.length>0)
         {
-            intermediate=this.dealWithGroup(group,intermediate)
+            intermediate=QueryController.GAhandler.dealWithGroup(group,intermediate)
             if(apply!==null&&typeof apply!=='undefined'&&apply.length>0)
-            { intermediate=this.dealWithApply(apply,intermediate)}
+            { intermediate=QueryController.GAhandler.dealWithApply(apply,intermediate)}
             else
             { for(var h=0;h<intermediate.length;h++ )
                 intermediate[h]=intermediate[h][0]
             }
         }
 
-        var finalResultObjArray: any = this.represent(get, intermediate);
+        var finalResultObjArray: any = QueryController.ResultsHandler.represent(get, intermediate);
 
         //Do this if order was requested
         if (order !== null) {
-            finalResultObjArray = this.sortArray(finalResultObjArray, order);
+            finalResultObjArray = QueryController.ResultsHandler.sortArray(finalResultObjArray, order);
         }
 
         // Log.trace("this is FINAL result:  " + JSON.stringify(finalResultObjArray))
@@ -298,7 +302,7 @@ export default class QueryController {
 
             for (var section of sections) {
                 if(where!=null&&Object.keys(where).length>0&& where!=undefined)
-                { if (this.parserEBNF(where, section)) {
+                { if (QueryController.EBNFParser.parseEBNF(where, section)) {
                     //add section to list if it meets WHERE criteria in query
                     selectedSections.push(section)}}
                 else
@@ -317,446 +321,15 @@ export default class QueryController {
         return prefix;
     }*/
 
-    public parserEBNF(where: any, section: any) {
-
-        let valid = true;
-
-        if ((typeof where['AND'] == 'undefined')
-            && (typeof where['OR'] == 'undefined')
-            && (typeof where['GT'] == 'undefined')
-            && (typeof where['LT'] == 'undefined')
-            && (typeof where['EQ'] == 'undefined')
-            && (typeof where['IS'] == 'undefined')
-            && (typeof where['NOT'] == 'undefined')) {
-            throw Error
-        }
-        ;
-
-        if (typeof where['AND'] !== 'undefined' || typeof where['OR'] !== 'undefined') {
-            //  Log.trace("type1!!!")
-            if (typeof where['AND'] !== 'undefined') {
-                var validList1: any = [];
-                for (var ANDfilter of where['AND']) {
-                    validList1.push(this.parserEBNF(ANDfilter, section));
-                }
-                //  Log.trace("validList1" + validList1);
-
-                //  Log.trace("validlist1: "+validList1.length);
-                for (var eachValid1 of validList1) {
-                    if (eachValid1 === false)
-                        valid = false;
-                }
-            }
-
-            if (typeof where['OR'] !== 'undefined') {
 
 
-                var validList2: any = [];
-                for (var ORfilter of where['OR']) {
-                    validList2.push(this.parserEBNF(ORfilter, section));
-                }
-
-                valid = false;
-
-                for (var eachValid2 of validList2) {
-                    if (eachValid2 === true) {
-                        valid = true
-
-                    }
-                }
-            }
-        }
 
 
-        if (typeof where['GT'] || typeof where['EQ'] || typeof where['LT'] !== 'undefined') {
-
-            if (typeof where['GT'] !== 'undefined') {
-
-                var whereKey1 = Object.keys(where['GT']).toString()
-                var whereValue1 = where['GT'][Object.keys(where['GT'])[0]]
-
-                if (QueryController.ValidKeyChecker.isvalidKey(whereKey1) === false) {
-                    throw Error
-                }
-                ;
-
-                valid = valid && (section[whereKey1] > whereValue1);
-            }
-
-            if (typeof where['EQ'] !== 'undefined') {
-                var whereKey2 = Object.keys(where['EQ']).toString()
-                var whereValue2 = where['EQ'][Object.keys(where['EQ'])[0]]
-                if (QueryController.ValidKeyChecker.isvalidKey(whereKey2) === false) {
-                    throw Error
-                }
-                ;
-                valid = valid && (((section[whereKey2])) === whereValue2);
-
-            }
-
-            if (typeof where['LT'] !== 'undefined') {
-
-                var whereKey3 = Object.keys(where['LT']).toString()
-                var whereValue3 = where['LT'][Object.keys(where['LT'])[0]]
-                if (QueryController.ValidKeyChecker.isvalidKey(whereKey3) === false) {
-                    throw Error
-                }
-                ;
-                valid = valid && (section[whereKey3] < whereValue3);
-
-            }
-        }
-
-        if (typeof where['IS'] !== 'undefined') {
-
-            var whereKey4 = Object.keys(where['IS']).toString();
-            var whereValue4 = where['IS'][Object.keys(where['IS'])[0]];
-            if (QueryController.ValidKeyChecker.isvalidKey(whereKey4) === false) {
-                throw Error
-            }
-            ;
-            var sectionWhere = section[whereKey4];
-            if (sectionWhere !== "") {
-                if (whereValue4.substring(0, 1) === "*" && whereValue4.substring(whereValue4.length - 1, whereValue4.length) === "*") {
-                    var whereValue4 = whereValue4.split("*").join("");
-                    valid = valid && sectionWhere.includes(whereValue4);
-                }
-                else if (whereValue4.substring(0, 1) === "*") {
-                    var whereValue4 = whereValue4.split("*").join("");
-                    valid = valid && (sectionWhere.substring(sectionWhere.length - whereValue4.length, sectionWhere.length) === whereValue4)
-                }
-                else if (whereValue4.substring(whereValue4.length - 1, whereValue4.length) === "*") {
-                    var whereValue4 = whereValue4.split("*").join("");
-                    valid = valid && (sectionWhere.substring(0, whereValue4.length) === whereValue4)
-                }
-                else {
-                    valid = valid && (sectionWhere === whereValue4);
-                }
-            }
-            else
-                valid = false;
-        }
-
-        if (typeof where['NOT'] !== 'undefined') {
-            valid = valid && (!this.parserEBNF(where['NOT'], section));
-        }
-
-        return valid;
-    }
-
-    /**
-     * Find the value from each section given key in GET
-     *
-     * @returns object for final result{[id: string: {}} returns empty if nothing was found
-     */
-    public represent(GETInput: any, sectionArray: any) {
-
-        //Log.trace("what is type of getArray:"  + Array.isArray(getArray))
-        var resultArray: any = []
-
-// Check to see if GET is string or Array
-        if (typeof GETInput === 'string') {
-            for (var sectionX of sectionArray) {
-                var resultObj: any = {}
-                resultObj[GETInput] = sectionX[GETInput]
-                resultArray.push(resultObj)
-            }
-        }
-        else if (Array.isArray(GETInput)) {
-
-            for (var eachSection of sectionArray) {
-                var resultObj1: any = {}
-                for (var j = 0; j < Object.keys(GETInput).length; j++) {
-                    var key = GETInput[j]
-                    resultObj1[key] = eachSection[key];
-                }
-                resultArray.push(resultObj1)
-            }
-        }
-        return resultArray;
-
-    }
-
-    public sortArray(resultArray: any, order: any) {
-        // Log.trace("INSIDE sorting!")
-        resultArray.sort(function (a: any, b: any) {
-            if (typeof order == "string") {
-                //orderkey is a string
-                var value1 = a[order];
-                //Log.trace("value1  " + value1)
-                var value2 = b[order];
-                if (value1 < value2) {
-                    return -1;
-                }
-                if (value1 > value2) {
-                    return 1;
-                }
-                return 0;
-
-            }
-
-            else if (typeof order == "object"){
-                var orderkey: any = order['keys'];//orderkey is an array
-                var i = 0;
-                if (order['dir'] === 'UP')// lowers come first
-                {
-                    while (i < orderkey.length) {
-                        var value1 = a[orderkey[i]];
-                        var value2 = b[orderkey[i]];
-                        //    Log.trace("value1,2up"+value1+ value2)
-                        if (value1 < value2) {
-                            return -1;
-                        }
-                        if (value1 > value2) {
-                            return 1;
-                        }
-                        else
-                            i++;
-                    }
-                    return 0;
-                }
-
-                if (order['dir'] === 'DOWN') {
-                    while (i < orderkey.length) {
-                        var value1 = a[orderkey[i]];
-                        var value2 = b[orderkey[i]];
-                        //   Log.trace("value1,2down"+value1+ value2)
-                        if (value1 < value2) {
-                            return 1;
-                        }
-                        if (value1 > value2) {
-                            return -1;
-                        }
-                        else
-                            i++;
-                    }
-                    return 0;
-                }
-            }
-        });
-        return resultArray;
-    }
-/*
-    public isvalidKey(key: any): any {
-        var isvalidKeyResult: any
-        if (key === "courses_dept" || key === "courses_id" || key === "courses_avg" ||
-            key === "courses_instructor" || key === "courses_title" || key === "courses_pass" ||
-            key === "courses_fail" || key === "courses_audit"||key=="courses_uuid"
-        ) {
-            isvalidKeyResult = true;
-        } else {
-            isvalidKeyResult = false;
-        }
-        return isvalidKeyResult;
-    }
-
-    public isvalidNumberKey(key: any): any {
-        var isvalidKeyResult: any
-        if (key === "courses_avg" ||
-            key === "courses_pass" ||
-            key === "courses_fail" || key === "courses_audit"
-        ) {
-            isvalidKeyResult = true;
-        } else {
-            isvalidKeyResult = false;
-        }
-        return isvalidKeyResult;
-    }
-    public isvalidStringKey(key: any): any {
-        var isvalidKeyResult: any
-        if (key === "courses_dept" ||
-            key === "courses_id" ||
-            key === "courses_instructor" || key === "courses_title"||key==="courses_uuid"
-        ) {
-            isvalidKeyResult = true;
-        } else {
-            isvalidKeyResult = false;
-        }
-        return isvalidKeyResult;
-    }
 
 
-    public contains(a:any, array:any):boolean{
-
-        for (var i = 0; i < a.length; i++) {
-            if (array[i] === a) {
-                return true;
-            }
-        }
-        return false;
-    }*/
-
-    public dealWithGroup(group:any,intermediate:any):any{
-        var groups:any=[];
-        while(intermediate.length!=0)
-        {   var sessions:any=[];
-            var lastintermediates:any=[];
-            var groupvalue:any={};
-
-            for (var a=0;a<group.length;a++)
-            {  var lastintermediate:any;
-                lastintermediate=intermediate[0][group[a]];
-                lastintermediates.push(lastintermediate);
-                groupvalue[group[a]]=intermediate[0][group[a]];
-            }
-            sessions.push(groupvalue);
-            for (var i=0;i<intermediate.length;i++)
-            {  if(this.checkGroupCorrect(group,intermediate[i],lastintermediates))
-            {   sessions.push(intermediate[i]);
-                intermediate.splice(i,1);
-                i--;
-            }
-            }
-            groups.push(sessions);
-        }
-        Log.trace("groups length"+groups.length);
-        return groups;
-    }
-
-    public checkGroupCorrect(group:any,intermediate:any,lastintermediates:any):boolean{
-        var validlist:any=[];
-        var valid:boolean=true;
-        for (var i=0;i< group.length;i++)
-        {
-            if(intermediate[group[i]]===lastintermediates[i])
-            {validlist.push(true);}
-            else
-            { validlist.push(false);}
-        }
-
-        for (var eachValid of validlist) {
-            if (eachValid === false)
-                valid = false;
-        }
-        return valid;
-    }
-
-    public dealWithApply(apply:any,grouplist:any):any {
-        var applylist:any=[];
-
-        Log.trace("jump into apply")
-        for (var applyobject of apply) {
-            var applynewkey=Object.keys(applyobject)[0];//coursesAvg
-            var applyvalue=applyobject[Object.keys(applyobject)[0]];
-            var applytoken=Object.keys(applyvalue)[0];//AVG
-            var applystring=applyvalue[Object.keys(applyvalue)[0]];//courses_avg
-            if (applytoken === 'AVG') {
-                if(!QueryController.ValidKeyChecker.isvalidNumberKey(applystring))
-                    throw Error;
-                else
-                    for (var i = 0; i < grouplist.length; i++) {
-                        var sessions = grouplist[i];
-
-                        var sum: number=0;
-                        var length:number=0;
-                        for (var j=1;j<sessions.length;j++)
-                        {
-                            /*if( sessions[j][applystring]!=='undefined'&&
-                             sessions[j][applystring]!=null)   */
-                            sum+=sessions[j][applystring];
-                            length++;
-                        }
-                        var averageValue: any;
-                        averageValue = parseFloat((sum / length).toFixed(2));
-                        grouplist[i][0][applynewkey]=averageValue;
-                    }
-            }
-
-            if (applytoken === 'MIN') {
-                if(!QueryController.ValidKeyChecker.isvalidNumberKey(applystring))
-                    throw Error;
-                else
-                    for (var i = 0; i < grouplist.length; i++) {
-                        var sessions = grouplist[i];
-                        var minsession:any=[];
-                        var min:number=sessions[1][applystring];
-                        for(var j=1;j<sessions.length;j++)
-                        {   /*if(sessions[j][applystring]!='undefined'&&
-                         sessions[j][applystring]!=null)  */
-                            if (sessions[j][applystring]<min)
-                                min=sessions[1][applystring]}
-
-                        grouplist[i][0][applynewkey]=min;
-                    }
-            }
-
-            if (applytoken === 'MAX') {
-                if(!QueryController.ValidKeyChecker.isvalidNumberKey(applystring))
-                    throw Error;
-                else
-                    for (var i = 0; i < grouplist.length; i++) {
-                        var sessions = grouplist[i];
-                        var maxsession:any=[];
-                        var max:number=sessions[1][applystring];
-                        for(var j=1;j<sessions.length;j++)
-                        { /* if(sessions[j][applystring]!='undefined'&&
-                         sessions[j][applystring]!=null)  */
-                            if(sessions[j][applystring]>max)
-                                max=sessions[j][applystring]}
-
-                        grouplist[i][0][applynewkey]=max;
-                    }
-            }
 
 
-            if (applytoken === 'COUNT') {
-                if (QueryController.ValidKeyChecker.isvalidNumberKey(applystring)) {
-                    for (var i = 0; i < grouplist.length; i++) {
-                        var sessions = grouplist[i];
-                        var count = 0;
-                        var keysession: any = []
-                        for (var j = 1; j < sessions.length; j++) {
-                            /*   if (sessions[j][applystring] != 'undefined' &&
-                             sessions[j][applystring] != null)  */
-                            keysession.push(sessions[j][applystring])
-                        }
-                        if (keysession.length > 1) {
-                            keysession.sort();
-                            for (var h = 0; h < keysession.length - 1; h++) {
-                                if (keysession[h] === keysession[h + 1]) {
-                                    keysession.splice(h, 1)
-                                    h--;
-                                }
-                            }
-                        }
-                        count = keysession.length;
-                        grouplist[i][0][applynewkey] = count;
-                    }
-                }
-                else if (QueryController.ValidKeyChecker.isvalidStringKey(applystring)) {
-                    for (var i = 0; i < grouplist.length; i++) {
-                        var sessions = grouplist[i];
-                        var count = 0;
-                        var keysession: any = []
-                        for (var j = 1; j < sessions.length; j++) {
-                            if (sessions[j][applystring] != 'undefined' &&
-                                sessions[j][applystring] != null &&
-                                sessions[j][applystring].length > 0)
-                                keysession.push(sessions[j][applystring])
-                        }
-                        if (keysession.length > 1) {
-                            keysession.sort();
-                            for (var h = 0; h < keysession.length - 1; h++) {
-                                if (keysession[h] === keysession[h + 1]) {
-                                    keysession.splice(h, 1)
-                                    h--;
-                                }
-                            }
-                        }
-                        count = keysession.length;
-                        grouplist[i][0][applynewkey] = count;
-                    }
-                }
-                else
-                    throw Error
-            }
 
-        }
-        for (var i = 0; i < grouplist.length; i++){
-            applylist.push(grouplist[i][0]);
-        }
-        return applylist;
-    }
 
 }
 

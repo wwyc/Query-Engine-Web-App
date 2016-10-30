@@ -36,7 +36,6 @@ export default class DatasetController {
     public getDataset(id: string): any {
         // TODO: this should check if the dataset is on disk in ./data if it is not already in memory.
 
-
         // check if dataset/memory is empty
         if (!(this.isEmpty(this.datasets) || (typeof this.datasets == "undefined"))){
 
@@ -51,10 +50,7 @@ export default class DatasetController {
 
             //check if dataset is in disk
             var fs = require('fs');
-
-            //Log.trace(process.cwd())
             this.relativePath = process.cwd()
-            Log.trace("inside getdataset(id)    " + this.relativePath)
             Log.trace("inside getdataset(id)    " + this.relativePath + "/data/courses.json")
 
 
@@ -67,7 +63,6 @@ export default class DatasetController {
             }
 
             this.datasets[id] = JSON.parse(data);
-            //Log.trace("inside getdataset() method" + JSON.stringify(this.datasets[id]))
             }
 
         return this.datasets[id];
@@ -92,7 +87,6 @@ export default class DatasetController {
             var Files=(fs1.readdirSync(that.relativePath+"/data/"))
 
             for(var file of Files){
-
                 var fileName=file.split(".")[0]
                 this.datasets[fileName]=this.getDataset(fileName)
             }
@@ -156,35 +150,7 @@ export default class DatasetController {
 
 
                         if (id == "courses") {
-
-                            let courseMap: any = {}
-
-                            for (var objs of endResult) {
-
-                            var courseObj = JSON.parse(objs)
-
-                                if (courseObj.result.length !== 0) {
-
-                                    var sessions: any = []
-                                    for (var obj of  courseObj.result) {
-                                        var session = new Session()
-                                        session.courses_dept = obj["Subject"]
-                                        session.courses_id = obj["Course"]
-                                        session.courses_avg = obj["Avg"]
-                                        session.courses_instructor = obj["Professor"]
-                                        session.courses_title = obj["Title"]
-                                        session.courses_pass = obj["Pass"]
-                                        session.courses_fail = obj["Fail"]
-                                        session.courses_audit = obj["Audit"]
-                                        session.courses_uuid=obj["id"].toString();
-                                        sessions.push(session)
-                                    }
-                                }
-
-                                if (typeof sessions !== "undefined") {
-                                    courseMap[session.courses_dept + session.courses_id] = sessions
-                                }
-                        }
+                            let courseMap = that.courseMapCreator(endResult)
                         processedDataset = courseMap
                         }
                         that.save(id, processedDataset)
@@ -199,9 +165,6 @@ export default class DatasetController {
                         throw Error
                     }
 
-
-                    //Log.trace("processedDataset FINAL type" + typeof processedDataset)
-
                 }).catch(function (err) {
                     Log.error('DatasetController::process(..) - unzip ERROR: ' + err.message);
                     reject(false);
@@ -215,13 +178,37 @@ export default class DatasetController {
 
     }
 
-    /**
-     * Writes the processed dataset to disk as 'id.json'. The function should overwrite
-     * any existing dataset with the same name.
-     *
-     * @param id
-     * @param processedDataset
-     */
+
+    public courseMapCreator(endResult: any) {
+
+        let courseMap: any = {}
+
+        for (var objs of endResult) {
+            var courseObj = JSON.parse(objs)
+            if (courseObj.result.length !== 0) {
+                var sessions: any = []
+                for (var obj of  courseObj.result) {
+                    var session = new Session()
+                    session.courses_dept = obj["Subject"]
+                    session.courses_id = obj["Course"]
+                    session.courses_avg = obj["Avg"]
+                    session.courses_instructor = obj["Professor"]
+                    session.courses_title = obj["Title"]
+                    session.courses_pass = obj["Pass"]
+                    session.courses_fail = obj["Fail"]
+                    session.courses_audit = obj["Audit"]
+                    session.courses_uuid=obj["id"].toString();
+                    sessions.push(session)
+                }
+            }
+            if (typeof sessions !== "undefined") {
+                courseMap[session.courses_dept + session.courses_id] = sessions
+            }
+        }
+        return courseMap
+    }
+
+
     public save(id: string, processedDataset: any) {
         // add it to the memory model
         this.datasets[id] = processedDataset;
@@ -234,9 +221,6 @@ export default class DatasetController {
 
         try {
             fs2.writeFileSync('data/' + id + '.json', datasetToSave, 'utf8')
-            //Log.trace("which directory and i in?"  + process.cwd())
-            //Log.trace("writting files success")
-
             this.relativePath = process.cwd()
         } catch(e){
             Log.trace("save dataset error" + e.message)
