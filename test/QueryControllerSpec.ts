@@ -1,7 +1,6 @@
-/*
-/!**
+/**
  * Created by rtholmes on 2016-10-31.
- *!/
+ */
 
 import {Datasets} from "../src/controller/DatasetController";
 import Log from "../src/Util";
@@ -38,8 +37,7 @@ describe("QueryController", function () {
                 facade = new InsightFacade();
             });
 
-
-
+/*
     it ("should be able to Find the average for all cpsc courses in up order", function() {
         var that = this;
         Log.trace("Starting test: " + that.test.title);
@@ -106,6 +104,6 @@ describe("QueryController", function () {
             });
         });
     });
+*/
 
 });
-*/

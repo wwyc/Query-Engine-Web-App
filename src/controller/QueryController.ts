@@ -10,7 +10,7 @@ import {stringify} from "querystring";
 export interface QueryRequest {
     GET: string|string[];
     WHERE: {};
-    ORDER: string;
+    ORDER?: string|{};
     AS: string;
 }
 
@@ -36,7 +36,6 @@ export default class QueryController {
             || (dcontroller.isEmpty(query))
             || (query.AS == null || typeof query.AS == 'undefined')
             || (query.GET == null || typeof query.GET == 'undefined')
-            || (dcontroller.isEmpty(query.GET))
             || (query.WHERE == null || typeof query.WHERE == 'undefined')
         /*            ||(Object.keys(query).length<2)
          ||(!(query.AS=="TABLE"))*/
@@ -51,6 +50,11 @@ export default class QueryController {
                 isValidResult = true
             }
         } else if (Array.isArray(query.GET)) {
+            //Metro: REST POST 400
+            if (query.GET.length == 0){
+                return false
+            }
+
             //gothrougheachelementofarrayandcheckifGETkeyisvalid
             for (var j = 0; j < Object.keys(query.GET).length; j++) {
                 if (!this.isvalidKey(query.GET[j])) {
@@ -58,16 +62,32 @@ export default class QueryController {
                 }
             }
             //try to find GET key in ORDER
-            if (query.ORDER !== null || typeof query.ORDER !== 'undefined') {
+            Log.trace("what is null order?   "  + (query.ORDER !== null).toString())
+
+            Log.trace("what is typeof order?   "  + (typeof query.ORDER == 'undefined').toString())
+
+            if (query.ORDER !== null && !(typeof query.ORDER == 'undefined')) {
                 isValidResult = false
-                for (var j = 0; j < Object.keys(query.GET).length; j++) {
-                    if (query.ORDER == null || query.GET[j] == query.ORDER) {
-                        isValidResult = true
+                if (typeof query.ORDER == 'string') {
+                    for (var j = 0; j < Object.keys(query.GET).length; j++) {
+                        if (query.ORDER == null || query.GET[j] == query.ORDER) {
+                            isValidResult = true
+                        }
                     }
+                } else if (typeof query.ORDER == 'object') {
+                    Log.trace(Object.keys(query.ORDER).toString())
+                    Log.trace(query.ORDER.hasOwnProperty("keys").toString())
+
+                    isValidResult = true
                 }
+            } else {
+                isValidResult = true
             }
+
+
+
         } else {
-            return false
+            isValidResult = true
         }
 
         //check WHERE key
@@ -315,7 +335,7 @@ export default class QueryController {
 
     }
 
-    public sortArray(resultArray: any, order: any) {
+/*    public sortArray(resultArray: any, order: any) {
         //Log.trace("INSIDE sorting!")
         resultArray.sort(function (a: any, b: any) {
             var value1 = a[order];
@@ -328,6 +348,66 @@ export default class QueryController {
                 return 1;
             }
             return 0;
+        });
+        return resultArray;
+    }*/
+
+    public sortArray(resultArray: any, order: any) {
+        // Log.trace("INSIDE sorting!")
+        resultArray.sort(function (a: any, b: any) {
+            if (typeof order == "string") {
+                //orderkey is a string
+                var value1 = a[order];
+                //Log.trace("value1  " + value1)
+                var value2 = b[order];
+                if (value1 < value2) {
+                    return -1;
+                }
+                if (value1 > value2) {
+                    return 1;
+                }
+                return 0;
+
+            }
+
+            else if (typeof order == "object"){
+                var orderkey: any = order['keys'];//orderkey is an array
+            var i = 0;
+            if (order['dir'] === 'UP')// lowers come first
+            {
+                while (i < orderkey.length) {
+                    var value1 = a[orderkey[i]];
+                    var value2 = b[orderkey[i]];
+                    //    Log.trace("value1,2up"+value1+ value2)
+                    if (value1 < value2) {
+                        return -1;
+                    }
+                    if (value1 > value2) {
+                        return 1;
+                    }
+                    else
+                        i++;
+                }
+                return 0;
+            }
+
+            if (order['dir'] === 'DOWN') {
+                while (i < orderkey.length) {
+                    var value1 = a[orderkey[i]];
+                    var value2 = b[orderkey[i]];
+                    //   Log.trace("value1,2down"+value1+ value2)
+                    if (value1 < value2) {
+                        return 1;
+                    }
+                    if (value1 > value2) {
+                        return -1;
+                    }
+                    else
+                        i++;
+                }
+                return 0;
+            }
+        }
         });
         return resultArray;
     }

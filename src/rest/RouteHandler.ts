@@ -88,7 +88,7 @@ export default class RouteHandler {
 
             let query:QueryRequest=req.params;
 
-            Log.trace(typeof req.params)
+            //Log.trace(typeof req.params)
 
             return RouteHandler.UBCInsightFacade.performQuery(query).then(function(response: InsightResponse){
                 if (response.code == 200){
