@@ -314,47 +314,12 @@ export default class QueryController {
                         selectedSections.push(section)
                     }
                 }
-
             }
         } catch (err) {
-            Log.trace ("inside dealWithWhere   " + err.message)
             this.isValidWhere = false
-            Log.trace ("inside dealWithWhere, isValidWhere  " + this.isValidWhere.toString())
-
         }
-
         return selectedSections;
     }
-
-    //return true if deep Where keys are valid
-
-/*    public checkWhere(query: QueryRequest): boolean{
-        Log.trace("inside CheckWhere")
-
-        var where = query.WHERE
-        QueryController.EBNFParser.parseEBNF(where, new Session())
-        Log.trace("EBNFParser.isvalidWhereKey       " + QueryController.EBNFParser.isvalidWhereKey.toString())
-        return QueryController.EBNFParser.isvalidWhereKey
-    }*/
-
-        /*
-            //helper function that returns prefix of string from GET
-            public stringPrefix(get: string) {
-                let prefix: any
-                prefix = get.split("_")[0];
-                //Log.trace(prefix);
-                return prefix;
-            }*/
-
-
-
-
-
-
-
-
-
-
 
 }
 

@@ -6,8 +6,6 @@ import Log from "../Util";
 
 export default class EBNFParser {
 
-       //public isvalidWhereKey = true;
-
     public parseEBNF(where: any, section: any) {
 
         let valid = true;
@@ -30,9 +28,6 @@ export default class EBNFParser {
                 for (var ANDfilter of where['AND']) {
                     validList1.push(this.parseEBNF(ANDfilter, section));
                 }
-                //  Log.trace("validList1" + validList1);
-
-                //  Log.trace("validlist1: "+validList1.length);
                 for (var eachValid1 of validList1) {
                     if (eachValid1 === false)
                         valid = false;
@@ -40,19 +35,14 @@ export default class EBNFParser {
             }
 
             if (typeof where['OR'] !== 'undefined') {
-
-
                 var validList2: any = [];
                 for (var ORfilter of where['OR']) {
                     validList2.push(this.parseEBNF(ORfilter, section));
                 }
-
                 valid = false;
-
                 for (var eachValid2 of validList2) {
                     if (eachValid2 === true) {
                         valid = true
-
                     }
                 }
             }
@@ -67,11 +57,8 @@ export default class EBNFParser {
                 var whereValue1 = where['GT'][Object.keys(where['GT'])[0]]
 
                 if (QueryController.ValidKeyChecker.isvalidKey(whereKey1) === false) {
-                    //this.isvalidWhereKey = false
                     throw Error
-                }
-                ;
-
+                };
                 valid = valid && (section[whereKey1] > whereValue1);
             }
 
@@ -79,11 +66,8 @@ export default class EBNFParser {
                 var whereKey2 = Object.keys(where['EQ']).toString()
                 var whereValue2 = where['EQ'][Object.keys(where['EQ'])[0]]
                 if (QueryController.ValidKeyChecker.isvalidKey(whereKey2) === false) {
-                    //this.isvalidWhereKey = false
                     throw Error
-
-                }
-                ;
+                };
                 valid = valid && (((section[whereKey2])) === whereValue2);
 
             }
@@ -93,11 +77,8 @@ export default class EBNFParser {
                 var whereKey3 = Object.keys(where['LT']).toString()
                 var whereValue3 = where['LT'][Object.keys(where['LT'])[0]]
                 if (QueryController.ValidKeyChecker.isvalidKey(whereKey3) === false) {
-                    //this.isvalidWhereKey = false
                     throw Error
-
-                }
-                ;
+                };
                 valid = valid && (section[whereKey3] < whereValue3);
 
             }
@@ -108,11 +89,8 @@ export default class EBNFParser {
             var whereKey4 = Object.keys(where['IS']).toString();
             var whereValue4 = where['IS'][Object.keys(where['IS'])[0]];
             if (QueryController.ValidKeyChecker.isvalidKey(whereKey4) === false) {
-                //this.isvalidWhereKey = false
                 throw Error
-
-            }
-            ;
+            };
             var sectionWhere = section[whereKey4];
             if (sectionWhere !== "") {
                 if (whereValue4.substring(0, 1) === "*" && whereValue4.substring(whereValue4.length - 1, whereValue4.length) === "*") {
@@ -138,7 +116,6 @@ export default class EBNFParser {
         if (typeof where['NOT'] !== 'undefined') {
             valid = valid && (!this.parseEBNF(where['NOT'], section));
         }
-
         return valid;
     }
 }
