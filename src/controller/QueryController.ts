@@ -10,6 +10,7 @@ import ValidKeyChecker from "../QCSupport/ValidKeyChecker";
 import EBNFParser from "../QCSupport/EBNFParser";
 import GAhandler from "../QCSupport/GROUPandAPPLYhandler";
 import ResultsHandler from "../QCSupport/ResultsHandler";
+import Session from "../DataStorage";
 
 export interface QueryRequest {
     GET: string|string[];
@@ -29,6 +30,7 @@ export default class QueryController {
     private static EBNFParser = new EBNFParser();
     private static GAhandler = new GAhandler();
     private static ResultsHandler = new ResultsHandler();
+    public isValidWhere = true;
 
     constructor(datasets: Datasets) {
         this.datasets = datasets;
@@ -297,29 +299,52 @@ export default class QueryController {
 
         var sections: any = []
 
-        for (var key in datasetRetrived) {
-            sections = datasetRetrived[key]
+        try {
+            for (var key in datasetRetrived) {
+                sections = datasetRetrived[key]
 
-            for (var section of sections) {
-                if(where!=null&&Object.keys(where).length>0&& where!=undefined)
-                { if (QueryController.EBNFParser.parseEBNF(where, section)) {
-                    //add section to list if it meets WHERE criteria in query
-                    selectedSections.push(section)}}
-                else
-                { selectedSections.push(section) }
+                for (var section of sections) {
+                    if (where != null && Object.keys(where).length > 0 && where != undefined) {
+                        if (QueryController.EBNFParser.parseEBNF(where, section)) {
+                            //add section to list if it meets WHERE criteria in query
+                            selectedSections.push(section)
+                        }
+                    }
+                    else {
+                        selectedSections.push(section)
+                    }
+                }
+
             }
+        } catch (err) {
+            Log.trace ("inside dealWithWhere   " + err.message)
+            this.isValidWhere = false
+            Log.trace ("inside dealWithWhere, isValidWhere  " + this.isValidWhere.toString())
 
         }
+
         return selectedSections;
     }
-/*
-    //helper function that returns prefix of string from GET
-    public stringPrefix(get: string) {
-        let prefix: any
-        prefix = get.split("_")[0];
-        //Log.trace(prefix);
-        return prefix;
+
+    //return true if deep Where keys are valid
+
+/*    public checkWhere(query: QueryRequest): boolean{
+        Log.trace("inside CheckWhere")
+
+        var where = query.WHERE
+        QueryController.EBNFParser.parseEBNF(where, new Session())
+        Log.trace("EBNFParser.isvalidWhereKey       " + QueryController.EBNFParser.isvalidWhereKey.toString())
+        return QueryController.EBNFParser.isvalidWhereKey
     }*/
+
+        /*
+            //helper function that returns prefix of string from GET
+            public stringPrefix(get: string) {
+                let prefix: any
+                prefix = get.split("_")[0];
+                //Log.trace(prefix);
+                return prefix;
+            }*/
 
 
 

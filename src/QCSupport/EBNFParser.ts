@@ -1,11 +1,12 @@
 import QueryController from "../controller/QueryController";
+import Log from "../Util";
 /**
  * Created by wchan on 2016-10-29.
  */
 
 export default class EBNFParser {
 
-
+       //public isvalidWhereKey = true;
 
     public parseEBNF(where: any, section: any) {
 
@@ -66,6 +67,7 @@ export default class EBNFParser {
                 var whereValue1 = where['GT'][Object.keys(where['GT'])[0]]
 
                 if (QueryController.ValidKeyChecker.isvalidKey(whereKey1) === false) {
+                    //this.isvalidWhereKey = false
                     throw Error
                 }
                 ;
@@ -77,7 +79,9 @@ export default class EBNFParser {
                 var whereKey2 = Object.keys(where['EQ']).toString()
                 var whereValue2 = where['EQ'][Object.keys(where['EQ'])[0]]
                 if (QueryController.ValidKeyChecker.isvalidKey(whereKey2) === false) {
+                    //this.isvalidWhereKey = false
                     throw Error
+
                 }
                 ;
                 valid = valid && (((section[whereKey2])) === whereValue2);
@@ -89,7 +93,9 @@ export default class EBNFParser {
                 var whereKey3 = Object.keys(where['LT']).toString()
                 var whereValue3 = where['LT'][Object.keys(where['LT'])[0]]
                 if (QueryController.ValidKeyChecker.isvalidKey(whereKey3) === false) {
+                    //this.isvalidWhereKey = false
                     throw Error
+
                 }
                 ;
                 valid = valid && (section[whereKey3] < whereValue3);
@@ -102,7 +108,9 @@ export default class EBNFParser {
             var whereKey4 = Object.keys(where['IS']).toString();
             var whereValue4 = where['IS'][Object.keys(where['IS'])[0]];
             if (QueryController.ValidKeyChecker.isvalidKey(whereKey4) === false) {
+                //this.isvalidWhereKey = false
                 throw Error
+
             }
             ;
             var sectionWhere = section[whereKey4];

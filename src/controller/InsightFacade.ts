@@ -12,6 +12,7 @@ import Log from "../Util";
 import fs = require('fs');
 import DatasetController from "./DatasetController";
 import {Datasets} from "./DatasetController";
+import EBNFParser from "../QCSupport/EBNFParser";
 
 export default class InsightFacade implements IInsightFacade {
 
@@ -98,17 +99,28 @@ export default class InsightFacade implements IInsightFacade {
                 let dcontroller = new DatasetController();
                 let datasets1: Datasets = dcontroller.getDatasets();
                 let qcontroller = new QueryController(datasets1);
-
                 let isValid = qcontroller.isValid(query);
+
+
                     if (isValid) {
+
                         if (typeof datasets1 == 'undefined'||(datasets1 == null)||dcontroller.isEmpty(datasets1)){
                             let qcontroller = new QueryController(datasets1);
                                 Log.error('RouteHandler::postQuery(..)-ERROR: dataset with id not found');
                                 return fulfill({code: 424, body: {}})
                             }
+
                         let queryResult = qcontroller.query(query);
-                        Log.trace('InsightFascade::performQuery(..) - SUCCESS')
-                        /*return*/ fulfill({code: 200, body: queryResult})
+                        let isDeepWhereValid = qcontroller.isValidWhere
+
+                        if (isDeepWhereValid == false){
+                            Log.error('RouteHandler::postQuery(..)-ERROR: deepWhereReferencingNonExistingDataset');
+                            return fulfill({code: 424, body: {}})
+                        } else {
+                            Log.trace('InsightFascade::performQuery(..) - SUCCESS')
+                            /*return*/ fulfill({code: 200, body: queryResult})
+                        }
+
                     } else {
                         Log.trace('InsightFascade::performQuery Failed(..) - ERROR: ');
                         return reject({code: 400, error: "invalid query"})
