@@ -57,30 +57,52 @@ describe("QueryController", function () {
         });
     });
 });
-
-    it (" Find the average for all courses in the university, sort up (hardest to easiest)", function() {
+    it ("should be able to Find the max fail for all cpsc courses in up order", function() {
         var that = this;
         Log.trace("Starting test: " + that.test.title);
         return facade.addDataset('courses', zipFileContents).then(function(response:InsightResponse)
         {
 
             let query: QueryRequest={
-                    GET: ["courses_dept", "courses_id", "courseAverage", "maxFail"],
-                    WHERE: {},
-                    GROUP: [ "courses_dept", "courses_id" ],
-                    APPLY: [ {"courseAverage": {"AVG": "courses_avg"}}, {"maxFail": {"MAX": "courses_fail"}} ],
-                    ORDER: { "dir": "UP", "keys": ["courseAverage", "maxFail", "courses_dept", "courses_id"]},
-                    AS:"TABLE"
-                };
+                GET: ["courses_dept", "courses_id", "courseAverage", "maxFail"],
+                WHERE:{"IS": {"courses_dept": "cpsc"}},
+                GROUP: [ "courses_dept", "courses_id" ],
+                APPLY: [ {"courseAverage": {"AVG": "courses_avg"}}, {"maxFail": {"MAX": "courses_fail"}} ],
+                ORDER: { "dir": "UP", "keys": ["courseAverage", "maxFail", "courses_dept", "courses_id"]},
+                AS:"TABLE"
+            };
             return facade.performQuery(query).then(function(response:InsightResponse){
-                //Log.trace(JSON.stringify(response.body))
-                let expectresult=JSON.parse(fs.readFileSync("./test/result/q2.json",'utf8'))
+                let expectresult=JSON.parse(fs.readFileSync("./test/result/q4.json",'utf8'))
                 expect(response.body).to.be.deep.equal(expectresult)
             });
         });
     });
 
 
+
+    it (" Find the numsection for all courses in the cpsc, sort up (hardest to easiest)", function() {
+        var that = this;
+        Log.trace("Starting test: " + that.test.title);
+        return facade.addDataset('courses', zipFileContents).then(function(response:InsightResponse)
+        {
+
+            let query: QueryRequest={
+                    GET: ["courses_dept", "courses_id", "numSections","minPass"],
+                    WHERE: {"IS": {"courses_dept": "cpsc"}},
+                    GROUP: [ "courses_dept", "courses_id" ],
+                APPLY: [ {"numSections": {"COUNT": "courses_uuid"}}, {"minPass": {"MIN": "courses_pass"}}],
+                ORDER: { "dir": "UP", "keys": ["numSections", "courses_dept", "courses_id"]},
+                    AS:"TABLE"
+                };
+            return facade.performQuery(query).then(function(response:InsightResponse){
+                //Log.trace(JSON.stringify(response.body))
+                let expectresult=JSON.parse(fs.readFileSync("./test/result/q5.json",'utf8'))
+                expect(response.body).to.be.deep.equal(expectresult)
+            });
+        });
+    });
+
+/*
     it (" Find the average for all courses in the university, sort up (hardest to easiest)", function() {
         var that = this;
         Log.trace("Starting test: " + that.test.title);
@@ -101,6 +123,6 @@ describe("QueryController", function () {
                 expect(response.body).to.be.deep.equal(expectresult)
             });
         });
-    });
+    });  */
 
 });
