@@ -38,7 +38,7 @@ describe("QueryController", function () {
     it ("find the rooms in DMP", function() {
         var that = this;
         Log.trace("Starting test: " + that.test.title);
-        return facade.addDataset('courses', zipFileContents).then(function(response:InsightResponse)
+        return facade.addDataset('rooms', zipFileContents).then(function(response:InsightResponse)
         {
             let query: QueryRequest= {
                 "GET": ["rooms_fullname", "rooms_number"],
@@ -56,7 +56,7 @@ describe("QueryController", function () {
     it ("count the number of rooms with > 160 seats in each building", function() {
         var that = this;
         Log.trace("Starting test: " + that.test.title);
-        return facade.addDataset('courses', zipFileContents).then(function(response:InsightResponse)
+        return facade.addDataset('rooms', zipFileContents).then(function(response:InsightResponse)
         {
             let query: QueryRequest= {
                     "GET": ["rooms_shortname", "numRooms"],
@@ -76,7 +76,7 @@ describe("QueryController", function () {
     it ("list rooms with moveable tables in a bounding box", function() {
         var that = this;
         Log.trace("Starting test: " + that.test.title);
-        return facade.addDataset('courses', zipFileContents).then(function(response:InsightResponse)
+        return facade.addDataset('rooms', zipFileContents).then(function(response:InsightResponse)
         {
             let query: QueryRequest={
                 "GET": ["rooms_fullname", "rooms_number", "rooms_seats"],
