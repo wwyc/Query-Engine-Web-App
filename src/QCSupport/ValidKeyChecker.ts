@@ -9,6 +9,12 @@ export default class ValidKeyChecker {
         if (key === "courses_dept" || key === "courses_id" || key === "courses_avg" ||
             key === "courses_instructor" || key === "courses_title" || key === "courses_pass" ||
             key === "courses_fail" || key === "courses_audit"||key=="courses_uuid"
+            || key === "rooms_fullname"||key==="rooms_shortname"
+            || key === "rooms_number"||key==="rooms_name"
+            || key === "rooms_address"
+            || key === "rooms_type"||key==="rooms_furniture"||key==="rooms_href"
+            || key === "courses_audit"
+            ||key==="rooms_lat"||key==="rooms_lon"||key==="rooms_seats"
         ) {
             isvalidKeyResult = true;
         } else {
@@ -22,6 +28,8 @@ export default class ValidKeyChecker {
         if (key === "courses_avg" ||
             key === "courses_pass" ||
             key === "courses_fail" || key === "courses_audit"
+            ||key==="rooms_lat"
+            || key === "rooms_lon"||key==="rooms_seats"
         ) {
             isvalidKeyResult = true;
         } else {
@@ -34,6 +42,10 @@ export default class ValidKeyChecker {
         if (key === "courses_dept" ||
             key === "courses_id" ||
             key === "courses_instructor" || key === "courses_title"||key==="courses_uuid"
+            || key === "rooms_fullname"||key==="rooms_shortname"
+            || key === "rooms_number"||key==="rooms_name"
+            || key === "rooms_address"
+            || key === "rooms_type"||key==="rooms_furniture"||key==="rooms_href"
         ) {
             isvalidKeyResult = true;
         } else {

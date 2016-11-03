@@ -293,9 +293,14 @@ export default class QueryController {
 
         //not able to access this.datasets directly; JSON.stringify and then parse it again fixed it
         var datasetsNew = JSON.parse(JSON.stringify(this.datasets))
-
+        var datasetRetrived: any
         // Retrieve dataset from given GET
-        var datasetRetrived = datasetsNew["courses"];
+
+        if (typeof datasetsNew["courses"] == "undefined"){
+            datasetRetrived = datasetsNew["rooms"];
+        } else {datasetRetrived = datasetsNew["courses"];
+        }
+
 
         var sections: any = []
 
