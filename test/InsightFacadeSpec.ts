@@ -113,10 +113,10 @@ describe("InsightFacadeDataset", function () {
         var that = this;
         Log.trace("Starting test: " + that.test.title);
 
-        var zipFileContents1 = new Buffer(fs.readFileSync('310co.1.0 - ForTestingInvalidDataSet.zip')).toString('base64');
+        //var zipFileContents1 = new Buffer(fs.readFileSync('310co.1.0 - ForTestingInvalidDataSet.zip')).toString('base64');
 
 
-        return facade.addDataset('courses', zipFileContents1).then(function (response: InsightResponse) {
+        return facade.addDataset('courses1234', zipFileContents).then(function (response: InsightResponse) {
             expect.fail('Should not happen');
         }).catch(function (response: InsightResponse) {
             expect(response.code).to.equal(400);
@@ -127,14 +127,20 @@ describe("InsightFacadeDataset", function () {
         var that = this;
         Log.trace("Starting test: " + that.test.title);
 
-        var zipFileContents1 = new Buffer(fs.readFileSync('file.txt')).toString('base64');
+        try{
+            var zipFileContents1 = new Buffer(fs.readFileSync('file.txt')).toString('base64');
+        }
+        catch (err){
+            Log.warn('DatasetController::process(..) - ERROR: ' + err);
+        }
 
-
-        return facade.addDataset('courses', zipFileContents1).then(function (response: InsightResponse) {
+        return facade.addDataset('courses',zipFileContents1).
+        then(function (response: InsightResponse) {
             expect.fail('Should not happen');
         }).catch(function (response: InsightResponse) {
             expect(response.code).to.equal(400);
         });
+
     });
 
 
@@ -152,9 +158,6 @@ describe("InsightFacadeDataset", function () {
     it("Deleting a non-existing dataset should return a 404. (404)", function () {
         var that = this;
         Log.trace("Starting test: " + that.test.title);
-
-        var zipFileContents1 = new Buffer(fs.readFileSync('file.txt')).toString('base64');
-
 
         return facade.removeDataset('courses123').then(function (response: InsightResponse) {
             expect.fail('Should not happen');
