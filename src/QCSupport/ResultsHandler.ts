@@ -1,7 +1,7 @@
 /**
  * Created by wchan on 2016-10-29.
  */
-
+import Log from "../Util";
 export default class ResultsHandler {
 
     /**
@@ -36,10 +36,17 @@ export default class ResultsHandler {
 
     }
 
-    public sortArray(resultArray: any, order: any) {
+    public sortArray(resultArray: any, order: any,id:string) {
         // Log.trace("INSIDE sorting!")
         resultArray.sort(function (a: any, b: any) {
-            if (typeof order == "string") {
+            if (typeof order === "string") {
+               if(order.includes("_"))
+                {if(order.split("_")[0]!==id)
+                {
+                    Log.trace("order is not correct")
+                    throw Error
+                }
+                }
                 //orderkey is a string
                 var value1 = a[order];
                 //Log.trace("value1  " + value1)
@@ -55,7 +62,14 @@ export default class ResultsHandler {
             }
 
             else if (typeof order == "object"){
-                var orderkey: any = order['keys'];//orderkey is an array
+                var orderkey: Array<string>= order['keys'];//orderkey is an array
+                for (var orderkeyEach of orderkey)
+                {
+                    if(orderkeyEach.includes("_"))
+                    { if(orderkeyEach.split("_")[0]!==id)
+                        { Log.trace("order is not correct**")
+                        throw Error}}
+                }
                 var i = 0;
                 if (order['dir'] === 'UP')// lowers come first
                 {

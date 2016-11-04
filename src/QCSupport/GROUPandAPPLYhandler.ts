@@ -26,7 +26,7 @@ export default class GAhandler {
         return valid;
     }
 
-    public dealWithGroup(group:any,intermediate:any):any{
+    public dealWithGroup(group:Array<string>,intermediate:any,id:string):any{
         var groups:any=[];
         while(intermediate.length!=0)
         {   var sessions:any=[];
@@ -34,7 +34,12 @@ export default class GAhandler {
             var groupvalue:any={};
 
             for (var a=0;a<group.length;a++)
-            {  var lastintermediate:any;
+            {   if (group[a].split("_")[0]!==id)
+            {
+                Log.trace("GROUP is not correct**")
+                throw Error;
+            }
+                var lastintermediate:any;
                 lastintermediate=intermediate[0][group[a]];
                 lastintermediates.push(lastintermediate);
                 groupvalue[group[a]]=intermediate[0][group[a]];
@@ -53,7 +58,7 @@ export default class GAhandler {
         return groups;
     }
 
-    public dealWithApply(apply:any,grouplist:any):any {
+    public dealWithApply(apply:any,grouplist:any,id:string):any {
         var applylist:any=[];
 
         Log.trace("jump into apply")
@@ -61,7 +66,14 @@ export default class GAhandler {
             var applynewkey=Object.keys(applyobject)[0];//coursesAvg
             var applyvalue=applyobject[Object.keys(applyobject)[0]];
             var applytoken=Object.keys(applyvalue)[0];//AVG
-            var applystring=applyvalue[Object.keys(applyvalue)[0]];//courses_avg
+            var applystring:string=applyvalue[Object.keys(applyvalue)[0]];//courses_avg
+
+            if(applystring.split("_")[0]!==id)
+            {
+                Log.trace("Apply is not correct**")
+                throw Error
+            }
+
             if (applytoken === 'AVG') {
                 if(!QueryController.ValidKeyChecker.isvalidNumberKey(applystring))
                     throw Error;
