@@ -50,21 +50,24 @@ export default class DatasetController {
         // TODO: this should check if the dataset is on disk in ./data if it is not already in memory.
 
         // check if dataset/memory is empty
-        if (!(this.isEmpty(this.datasets) || (typeof this.datasets == "undefined"))){
+        if (!(this.isEmpty(this.datasets[id]) || (typeof this.datasets[id] === "undefined")||this.datasets[id]===null)){
 
             Log.trace("dataset is in memory")
-            var keys = Object.keys(this.datasets);
+            return this.datasets[id];
+          /*  var keys = Object.keys(this.datasets);
             for (var id1 of keys) {
                 Log.trace(id1);
-                if (id == id1){
+                if (id === id1){
                     return this.datasets[id];
                 }
-            }}  else {
+            }   */
+
+        }  else {
 
             //check if dataset is in disk
             var fs = require('fs');
             this.relativePath = process.cwd()
-            Log.trace("inside getdataset(id)    " + this.relativePath + "/data/" +id+ ".json")
+            Log.trace("inside getdataset("+id+")"  + this.relativePath + "/data/" +id+ ".json")
 
 
             try {var data = fs.readFileSync(this.relativePath + "/data/" + id + ".json")
@@ -88,7 +91,7 @@ export default class DatasetController {
 
         Log.trace("this.datasets - is it empty?:  " + this.isEmpty(this.datasets))
 
-        if (this.isEmpty(this.datasets)|| (typeof this.datasets == "undefined")) {
+        if (this.isEmpty(this.datasets)|| (typeof this.datasets === "undefined")) {
             //check if datasets in memory is empty
             var fs1 = require('fs');
             //read directory and return files (array of file names)
@@ -98,9 +101,10 @@ export default class DatasetController {
             Log.trace(that.relativePath)
 
             var Files=(fs1.readdirSync(that.relativePath+"/data/"))
-
+         Log.trace("files length"+Files.length)
             for(var file of Files){
                 var fileName=file.split(".")[0]
+                Log.trace("fileName"+fileName)
                 this.datasets[fileName]=this.getDataset(fileName)
             }
 
