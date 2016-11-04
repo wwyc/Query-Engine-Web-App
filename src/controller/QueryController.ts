@@ -257,18 +257,25 @@ export default class QueryController {
         var format = query.AS;
 
         var intermediate: any = [];
+        var id:string;
+
 
         if (typeof get === 'string') {
-            intermediate = this.dealWithWhere(where, get)
+           id=this.stringPrefix(get)
         } else {
-            intermediate = this.dealWithWhere(where, get[0])
+          /*  if(!this.CheckGetGroup(get))
+            { Log.trace("get is not correct**")
+                throw Error}  */
+            id=this.CheckGetGroup(get);
         }
+
+        intermediate = this.dealWithWhere(where, id)
 
         if(group!==null&&typeof group!=='undefined'&& group.length>0)
         {
-            intermediate=QueryController.GAhandler.dealWithGroup(group,intermediate)
+            intermediate=QueryController.GAhandler.dealWithGroup(group,intermediate,id)
             if(apply!==null&&typeof apply!=='undefined'&&apply.length>0)
-            { intermediate=QueryController.GAhandler.dealWithApply(apply,intermediate)}
+            { intermediate=QueryController.GAhandler.dealWithApply(apply,intermediate,id)}
             else
             { for(var h=0;h<intermediate.length;h++ )
                 intermediate[h]=intermediate[h][0]
@@ -279,7 +286,8 @@ export default class QueryController {
 
         //Do this if order was requested
         if (order !== null) {
-            finalResultObjArray = QueryController.ResultsHandler.sortArray(finalResultObjArray, order);
+
+            finalResultObjArray = QueryController.ResultsHandler.sortArray(finalResultObjArray, order,id);
         }
 
         // Log.trace("this is FINAL result:  " + JSON.stringify({render: format, result: finalResultObjArray}))
@@ -288,7 +296,7 @@ export default class QueryController {
     }
 
 //deal with where
-    public  dealWithWhere(where: any, get: any) {
+    public  dealWithWhere(where: any, id: any) {
         var selectedSections: any = []
 
         //not able to access this.datasets directly; JSON.stringify and then parse it again fixed it
@@ -302,7 +310,7 @@ export default class QueryController {
         }
 */
 try{
-      datasetRetrived=datasetsNew[this.stringPrefix(get)]
+      datasetRetrived=datasetsNew[id]
 }
       catch(err)
       {
@@ -317,7 +325,7 @@ try{
 
                 for (var section of sections) {
                     if (where != null && Object.keys(where).length > 0 && where != undefined) {
-                        if (QueryController.EBNFParser.parseEBNF(where, section)) {
+                        if (QueryController.EBNFParser.parseEBNF(where, section,id)) {
                             //add section to list if it meets WHERE criteria in query
                             selectedSections.push(section)
                         }
@@ -336,10 +344,36 @@ try{
     public stringPrefix(get: string) {
         let prefix: any
         prefix = get.split("_")[0];
-        Log.trace("prefix"+prefix);
         return prefix;
     }
 
+
+
+    public CheckGetGroup(get:Array<string>):string{
+        var id1:string;
+        var underscoreArray:Array<any>=[];
+        for(var getEach of get)
+        {
+            if(getEach.includes("_"))
+             underscoreArray.push(getEach)
+        }
+            if(underscoreArray.length===0)
+            {
+                throw Error
+            }
+            else
+            {   id1=underscoreArray[0];
+             for (var underscoreEach of underscoreArray)
+            {
+                if(underscoreEach.split("_")[0]!==id1.split("_")[0])
+                {
+                    Log.trace("GET is not correct")
+                    throw Error
+                }
+            }
+        }
+        return id1.split("_")[0]
+    }
 
 }
 
