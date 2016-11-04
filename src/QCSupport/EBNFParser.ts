@@ -61,7 +61,7 @@ export default class EBNFParser {
                 };
                 if(whereKey1.split("_")[0]!==id)
                 {
-                    Log.trace("GT is not corret **")
+                  //  Log.trace("GT is not corret **")
                     throw Error
                 }
                 valid = valid && (section[whereKey1] > whereValue1);
@@ -76,7 +76,7 @@ export default class EBNFParser {
 
                 if(whereKey2.split("_")[0]!==id)
                 {
-                    Log.trace("EQ is not corret **")
+                   // Log.trace("EQ is not corret **")
                     throw Error
                 }
 
@@ -94,7 +94,7 @@ export default class EBNFParser {
 
                 if(whereKey3.split("_")[0]!==id)
                 {
-                    Log.trace("LT is not correct** ")
+                  //  Log.trace("LT is not correct** ")
                     throw Error
                 }
 
@@ -112,7 +112,7 @@ export default class EBNFParser {
             };
             if(whereKey4.split("_")[0]!==id)
             {
-                Log.trace("IS is not correct** ")
+             //  Log.trace("IS is not correct** ")
                 throw Error
             }
 
