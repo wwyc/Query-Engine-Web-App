@@ -36,7 +36,7 @@ export default class GAhandler {
             for (var a=0;a<group.length;a++)
             {   if (group[a].split("_")[0]!==id)
             {
-                Log.trace("GROUP is not correct**")
+              //  Log.trace("GROUP is not correct**")
                 throw Error;
             }
                 var lastintermediate:any;
@@ -70,7 +70,7 @@ export default class GAhandler {
 
             if(applystring.split("_")[0]!==id)
             {
-                Log.trace("Apply is not correct**")
+                //Log.trace("Apply is not correct**")
                 throw Error
             }
 
