@@ -296,11 +296,18 @@ export default class QueryController {
         var datasetRetrived: any
         // Retrieve dataset from given GET
 
-        if (typeof datasetsNew["courses"] == "undefined"){
+  /*if (typeof datasetsNew["courses"] === "undefined"||datasetsNew["courses"] === null){
             datasetRetrived = datasetsNew["rooms"];
         } else {datasetRetrived = datasetsNew["courses"];
         }
-
+*/
+try{
+      datasetRetrived=datasetsNew[this.stringPrefix(get)]
+}
+      catch(err)
+      {
+          Log.trace("dataset is not exist" );
+      }
 
         var sections: any = []
 
@@ -325,6 +332,14 @@ export default class QueryController {
         }
         return selectedSections;
     }
+
+    public stringPrefix(get: string) {
+        let prefix: any
+        prefix = get.split("_")[0];
+        Log.trace("prefix"+prefix);
+        return prefix;
+    }
+
 
 }
 
