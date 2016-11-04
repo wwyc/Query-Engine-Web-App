@@ -43,7 +43,7 @@ export default class ResultsHandler {
                if(order.includes("_"))
                 {if(order.split("_")[0]!==id)
                 {
-                    Log.trace("order is not correct")
+                   // Log.trace("order is not correct")
                     throw Error
                 }
                 }
@@ -67,7 +67,8 @@ export default class ResultsHandler {
                 {
                     if(orderkeyEach.includes("_"))
                     { if(orderkeyEach.split("_")[0]!==id)
-                        { Log.trace("order is not correct**")
+                        { 
+                         //Log.trace("order is not correct**")
                         throw Error}}
                 }
                 var i = 0;
