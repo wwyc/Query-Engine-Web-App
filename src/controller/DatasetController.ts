@@ -197,9 +197,7 @@ export default class DatasetController {
                             })
 
                             let BuildingMap: any = {}
-
-                            //Log.trace("what is promiseArray1 length    "  + promiseArray1.length)
-
+                            
                             Promise.all(promiseArray1).then(function(endResult: any) {
 
                                 Log.trace("inside PROMISE.ALL #2")
