@@ -12,7 +12,7 @@ import {InsightResponse} from "../src/controller/IInsightFacade";
 import {QueryRequest, default as QueryController} from "../src/controller/QueryController";
 
 var fs = require('fs');
-describe("QueryController", function () {
+describe("RoomsQueryController", function () {
     this.timeout(100000);
 
     var zipFileContents: string = null;
@@ -35,7 +35,7 @@ describe("QueryController", function () {
     beforeEach(function () {
         facade = new InsightFacade();
     });
-    it ("find the rooms in DMP", function() {
+    it("find the rooms in DMP", function() {
         var that = this;
         Log.trace("Starting test: " + that.test.title);
         return facade.addDataset('rooms', zipFileContents).then(function(response:InsightResponse)

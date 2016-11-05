@@ -104,14 +104,18 @@ export default class InsightFacade implements IInsightFacade {
 
                     if (isValid) {
 
-                        if (typeof datasets1 == 'undefined'||(datasets1 == null)||dcontroller.isEmpty(datasets1)){
+                        let queryResult = qcontroller.query(query);
+                        let isDeepWhereValid = qcontroller.isValidWhere
+                        let id = qcontroller.datasetID
+                        Log.trace("Insdie InsightFacadel - performQuery:  this is datasetID     " + id)
+
+                        if (typeof datasets1[id] == 'undefined'||(datasets1[id] == null)||dcontroller.isEmpty(datasets1[id])){
                             let qcontroller = new QueryController(datasets1);
                                 Log.error('RouteHandler::postQuery(..)-ERROR: dataset with id not found');
                                 return fulfill({code: 424, body: {}})
                             }
 
-                        let queryResult = qcontroller.query(query);
-                        let isDeepWhereValid = qcontroller.isValidWhere
+
 
                         if (isDeepWhereValid == false){
                             Log.error('RouteHandler::postQuery(..)-ERROR: deepWhereReferencingNonExistingDataset');

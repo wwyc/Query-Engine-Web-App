@@ -31,6 +31,7 @@ export default class QueryController {
     private static GAhandler = new GAhandler();
     private static ResultsHandler = new ResultsHandler();
     public isValidWhere = true;
+    public datasetID: any = null;
 
     constructor(datasets: Datasets) {
         this.datasets = datasets;
@@ -311,6 +312,8 @@ export default class QueryController {
 */
 try{
       datasetRetrived=datasetsNew[id]
+    this.datasetID = id
+
 }
       catch(err)
       {
