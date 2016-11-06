@@ -197,7 +197,7 @@ export default class DatasetController {
                             })
 
                             let BuildingMap: any = {}
-                            
+
                             Promise.all(promiseArray1).then(function(endResult: any) {
 
                                 Log.trace("inside PROMISE.ALL #2")
@@ -270,8 +270,8 @@ export default class DatasetController {
                                             var BIOLrowChildNodes3ChildNode1a = parse5.treeAdapters.default.getChildNodes(BIOLrowChildNodes3ChildNodeRoomRows)[1]
                                             var BIOLrowChildNodes3ChildNode1b = parse5.treeAdapters.default.getChildNodes(BIOLrowChildNodes3ChildNode1a)[1]
                                             var BIOLrowChildNodes3ChildNode0 = parse5.treeAdapters.default.getChildNodes(BIOLrowChildNodes3ChildNode1b)[0]
-                                            var roomNumber = BIOLrowChildNodes3ChildNode0.value
-                                            //Log.trace ("inside ArrayofRoomRows Loop     " + roomNumber)
+                                            var roomNumber = BIOLrowChildNodes3ChildNode0.value.trim()
+                                            //Log.trace ("what is room number     " + roomNumber)
 
                                             //find room href
                                             var roomhref = parse5.treeAdapters.default.getAttrList(BIOLrowChildNodes3ChildNode1b)[0].value
