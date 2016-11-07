@@ -270,8 +270,9 @@ export default class DatasetController {
                                             var BIOLrowChildNodes3ChildNode1a = parse5.treeAdapters.default.getChildNodes(BIOLrowChildNodes3ChildNodeRoomRows)[1]
                                             var BIOLrowChildNodes3ChildNode1b = parse5.treeAdapters.default.getChildNodes(BIOLrowChildNodes3ChildNode1a)[1]
                                             var BIOLrowChildNodes3ChildNode0 = parse5.treeAdapters.default.getChildNodes(BIOLrowChildNodes3ChildNode1b)[0]
-                                            var roomNumber = BIOLrowChildNodes3ChildNode0.value.trim()
+                                            var roomNumber = BIOLrowChildNodes3ChildNode0.value.toString().trim()
                                             //Log.trace ("what is room number     " + roomNumber)
+                                            //Log.trace ("what is room number type    " + typeof roomNumber)
 
                                             //find room href
                                             var roomhref = parse5.treeAdapters.default.getAttrList(BIOLrowChildNodes3ChildNode1b)[0].value
@@ -299,7 +300,7 @@ export default class DatasetController {
 
                                             var addressURL = that.getAddressURL(roomAddress)
 
-                                            Room.rooms_number = roomNumber.toString()
+                                            Room.rooms_number = roomNumber
                                             Room.rooms_seats = parseInt(roomCapacity)
                                             Room.rooms_furniture = roomFurniture
                                             Room.rooms_type = roomType
