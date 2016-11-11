@@ -198,151 +198,178 @@ export default class DatasetController {
 
                             let BuildingMap: any = {}
 
-                            Promise.all(promiseArray1).then(function(endResult: any) {
+                            //var validBuildingaddressURLObj: any = {}
 
-                                Log.trace("inside PROMISE.ALL #2")
 
-                                // Loop through each building file
-                                for (var objs of endResult) {
+                            var validBuildingValidBuildingAddress: any = that.getValidBuildingAddress(document)
 
-                                    var eachBuildingRoomsArray: any = []
-                                    var roomLat: any = 0
-                                    var roomLon: any = 0
+                            var latlonPromiseObj: any = []
 
-                                    var document1 = parse5.parse(objs.toString(), {treeAdapter: parse5.treeAdapters.default});
-                                    var BIOLChildNode = parse5.treeAdapters.default.getChildNodes(document1)
-                                    var BIOLhtmlChildNode = BIOLChildNode[6]
-                                    var BIOLhtmlChildNodeBody = parse5.treeAdapters.default.getChildNodes(BIOLhtmlChildNode)[3]
-                                    var BIOLhtmlChildNodeBodyChild31 = parse5.treeAdapters.default.getChildNodes(BIOLhtmlChildNodeBody)[31]
-                                    var BIOLhtmlChildNodeBodyChild10 = parse5.treeAdapters.default.getChildNodes(BIOLhtmlChildNodeBodyChild31)[10]
+                            for (var address of validBuildingValidBuildingAddress){
+                                var promiseLatLon = that.getLatLon(address)
+                                latlonPromiseObj.push(promiseLatLon)
+                            }
 
-                                    // Building UCLL has a different location for name of building
-                                    if  (parse5.treeAdapters.default.getChildNodes(BIOLhtmlChildNodeBodyChild10).length <3) {
-                                        BIOLhtmlChildNodeBodyChild10 = parse5.treeAdapters.default.getChildNodes(BIOLhtmlChildNodeBodyChild31)[12]
-                                    }
+                            Promise.all(latlonPromiseObj).then(function(latlonobj:any){
 
-                                    var BIOLhtmlChildNodeBodyChild1 = parse5.treeAdapters.default.getChildNodes(BIOLhtmlChildNodeBodyChild10)[1]
-                                    var BIOLhtmlChildNodeBodyChild3 = parse5.treeAdapters.default.getChildNodes(BIOLhtmlChildNodeBodyChild1)[3]
-                                    var BIOLhtmlChildNodeBodyChild1a = parse5.treeAdapters.default.getChildNodes(BIOLhtmlChildNodeBodyChild3)[1]
+                                // var eachlatlonobj = latlonobj[0]
+                                // Log.trace("what is inside eachlatlonobj   " + eachlatlonobj.latlon.lat)
+                                // Log.trace("what is inside eachlatlonobj   " + eachlatlonobj.latlon.lon)
+                                // Log.trace("what is inside eachlatlonobj   " + eachlatlonobj.address)
 
-                                    //find long name
-                                    var BIOL1 = parse5.treeAdapters.default.getChildNodes(BIOLhtmlChildNodeBodyChild1a)[3]
-                                    var BIOL2 = parse5.treeAdapters.default.getChildNodes(BIOL1)[1]
-                                    var BIOL3 = parse5.treeAdapters.default.getChildNodes(BIOL2)[1]
-                                    var BIOL4 = parse5.treeAdapters.default.getChildNodes(BIOL3)[1]
-                                    var BIOL5 = parse5.treeAdapters.default.getChildNodes(BIOL4)[1]
-                                    var BIOL5 = parse5.treeAdapters.default.getChildNodes(BIOL5)[0]
-                                    var BIOL6 = parse5.treeAdapters.default.getChildNodes(BIOL5)[0]
-                                    var LongName = BIOL6.value
-                                    Log.trace("what is the building 2 " + LongName)
+                                Promise.all(promiseArray1).then(function(endResult: any) {
 
-                                    //  Look for room table / check if there are rooms in this building
+                                    Log.trace("inside PROMISE.ALL #2")
 
-                                    var BIOLhtmlChildNodeBodyChild5 = parse5.treeAdapters.default.getChildNodes(BIOLhtmlChildNodeBodyChild1a)[5]
-                                    var BIOLhtmlChildNodeBodyChild1b = parse5.treeAdapters.default.getChildNodes(BIOLhtmlChildNodeBodyChild5)[1]
+                                    // Loop through each building file
+                                    for (var objs of endResult) {
 
-                                    if (parse5.treeAdapters.default.getChildNodes(BIOLhtmlChildNodeBodyChild1b).length > 2) {
-                                        Log.trace( " there are rooms in this building")
-                                        var BIOLhtmlChildNodeBodyChild3b = parse5.treeAdapters.default.getChildNodes(BIOLhtmlChildNodeBodyChild1b)[3]
-                                        var BIOLhtmlTableNodes = parse5.treeAdapters.default.getChildNodes(BIOLhtmlChildNodeBodyChild3b)
+                                        var eachBuildingRoomsArray: any = []
+                                        var roomLat: any = 0
+                                        var roomLon: any = 0
 
-                                        //find room address
-                                        var BIOL7 = parse5.treeAdapters.default.getChildNodes(BIOL4)[3]
-                                        var BIOL8 = parse5.treeAdapters.default.getChildNodes(BIOL7)[0]
-                                        var BIOL9 = parse5.treeAdapters.default.getChildNodes(BIOL8)[0]
-                                        var roomAddress = BIOL9.value
+                                        var document1 = parse5.parse(objs.toString(), {treeAdapter: parse5.treeAdapters.default});
+                                        var BIOLChildNode = parse5.treeAdapters.default.getChildNodes(document1)
+                                        var BIOLhtmlChildNode = BIOLChildNode[6]
+                                        var BIOLhtmlChildNodeBody = parse5.treeAdapters.default.getChildNodes(BIOLhtmlChildNode)[3]
+                                        var BIOLhtmlChildNodeBodyChild31 = parse5.treeAdapters.default.getChildNodes(BIOLhtmlChildNodeBody)[31]
+                                        var BIOLhtmlChildNodeBodyChild10 = parse5.treeAdapters.default.getChildNodes(BIOLhtmlChildNodeBodyChild31)[10]
 
-                                        var BIOLrowNode = BIOLhtmlTableNodes[1]
-                                        var BIOLrowChildNodes3 = parse5.treeAdapters.default.getChildNodes(BIOLrowNode)[3]
-
-                                        //  Loop through room table
-                                        var ArrayofRoomRows = parse5.treeAdapters.default.getChildNodes(BIOLrowChildNodes3)
-
-                                        for (var i = 1; i < ArrayofRoomRows.length; i++) {
-                                            //Log.trace ("inside ArrayofRoomRows Loop START")
-
-                                            // create a new room for each row
-                                            var Room: any = new Room2()
-                                            //Log.trace("new room created!!")
-
-                                            //find room number
-                                            var BIOLrowChildNodes3ChildNodeRoomRows = parse5.treeAdapters.default.getChildNodes(BIOLrowChildNodes3)[i]
-                                            var BIOLrowChildNodes3ChildNode1a = parse5.treeAdapters.default.getChildNodes(BIOLrowChildNodes3ChildNodeRoomRows)[1]
-                                            var BIOLrowChildNodes3ChildNode1b = parse5.treeAdapters.default.getChildNodes(BIOLrowChildNodes3ChildNode1a)[1]
-                                            var BIOLrowChildNodes3ChildNode0 = parse5.treeAdapters.default.getChildNodes(BIOLrowChildNodes3ChildNode1b)[0]
-                                            var roomNumber = BIOLrowChildNodes3ChildNode0.value.toString().trim()
-                                            //Log.trace ("what is room number     " + roomNumber)
-                                            //Log.trace ("what is room number type    " + typeof roomNumber)
-
-                                            //find room href
-                                            var roomhref = parse5.treeAdapters.default.getAttrList(BIOLrowChildNodes3ChildNode1b)[0].value
-
-                                            //find room seats
-                                            var BIOLrowChildNodes3ChildNode3a = parse5.treeAdapters.default.getChildNodes(BIOLrowChildNodes3ChildNodeRoomRows)[3]
-                                            var BIOLrowChildNodes3ChildNode3a0 = parse5.treeAdapters.default.getChildNodes(BIOLrowChildNodes3ChildNode3a)[0]
-                                            var roomCapacity = BIOLrowChildNodes3ChildNode3a0.value.trim()
-
-                                            //find room furniture
-                                            var BIOLrowChildNodes3ChildNode5 = parse5.treeAdapters.default.getChildNodes(BIOLrowChildNodes3ChildNodeRoomRows)[5]
-                                            var BIOLrowChildNodes3ChildNode50 = parse5.treeAdapters.default.getChildNodes(BIOLrowChildNodes3ChildNode5)[0]
-                                            var roomFurniture = BIOLrowChildNodes3ChildNode50.value.trim()
-
-                                            //find room type
-                                            var BIOLrowChildNodes3ChildNode7 = parse5.treeAdapters.default.getChildNodes(BIOLrowChildNodes3ChildNodeRoomRows)[7]
-                                            var BIOLrowChildNodes3ChildNode70 = parse5.treeAdapters.default.getChildNodes(BIOLrowChildNodes3ChildNode7)[0]
-                                            var roomType = BIOLrowChildNodes3ChildNode70.value.trim()
-
-                                            // create room Address in %20 for getLatLon
-                                            var Array = roomhref.split("/")
-                                            var Length = Array.length
-                                            var LastItem = Array[Length - 1]
-                                            var Short = LastItem.split("-")[0]
-
-                                            var addressURL = that.getAddressURL(roomAddress)
-
-                                            Room.rooms_number = roomNumber
-                                            Room.rooms_seats = parseInt(roomCapacity)
-                                            Room.rooms_furniture = roomFurniture
-                                            Room.rooms_type = roomType
-                                            Room.rooms_shortname = Short
-                                            Room.rooms_name = Room.rooms_shortname + "_" + Room.rooms_number
-                                            Room.rooms_href = roomhref
-                                            Room.rooms_fullname = LongName
-                                            Room.rooms_address = roomAddress
-
-                                            eachBuildingRoomsArray.push(Room)
-                                            i++
+                                        // Building UCLL has a different location for name of building
+                                        if  (parse5.treeAdapters.default.getChildNodes(BIOLhtmlChildNodeBodyChild10).length <3) {
+                                            BIOLhtmlChildNodeBodyChild10 = parse5.treeAdapters.default.getChildNodes(BIOLhtmlChildNodeBodyChild31)[12]
                                         }
 
-                                        Log.trace("how many rooms in BuildingroomArray?  last 3 " + eachBuildingRoomsArray.length)
+                                        var BIOLhtmlChildNodeBodyChild1 = parse5.treeAdapters.default.getChildNodes(BIOLhtmlChildNodeBodyChild10)[1]
+                                        var BIOLhtmlChildNodeBodyChild3 = parse5.treeAdapters.default.getChildNodes(BIOLhtmlChildNodeBodyChild1)[3]
+                                        var BIOLhtmlChildNodeBodyChild1a = parse5.treeAdapters.default.getChildNodes(BIOLhtmlChildNodeBodyChild3)[1]
 
-                                        that.getLatLon("http://skaha.cs.ubc.ca:8022/api/v1/team34/" + addressURL).then(function (latlon: any) {
-                                            //Log.trace("inside getLatLon.then")
-                                            roomLat = latlon.lat
-                                            roomLon = latlon.lon
-                                            for (var room of eachBuildingRoomsArray) {
-                                                room.rooms_lat = roomLat
-                                                room.rooms_lon = roomLon
+                                        //find long name
+                                        var BIOL1 = parse5.treeAdapters.default.getChildNodes(BIOLhtmlChildNodeBodyChild1a)[3]
+                                        var BIOL2 = parse5.treeAdapters.default.getChildNodes(BIOL1)[1]
+                                        var BIOL3 = parse5.treeAdapters.default.getChildNodes(BIOL2)[1]
+                                        var BIOL4 = parse5.treeAdapters.default.getChildNodes(BIOL3)[1]
+                                        var BIOL5 = parse5.treeAdapters.default.getChildNodes(BIOL4)[1]
+                                        var BIOL5 = parse5.treeAdapters.default.getChildNodes(BIOL5)[0]
+                                        var BIOL6 = parse5.treeAdapters.default.getChildNodes(BIOL5)[0]
+                                        var LongName = BIOL6.value
+                                        //Log.trace("what is the building 2 " + LongName)
+
+                                        //  Look for room table / check if there are rooms in this building
+
+                                        var BIOLhtmlChildNodeBodyChild5 = parse5.treeAdapters.default.getChildNodes(BIOLhtmlChildNodeBodyChild1a)[5]
+                                        var BIOLhtmlChildNodeBodyChild1b = parse5.treeAdapters.default.getChildNodes(BIOLhtmlChildNodeBodyChild5)[1]
+
+                                        if (parse5.treeAdapters.default.getChildNodes(BIOLhtmlChildNodeBodyChild1b).length > 2) {
+                                            //Log.trace( " there are rooms in this building")
+                                            var BIOLhtmlChildNodeBodyChild3b = parse5.treeAdapters.default.getChildNodes(BIOLhtmlChildNodeBodyChild1b)[3]
+                                            var BIOLhtmlTableNodes = parse5.treeAdapters.default.getChildNodes(BIOLhtmlChildNodeBodyChild3b)
+
+                                            //find room address
+                                            var BIOL7 = parse5.treeAdapters.default.getChildNodes(BIOL4)[3]
+                                            var BIOL8 = parse5.treeAdapters.default.getChildNodes(BIOL7)[0]
+                                            var BIOL9 = parse5.treeAdapters.default.getChildNodes(BIOL8)[0]
+                                            var roomAddress = BIOL9.value
+
+                                            var BIOLrowNode = BIOLhtmlTableNodes[1]
+                                            var BIOLrowChildNodes3 = parse5.treeAdapters.default.getChildNodes(BIOLrowNode)[3]
+
+                                            //  Loop through room table
+                                            var ArrayofRoomRows = parse5.treeAdapters.default.getChildNodes(BIOLrowChildNodes3)
+
+
+
+                                            for (var i = 1; i < ArrayofRoomRows.length; i++) {
+                                                //Log.trace ("inside ArrayofRoomRows Loop START")
+
+                                                // create a new room for each row
+                                                var Room: any = new Room2()
+                                                //Log.trace("new room created!!")
+
+                                                //find room number
+                                                var BIOLrowChildNodes3ChildNodeRoomRows = parse5.treeAdapters.default.getChildNodes(BIOLrowChildNodes3)[i]
+                                                var BIOLrowChildNodes3ChildNode1a = parse5.treeAdapters.default.getChildNodes(BIOLrowChildNodes3ChildNodeRoomRows)[1]
+                                                var BIOLrowChildNodes3ChildNode1b = parse5.treeAdapters.default.getChildNodes(BIOLrowChildNodes3ChildNode1a)[1]
+                                                var BIOLrowChildNodes3ChildNode0 = parse5.treeAdapters.default.getChildNodes(BIOLrowChildNodes3ChildNode1b)[0]
+                                                var roomNumber = BIOLrowChildNodes3ChildNode0.value.toString().trim()
+                                                //Log.trace ("what is room number     " + roomNumber)
+                                                //Log.trace ("what is room number type    " + typeof roomNumber)
+
+                                                //find room href
+                                                var roomhref = parse5.treeAdapters.default.getAttrList(BIOLrowChildNodes3ChildNode1b)[0].value
+
+                                                //find room seats
+                                                var BIOLrowChildNodes3ChildNode3a = parse5.treeAdapters.default.getChildNodes(BIOLrowChildNodes3ChildNodeRoomRows)[3]
+                                                var BIOLrowChildNodes3ChildNode3a0 = parse5.treeAdapters.default.getChildNodes(BIOLrowChildNodes3ChildNode3a)[0]
+                                                var roomCapacity = BIOLrowChildNodes3ChildNode3a0.value.trim()
+
+                                                //find room furniture
+                                                var BIOLrowChildNodes3ChildNode5 = parse5.treeAdapters.default.getChildNodes(BIOLrowChildNodes3ChildNodeRoomRows)[5]
+                                                var BIOLrowChildNodes3ChildNode50 = parse5.treeAdapters.default.getChildNodes(BIOLrowChildNodes3ChildNode5)[0]
+                                                var roomFurniture = BIOLrowChildNodes3ChildNode50.value.trim()
+
+                                                //find room type
+                                                var BIOLrowChildNodes3ChildNode7 = parse5.treeAdapters.default.getChildNodes(BIOLrowChildNodes3ChildNodeRoomRows)[7]
+                                                var BIOLrowChildNodes3ChildNode70 = parse5.treeAdapters.default.getChildNodes(BIOLrowChildNodes3ChildNode7)[0]
+                                                var roomType = BIOLrowChildNodes3ChildNode70.value.trim()
+
+                                                // create room Address in %20 for getLatLon
+                                                var Array = roomhref.split("/")
+                                                var Length = Array.length
+                                                var LastItem = Array[Length - 1]
+                                                var Short = LastItem.split("-")[0]
+
+                                                var addressURL = that.getAddressURL(roomAddress)
+
+                                                //validBuildingaddressURLObj[Short] = addressURL
+
+                                                Room.rooms_number = roomNumber
+                                                Room.rooms_seats = parseInt(roomCapacity)
+                                                Room.rooms_furniture = roomFurniture
+                                                Room.rooms_type = roomType
+                                                Room.rooms_shortname = Short
+                                                Room.rooms_name = Room.rooms_shortname + "_" + Room.rooms_number
+                                                Room.rooms_href = roomhref
+                                                Room.rooms_fullname = LongName
+                                                Room.rooms_address = roomAddress
+
+
+
+                                                for (var eachlatlonobj of latlonobj){
+                                                    if (eachlatlonobj.address = Room.rooms_address) {
+                                                        Room.rooms_lat = parseFloat(eachlatlonobj.latlon.lat)
+                                                        Room.rooms_lon = parseFloat(eachlatlonobj.latlon.lon)
+                                                    }
+                                                }
+
+                                                eachBuildingRoomsArray.push(Room)
+                                                i++
                                             }
 
-                                        }).catch(function (err: Error) {
-                                            Log.trace('then error    ' + err.message);
-                                        })
-                                        BuildingMap[Short] = eachBuildingRoomsArray
+                                            //Log.trace("how many rooms in BuildingroomArray?  last 3 " + eachBuildingRoomsArray.length)
+                                            BuildingMap[Short] = eachBuildingRoomsArray
+                                        }
                                     }
-                                }
 
-                                //Log.trace("BuildingMapKeys   FIRST  "  + Object.keys(BuildingMap).toString())
+                                    //Log.trace("BuildingMapKeys   FIRST  "  + Object.keys(BuildingMap).toString())
 
-                                processedDataset = BuildingMap
-                                that.save(id, processedDataset)
-                                Log.trace("process dataset...rooms dataset saved")
-                                fulfill(true)
+                                }).then(function(){
 
-                            }). catch (function (err) {
-                                Log.error('DatasetController::process(..) - Promise #2 ERROR: ' + err.message);
-                                reject(false);
-                            });
+                                    processedDataset = BuildingMap
+                                    that.save(id, processedDataset)
+                                    Log.trace("process dataset...rooms dataset saved")
+                                    fulfill(true)
+
+
+                                }). catch (function (err) {
+                                    Log.error('DatasetController::process(..) - Promise #2 ERROR: ' + err.message);
+                                    reject(false);
+                                });
+
+
+                            })
+
+
                             //Log.trace("BuildingMapKeys   LAST  "  + Object.keys(BuildingMap).toString())
                         }
 
@@ -433,7 +460,8 @@ export default class DatasetController {
         return true;
     }
 
-    public getLatLon(httpAddress: any): Promise<String> {
+    public getLatLon(address: any): Promise<String> {
+        var httpAddress = "http://skaha.cs.ubc.ca:8022/api/v1/team34/" + this.getAddressURL(address)
         return new Promise(function (fulfill, reject) {
             let parsedData: any
             try {
@@ -445,7 +473,7 @@ export default class DatasetController {
                     data.on('end', () => {
                         try {
                             parsedData = JSON.parse(rawData);
-                            return fulfill(parsedData)
+                            return fulfill({latlon: parsedData, address:address})
                         } catch (e) {
                             console.log(e.message);
                             return reject (e.message)
@@ -501,7 +529,58 @@ export default class DatasetController {
             i++
         }
 
+        var validBuildingAddress: any = []
+
+        for (var i = 1; i < htmlTableNodes.length; i++){
+            //Log.trace("what is i   " + i.toString())
+            var rowNode = htmlTableNodes[i]
+            var rowChildNodes3LL = parse5.treeAdapters.default.getChildNodes(rowNode)[7]
+            var rowChildNodes3ChildNode0LL = parse5.treeAdapters.default.getChildNodes(rowChildNodes3LL)[0]
+
+
+            var bAddress = rowChildNodes3ChildNode0LL.value.trim()
+            //Log.trace(bAddress)
+            validBuildingAddress.push(shortName)
+            //Log.trace("validBuildingAddress length    " + validBuildingAddress.length)
+            i++
+        }
+
         return validBuildingShortNameArray
     }
+
+
+    public getValidBuildingAddress(document: any){
+
+        //var parse5 = require ("parse5")
+        var ChildNode = parse5.treeAdapters.default.getChildNodes(document)
+        var htmlChildNode = parse5.treeAdapters.default.getChildNodes(document)[6]
+        var htmlChildNodeBody = parse5.treeAdapters.default.getChildNodes(htmlChildNode)[3]
+        var htmlChildNodeBodyChild31 = parse5.treeAdapters.default.getChildNodes(htmlChildNodeBody)[31]
+        var htmlChildNodeBodyChild10 = parse5.treeAdapters.default.getChildNodes(htmlChildNodeBodyChild31)[10]
+        var htmlChildNodeBodyChild1 = parse5.treeAdapters.default.getChildNodes(htmlChildNodeBodyChild10)[1]
+        var htmlChildNodeBodyChild3 = parse5.treeAdapters.default.getChildNodes(htmlChildNodeBodyChild1)[3]
+        var htmlChildNodeBodyChild1a = parse5.treeAdapters.default.getChildNodes(htmlChildNodeBodyChild3)[1]
+        var htmlChildNodeBodyChild5 = parse5.treeAdapters.default.getChildNodes(htmlChildNodeBodyChild1a)[5]
+        var htmlChildNodeBodyChild1b = parse5.treeAdapters.default.getChildNodes(htmlChildNodeBodyChild5)[1]
+        var htmlChildNodeBodyChild3b = parse5.treeAdapters.default.getChildNodes(htmlChildNodeBodyChild1b)[3]
+        var htmlTableNodes = parse5.treeAdapters.default.getChildNodes(htmlChildNodeBodyChild3b)
+
+        var validBuildingAddress: any = []
+
+        for (var i = 1; i < htmlTableNodes.length; i++){
+            //Log.trace("what is i   " + i.toString())
+            var rowNode = htmlTableNodes[i]
+            var rowChildNodes3LL = parse5.treeAdapters.default.getChildNodes(rowNode)[7]
+            var rowChildNodes3ChildNode0LL = parse5.treeAdapters.default.getChildNodes(rowChildNodes3LL)[0]
+
+            var bAddress = rowChildNodes3ChildNode0LL.value.trim()
+            //Log.trace(bAddress)
+            validBuildingAddress.push(bAddress)
+            i++
+        }
+
+        return validBuildingAddress
+    }
+
 }
 
