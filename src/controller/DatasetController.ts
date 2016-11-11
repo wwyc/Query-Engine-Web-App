@@ -336,7 +336,8 @@ export default class DatasetController {
 
 
                                                 for (var eachlatlonobj of latlonobj){
-                                                    if (eachlatlonobj.address = Room.rooms_address) {
+
+                                                    if (Room.rooms_address == eachlatlonobj.address) {
                                                         Room.rooms_lat = parseFloat(eachlatlonobj.latlon.lat)
                                                         Room.rooms_lon = parseFloat(eachlatlonobj.latlon.lon)
                                                     }
@@ -366,6 +367,8 @@ export default class DatasetController {
                                     reject(false);
                                 });
 
+
+                            }).then(function(){
 
                             })
 
