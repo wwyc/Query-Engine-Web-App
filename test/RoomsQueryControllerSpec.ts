@@ -13,7 +13,7 @@ import {QueryRequest, default as QueryController} from "../src/controller/QueryC
 
 var fs = require('fs');
 describe("RoomsQueryController", function () {
-    this.timeout(100000);
+    this.timeout(1000000);
 
     var zipFileContents: string = null;
     var facade: InsightFacade = null;
@@ -98,7 +98,40 @@ describe("RoomsQueryController", function () {
     });
 
 
+    it("Revolution1: Should not be possible to query multiple datasets at the same time", function () {
+        var that = this;
+        let query: QueryRequest = {
+            GET: ["rooms_fullname", "courses_id"],
+            WHERE: {
+                IS: {"rooms_number": "2365"}
+            },
+            ORDER: {"dir": "UP", "keys": ["rooms_number"]},
+            AS: "TABLE"
+        };
+        return facade.performQuery(query).then(function(response: InsightResponse){
+            expect.fail();
+        }).catch(function(response: InsightResponse){
+            expect(response.code).to.equal(400);
+        });
+    });
 
+
+    it("Revolution2: Should not be possible to query multiple datasets at the same time", function () {
+        var that = this;
+        let query: QueryRequest = {
+            GET: ["rooms_fullname", "rooms_number"],
+            WHERE: {
+                IS: {"courses_avg": 23}
+            },
+            ORDER: {"dir": "UP", "keys": ["rooms_number"]},
+            AS: "TABLE"
+        };
+        return facade.performQuery(query).then(function(response: InsightResponse){
+            expect.fail();
+        }).catch(function(response: InsightResponse){
+            expect(response.code).to.equal(400);
+        });
+    });
 
 
 
