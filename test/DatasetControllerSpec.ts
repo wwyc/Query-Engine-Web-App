@@ -9,7 +9,7 @@ import JSZip = require('jszip');
 import {expect} from 'chai';
 
 describe("DatasetController", function () {
-
+   this.timeout(100000);
     beforeEach(function () {
     });
 

@@ -14,7 +14,7 @@ import {InsightResponse} from "../src/controller/IInsightFacade";
 import {QueryRequest, default as QueryController} from "../src/controller/QueryController";
 
 describe("InsightFacadeQuery", function () {
-    this.timeout(10000);
+    this.timeout(100000);
 
     var zipFileContents: string = null;
     var facade: InsightFacade = null;
@@ -486,6 +486,24 @@ describe("InsightFacadeQuery", function () {
         });
     });
 
+    it("Should not be able to perform a query with same APPLY keys22 (400)", function () {
+        var that = this;
+        Log.trace("Starting test: " + that.test.title);
+        let query: QueryRequest = {
+            GET: ["courses_id", "courses_avg"],
+            WHERE: {"GT": {"courses_avg": 90}},
+            GROUP: ["courses_avg"],
+            APPLY: [{"courses_avg": {"COUNT": "courses_avg"}},{"averagecount": {"COUNT": "courses_instructor"}}],
+            ORDER: 'courses_avg', AS: 'table'
+        };
+
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect.fail('Should not happen');
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(400);
+        });
+    });
+
 
     it("EBNF parser1 cover", function () {
         var that = this;
@@ -599,6 +617,223 @@ describe("InsightFacadeQuery", function () {
         });
     });
 
+    it("All keys in GET should be in either GROUP or APPLY.", function () {
+        var that = this;
+        Log.trace("Starting test: " + that.test.title);
+        let query: QueryRequest = {
+            "GET": [ "courses_id","courses_avg"],
+            "WHERE": {"IS": {"courses_dept": "cpsc"}},
+            "GROUP": ["courses_id" ],
+            "APPLY": [],
+            "ORDER": 'courses_id',
+            "AS": "TABLE"
+        };
+
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+
+            expect.fail('Should not happen');
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(400);
+        });
+    });
+
+    it("All keys in GET without underscore should be in either GROUP or APPLY.", function () {
+        var that = this;
+        Log.trace("Starting test: " + that.test.title);
+        let query: QueryRequest = {
+            "GET": [ "courses_id","averageXXX"],
+            "WHERE": {"IS": {"courses_dept": "cpsc"}},
+            "GROUP": [ "courses_id" ],
+            "APPLY": [{"Averagecount": {"COUNT": "courses_avg"}}],
+            "ORDER": { "dir": "DOWN", "keys": ["Averagecount", "courses_id"]},
+            "AS": "TABLE"
+        };
+
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+
+            expect.fail('Should not happen');
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(400);
+        });
+    });
+
+    it("accept empty where", function () {
+        var that = this;
+        Log.trace("Starting test: " + that.test.title);
+        let query: QueryRequest = {
+            "GET": [ "courses_id"],
+            "WHERE": {},
+            "GROUP": [ "courses_id" ],
+            "APPLY": [{"Averagecount": {"COUNT": "courses_avg"}}],
+            "ORDER": { "dir": "DOWN", "keys": ["Averagecount", "courses_id"]},
+            "AS": "TABLE"
+        };
+
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+
+            expect(response.code).to.equal(200);
+        }).catch(function (response: InsightResponse) {
+
+            expect.fail('Should not happen');
+        });
+    });
+
+
+
+    it("should not be able to accept wrong room name", function () {
+        var that = this;
+        Log.trace("Starting test: " + that.test.title);
+        let query: QueryRequest =  {
+
+            "GET": ["rooms_full", "rooms_number"],
+            "WHERE": {"IS": {"rooms_shortname": "DMP"}},
+            "ORDER": { "dir": "UP", "keys": ["rooms_number"]},
+            "AS": "TABLE"
+        };
+
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+
+            expect.fail('Should not happen');
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(424);
+        });
+    });
+
+
+    it("should not be able to accept wrong room name", function () {
+        var that = this;
+        Log.trace("Starting test: " + that.test.title);
+        let query: QueryRequest =  {
+
+            "GET": ["rooms_fullname", "rooms_number"],
+            "WHERE": {"IS": {"rooms_shorts": "DMP"}},
+            "ORDER": { "dir": "UP", "keys": ["rooms_number"]},
+            "AS": "TABLE"
+        };
+
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+
+            expect.fail('Should not happen');
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(424);
+        });
+    });
+
+    it("should not be able to accept wrong room name", function () {
+        var that = this;
+        Log.trace("Starting test: " + that.test.title);
+        let query: QueryRequest =  {
+
+            "GET": ["rooms_fullname", "rooms_number"],
+            "WHERE": {"IS": {"rooms_shorts": "DMP"}},
+            "ORDER": { "dir": "UP", "keys": ["rooms_num"]},
+            "AS": "TABLE"
+        };
+
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+
+            expect.fail('Should not happen');
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(400);
+        });
+    });
+    it("proper room query", function() {
+        var that = this;
+
+        Log.trace("Starting test: " + that.test.title);
+            let query: QueryRequest= {
+                "GET": ["rooms_fullname", "rooms_number","rooms_address","rooms_type","rooms_furniture"
+                ,"rooms_href"],
+                "WHERE": {"IS": {"rooms_shortname": "DMP"}},
+                "ORDER": { "dir": "UP", "keys": ["rooms_number"]},
+                "AS": "TABLE"
+            };
+            return facade.performQuery(query).then(function (response: InsightResponse) {
+
+                expect(response.code).to.equal(200);
+            }).catch(function (response: InsightResponse) {
+
+                expect.fail('Should not happen');
+            });
+        });
+    it("All keys in GET without underscore should be in either GROUP or APPLY.3", function () {
+        var that = this;
+        Log.trace("Starting test: " + that.test.title);
+        let query: QueryRequest = {
+            "GET": [ "courses_avg"],
+            "WHERE": {"IS": {"courses_dept": "cpsc"}},
+            "GROUP": [ "courses_id" ],
+            "APPLY": [{"Averagecount": {"COUNT": "courses_avg"}}],
+            "ORDER": { "dir": "DOWN", "keys": ["Averagecount", "courses_id"]},
+            "AS": "TABLE"
+        };
+
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+
+            expect.fail('Should not happen');
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(400);
+        });
+    });
+
+    it("All keys in GET without underscore should be in either GROUP or APPLY.3", function () {
+        var that = this;
+        Log.trace("Starting test: " + that.test.title);
+        let query: QueryRequest = {
+            "GET": [ "courses_avg"],
+            "WHERE": {"IS": {"courses_dept": "cpsc"}},
+            "GROUP": [ "courses_id" ],
+            "APPLY": [{"Averagecount": {"COUNT": "courses_avg"}},{"Averagecount": {"MAX": "courses_avg"}}],
+            "ORDER": { "dir": "DOWN", "keys": ["Averagecount", "courses_id"]},
+            "AS": "TABLE"
+        };
+
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+
+            expect.fail('Should not happen');
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(400);
+        });
+    });
+
+    it("All keys in GET without underscore should be in either GROUP or APPLY.3when apply empty", function () {
+        var that = this;
+        Log.trace("Starting test: " + that.test.title);
+        let query: QueryRequest = {
+            "GET": [ "courses_id","Averagecount"],
+            "WHERE": {"IS": {"courses_dept": "cpsc"}},
+            "GROUP": [ "courses_id" ],
+            "APPLY": [],
+            "ORDER": { "dir": "DOWN", "keys": ["Averagecount", "courses_id"]},
+            "AS": "TABLE"
+        };
+
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+
+            expect.fail('Should not happen');
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(400);
+        });
+    });
+    it("All keys in GET without underscore should be in either GROUP or APPLY.3when apply empty", function () {
+        var that = this;
+        Log.trace("Starting test: " + that.test.title);
+        let query: QueryRequest = {
+            "GET": [ "Averagecount"],
+            "WHERE": {"IS": {"courses_dept": "cpsc"}},
+            "GROUP": [ "courses_id" ],
+            "APPLY": [{"averagecount": {"COUNT": "courses_avg"}}],
+            "ORDER": { "dir": "DOWN", "keys": ["Averagecount", "courses_id"]},
+            "AS": "TABLE"
+        };
+
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+
+            expect.fail('Should not happen');
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(400);
+        });
+    });
 
 
 });

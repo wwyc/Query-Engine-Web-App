@@ -10,7 +10,7 @@ import {InsightResponse} from "../src/controller/IInsightFacade";
 import {QueryRequest} from "../src/controller/QueryController";
 
 describe("InsightFacadeDataset", function () {
-    this.timeout(10000);
+    this.timeout(100000);
 
     var zipFileContents: string = null;
     var facade: InsightFacade = null;
