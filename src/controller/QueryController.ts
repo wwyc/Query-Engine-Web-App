@@ -101,8 +101,8 @@ export default class QueryController {
         //•	Jonah: Empty GROUP should not be valid.
         if (typeof query.APPLY !== 'undefined'/*&& query.APPLY !== null*/) {
             if (typeof query.GROUP === 'undefined'||query.GROUP === null||query.GROUP.length===0) {
-                Log.trace("APPLY without GROUP should not be valid.")
-                Log.trace("Empty GROUP should not be valid.")
+               // Log.trace("APPLY without GROUP should not be valid.")
+                //Log.trace("Empty GROUP should not be valid.")
                 return false
             }
         }
@@ -110,7 +110,7 @@ export default class QueryController {
         //•	Kodiak: GROUP without APPLY should not be valid.
         if (typeof query.GROUP !== 'undefined' /*&& query.GROUP !== null*/) {
             if (typeof query.APPLY === 'undefined' ) {
-                Log.trace("GROUP without APPLY should not be valid.")
+                //Log.trace("GROUP without APPLY should not be valid.")
                 return false
             }
 
@@ -118,7 +118,7 @@ export default class QueryController {
             for (var i = 0; i < query.GROUP.length; i++) {
                 // check if all keys in GROUP are presented in GET String
                 if (!QueryController.ValidKeyChecker.isvalidKey(query.GROUP[i])) {
-                    Log.trace("some keys in GROUP are not valid")
+                  //  Log.trace("some keys in GROUP are not valid")
                     return false
                 }}
 
@@ -127,7 +127,7 @@ export default class QueryController {
                 //if GET is a string
                 if (typeof query.GET ==='string') {
                     if (!(query.GROUP[a] === query.GET)) {
-                        Log.trace("All keys in GROUP should be presented in GET.")
+                       // Log.trace("All keys in GROUP should be presented in GET.")
                         return false
                     }
                 } else {
@@ -139,7 +139,7 @@ export default class QueryController {
                         }
                     }
                     if (!ISinGetKey) {
-                        Log.trace("All keys in GROUP should be presented in GET.")
+                       // Log.trace("All keys in GROUP should be presented in GET.")
                         return false
                     }
                 }
@@ -159,7 +159,7 @@ export default class QueryController {
                     { ISKeyinbothGROUPandAPPLY = true }}
 
                 if (ISKeyinbothGROUPandAPPLY){
-                    Log.trace("GROUP & APPLY cannot have the same keys")
+                   // Log.trace("GROUP & APPLY cannot have the same keys")
                     return false
                 }
             }}
@@ -174,12 +174,12 @@ export default class QueryController {
                     query.GROUP.length>0
                 )
                     if(!QueryController.ValidKeyChecker.contains(query.GET,query.GROUP))
-                    { Log.trace("All keys in GET should be in either GROUP or APPLY.")
+                    {// Log.trace("All keys in GET should be in either GROUP or APPLY.")
                         return false;}
 
                         if (!query.GET.includes("_")) {
                             if (!QueryController.ValidKeyChecker.contains(query.GET, query.GROUP)) {
-                                Log.trace("All keys in GET without underscore should be in APPLY.")
+                               // Log.trace("All keys in GET without underscore should be in APPLY.")
                                 return false;
                             }}} else
                 {return false}
@@ -189,7 +189,7 @@ export default class QueryController {
                     if (typeof query.GROUP !== 'undefined' && query.GROUP !== null
                         && query.GROUP.length > 0) {
                         if (!(query.GROUP.includes(query.GET[s]))) {
-                            Log.trace("All keys in GET with underscore should be in GROUP.")
+                            //Log.trace("All keys in GET with underscore should be in GROUP.")
                             return false;
 
                         }}}  else if (!query.GET[s].includes("_")) {
@@ -205,7 +205,7 @@ export default class QueryController {
                                 applyarray1.push(Object.keys(applyObject)[0])
                             }
                             if (!(applyarray1.includes(query.GET[s]))) {
-                                Log.trace("All keys in GET without underscore should be in APPLY.")
+                                //Log.trace("All keys in GET without underscore should be in APPLY.")
                                 return false;
                             }}}
             }}
@@ -222,7 +222,7 @@ export default class QueryController {
                 for(var h=0; h<applyarray.length-1;h++)
                 {
                     if(applyarray[h]===applyarray[h+1])
-                    { Log.trace("duplicate keys found in APPLY")
+                    {// Log.trace("duplicate keys found in APPLY")
                         return false;}
                 }}
         }
