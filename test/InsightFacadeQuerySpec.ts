@@ -783,7 +783,7 @@ describe("InsightFacadeQuery", function () {
             "GET": [ "courses_avg"],
             "WHERE": {"IS": {"courses_dept": "cpsc"}},
             "GROUP": [ "courses_id" ],
-            "APPLY": [{"Averagecount": {"COUNT": "courses_avg"}},{"Averagecount": {"MAX": "courses_avg"}}],
+            "APPLY": [{"Averagecount": {"COUNT": "courses_avg"}}],
             "ORDER": { "dir": "DOWN", "keys": ["Averagecount", "courses_id"]},
             "AS": "TABLE"
         };
@@ -835,6 +835,85 @@ describe("InsightFacadeQuery", function () {
         });
     });
 
+    it("COUNT string cover", function () {
+        var that = this;
+        Log.trace("Starting test: " + that.test.title);
+        let query: QueryRequest = {
+            "GET": ["courses_id","Averagecount"],
+            "WHERE": {"IS": {"courses_dept": "cpsc"}} ,
+            "GROUP": [ "courses_id" ],
+            "APPLY": [ {"Averagecount": {"COUNT": "courses_avg"}},{"Instructorcount": {"COUNT": "courses_instructor"}},
+
+            ],
+            "ORDER": { "dir": "UP", "keys": ["Averagecount", "courses_id"]},
+            "AS": "TABLE"
+        };
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect(response.code).to.equal(200);
+        }).catch(function (response: InsightResponse) {
+            expect.fail('Should not happen');
+        });
+    });
+
+    it("COUNT string cover", function () {
+        var that = this;
+        Log.trace("Starting test: " + that.test.title);
+        let query: QueryRequest = {
+            "GET": ["rooms_name","Averagecount","roomtypescount","roomfurniturecount"],
+            "WHERE": {"GT": {"rooms_seats": 160}},
+            "GROUP": [ "rooms_name" ],
+            "APPLY": [ {"Averagecount": {"COUNT": "rooms_address"}},{"roomtypescount": {"COUNT": "rooms_type"}},
+                {"roomfurniturecount": {"COUNT": "rooms_furniture" }},{"roomhrefcount": {"COUNT":"rooms_href"}}
+            ],
+            "ORDER": { "dir": "UP", "keys": ["Averagecount", "rooms_name"]},
+            "AS": "TABLE"
+        };
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect(response.code).to.equal(200);
+        }).catch(function (response: InsightResponse) {
+            expect.fail('Should not happen');
+        });
+    });
+    it("COUNT string cover2", function () {
+        var that = this;
+        Log.trace("Starting test: " + that.test.title);
+        let query: QueryRequest = {
+            "GET": ["rooms_name","Averagecount","roomtypescount","roomfurniturecount"],
+            "WHERE": {"GT": {"rooms_seats": 160}},
+            "GROUP": [ "rooms_name" ],
+            "APPLY": [ {"Averagecount": {"COUNT": "rooms_addresssss"}},{"roomtypescount": {"COUNT": "rooms_type"}},
+                {"roomfurniturecount": {"COUNT": "rooms_furniture" }},{"roomhrefcount": {"COUNT":"rooms_href"}}
+            ],
+            "ORDER": { "dir": "UP", "keys": ["Averagecount", "rooms_name"]},
+            "AS": "TABLE"
+        };
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect.fail('Should not happen');
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(400);
+        });
+    });
+
+
+    it("All keys in GET without underscore should be in either GROUP or APPLY.3", function () {
+        var that = this;
+        Log.trace("Starting test: " + that.test.title);
+        let query: QueryRequest = {
+            "GET": [ "courses_avg"],
+            "WHERE": {"IS": {"courses_dept": "cpsc"}},
+            "GROUP": [ "courses_id" ],
+            "APPLY": [],
+            "ORDER": { "dir": "DOWN", "keys": ["courses_id"]},
+            "AS": "TABLE"
+        };
+
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+
+            expect.fail('Should not happen');
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(400);
+        });
+    });
 
 });
 
