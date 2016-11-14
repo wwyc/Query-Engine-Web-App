@@ -10,6 +10,7 @@ Contributions:
 Link to major commits: 
 1)fixed dataset controller bug
 https://github.com/CS310-2016Fall/cpsc310project_team34/commit/2ef2b0874e24f9f789292b40e34ca05e3199ae9f
+
 2)write test for D3
 https://github.com/CS310-2016Fall/cpsc310project_team34/commit/3417d8929fb4a74534679de75348ed2d050804f1
 https://github.com/CS310-2016Fall/cpsc310project_team34/commit/d629128ff80536bc57a11b331f9db18e62c82aba
