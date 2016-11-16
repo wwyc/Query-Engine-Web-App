@@ -1,5 +1,5 @@
 Final auto test pass rate:  100%
-Unit tests code coverage rate:  93.28%
+Unit tests code coverage rate:  93.83%
 
 Contributions:  
 - fixed all bugs in D1 & D2 to achieve 100% for autotests, refractored QC controller
