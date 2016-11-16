@@ -3,6 +3,7 @@ Tues Nov 8  - Winnie to finish D3 & Alicia to add tests (Completed)
             
 Tues Nov 15 - finish first three tasks, have some idea about novel function
 *  UPDATE:
+
 1) course explorer - filter completed, need to implement GET & ORDER (50%) - (Alicia to continue)
    
 2) room explorer - filter completed need to implement implement GET & ORDER (50%) - (Alicia to continue)
