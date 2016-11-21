@@ -1,53 +1,166 @@
 <!DOCTYPE html>
 <head>
-  <link rel="stylesheet" href="./public/bootstrap.min.css">
-  <link rel="stylesheet" href="./public/main.css">
-  <script src="./public/jquery.min.js"></script>
-  <script src="./public/bootstrap.min.js"></script>
-  <script src="./public/d3.min.js"></script>
-  <script src="./public/main.js"></script>
+	<link rel="stylesheet" href="./public/bootstrap.min.css">
+	<link rel="stylesheet" href="./public/main.css">
+	<script src="./public/jquery.min.js"></script>
+	<script src="./public/bootstrap.min.js"></script>
+	<script src="./public/d3.min.js"></script>
+	<script src="./public/main.js"></script>
 </head>
 <html>
-  <body>
-    <div id="dataset">
-      <div class="form-group">
-	<h3>Dataset</h3>
-	<label for="datasetId">ID:</label>
-	<input type="text" class="form-control" id="datasetId">
-	<label for="datasetZip">Archive:</label>
-	<input type="file" class="form-control" id="datasetZip">
+<body>
+<div id="dataset">
+	<div class="form-group">
+		<h3>Dataset</h3>
+		<label for="datasetId">ID:</label>
+		<input type="text" class="form-control" id="datasetId">
+		<label for="datasetZip">Archive:</label>
+		<input type="file" class="form-control" id="datasetZip">
 	</div>
 	<button type="button" class="btn btn-primary" id="datasetAdd">Add Dataset</button>
 	<button type="button" class="btn btn-primary" id="datasetRm">Remove Dataset</button>
-    </div>
-    <div id="container">
-      <h3>Query</h3>
-      <form id="queryForm">
-	<div class="form-group">
-	  <label for="query">Query:</label>
-	  <textarea class="form-control" rows="10" id="query"></textarea>
-	</div>
+</div>
+
+<div id="container">
+	<h3>Courses Explorer</h3>
+	<form id="queryForm">
+		<div class="form-group">
+			<h4> show all of the sections in department X</h4>
+			<label for="department">Department:</label>
+			<textarea class="form-control" rows="1" id="department"></textarea>
+			<h4>Show all of the courses in department X in an order</h4>
+			<div class="form-group">
+				<label>Choosing Compare Key</label>
+				<input type="checkbox" name="getcoursebydept" value="courses_pass" > Courses Pass</input>
+				<input type="checkbox" name="getcoursebydept" value="courses_fail" > Courses Failing</input>
+				<input type="checkbox" name="getcoursebydept" value="courses_avg" > Courses avg</input>
+			</div>
+			<h4>    </h4>
+			<label for="instructor">Instructor:</label>
+			<textarea class="form-control" rows="1" id="instructor"></textarea>
+			<label for="sectionsize">Section size:</label>
+			<select id="sectionsizecompare">
+				<option value="GT"> > </option>
+				<option  value="EQ" > = </option>
+				<option  value="LT" > < </option>
+			</select>    <br>
+			<textarea class="form-control" rows="1" id="sectionsize"></textarea>
+			<label for="title">Title:</label>
+			<textarea class="form-control" rows="1" id="title"></textarea>
+		</div>
+
+        <div class="form-group">
+            <!--  order    多选 !-->
+            <label >Compare direction:</label>
+            <select id="direction0">
+                <option value="UP"> UP </option>
+                <option value="DOWN"> DOWN </option>
+            </select>    <br>
+
+        </div>
+
+        <div class="form-group">
+            <label>Choosing Filter</label>
+            <input type="checkbox" name="getcourse" value= "courses_dept" > Department</input>
+            <input type="checkbox" name="getcourse" value="courses_title" > Title</input>
+            <input type="checkbox" name="getcourse" value="courses_size" > Section Size </input><br>
+			<input type="checkbox" name="getcourse" value="courses_instructor" >Instructor </input>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+	</form>
+
+
+
+</div>
+
+
+<div id="container1">
+	<h3>Rooms Explorer</h3>
+	<form id="queryForm1">
+		<!--  filter !-->
+		<div class="form-group">
+			<label for="buildingname">Building Name:</label>
+			<textarea class="form-control" rows="1" id="buildingname"></textarea>
+			<label for="roomnumber">Room Number:</label>
+			<textarea class="form-control" rows="1" id="roomnumber"></textarea>
+			<label for="roomsize">Room Size:</label>
+			<select id="roomsizecompare">
+				<option value="GT" > > </option>
+				<option value="EQ"> = </option>
+				<option value="LT"> < </option>
+			</select>    <br>
+			<textarea class="form-control" rows="1" id="roomsize"></textarea>
+			<label for="roomtype">Room Type:</label>
+			<textarea class="form-control" rows="1" id="roomtype"></textarea>
+			<label for="furnituretype">Furniture type:</label>
+			<textarea class="form-control" rows="1" id="furnituretype"></textarea>
+			<h4>Location:</h4>
+			<label for="choosebuilding"> building name</label>
+			<textarea class="form-control" rows="1" id="choosebuilding"></textarea>
+			<label for="distance"> distance (meters)</label>
+			<textarea class="form-control" rows="1" id="distance"></textarea>
+
+		</div>
+
+		<div class="form-group">
+				<!--  order    多选 !-->
+		<label >Compare direction:</label>
+                    <select id="direction1">
+                        <option> UP </option>
+                        <option> DOWN </option>
+                    </select>    <br>
+			<!--  order    多选 !-->
+
+        </div>
+
+		<div class="form-group">
+			<label>Choosing Filter</label>
+			<input type="checkbox" name="getroomfilter" value= "rooms_shortname" > Building Name</input>
+			<input type="checkbox" name="getroomfilter" value="rooms_seats" > Room Size </input>
+			<input type="checkbox" name="getroomfilter" value="rooms_type" > Room type </input>
+			<input type="checkbox" name="getroomfilter" value="rooms_furniture" > Furniture Type </input>
+			<input type="checkbox" name="getroomfilter" value="roomsdistance" > Distance</input>
+		</div>
+
+
+		<button type="submit" class="btn btn-primary">Confirm</button>
+	</form>
+</div>
+
+
+<div id="roomscheduling">
+<h3> Room Scheduling</h3>
+<form id="schedulingform">
+	<label> Room List</label>
+	<textarea class="form-control" rows="5" id="roomlist" ></textarea>
+	<label> Course List</label>
+	<textarea class="form-control" rows="5" id="courselist"></textarea>
 	<button type="submit" class="btn btn-primary">Submit</button>
-      </form>
-    </div>
-    <div id="render">
-      <h3>Result</h3>
-    </div>
-    <div class="modal fade" id="errorModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document">
-	<div class="modal-content">
-	  <div class="modal-header">
-	    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-	    <h4 class="modal-title"></h4>
-	  </div>
-	  <div class="modal-body">
-	    <p></p>
-	  </div>
-	  <div class="modal-footer">
-	    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-	  </div>
+	</form>
+</div>
+
+
+
+
+<div id="render">
+	<h3>Result</h3>
+</div>
+<div class="modal fade" id="errorModal" tabindex="-1" role="dialog">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title"></h4>
+			</div>
+			<div class="modal-body">
+				<p></p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+		</div>
 	</div>
-      </div>
-      </div>
-  </body>
+</div>
+</body>
 </html>
