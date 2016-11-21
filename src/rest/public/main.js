@@ -390,7 +390,7 @@ else if(filterresult.length===3)
         var roomquery;
         var coursequery;
    roomquery=JSON.stringify({
-       "GET": ["rooms_fullname", "rooms_number","rooms_seats"],
+       "GET": ["rooms_shortname", "rooms_number","rooms_seats"],
        "WHERE": {"IS": {"rooms_shortname": "DMP"}},
        "ORDER": { "dir": "UP", "keys": ["rooms_seats"]},
        "AS": "TABLE"
@@ -425,7 +425,7 @@ else if(filterresult.length===3)
             var leftsection = 0
             var badcourse=0;
             var rowmaintain=0
-
+            var badcoursearr=[]
             for (var i = 0; i < coursearray.length; i++) {
                 //  sectionnumber /3 round
                 distributedsection += coursearray[i]["Sectionnumber"]
@@ -433,7 +433,7 @@ else if(filterresult.length===3)
             }
             for(var c=0;c<roomarray.length;c++){
 
-                roomarray[c]["leftslot"]=11
+                roomarray[c]["leftslot"]=15
               //  console.log(JSON.stringify( roomarray[c]))
             }
             for(var d=0;d<coursearray.length;d++){
@@ -449,21 +449,28 @@ else if(filterresult.length===3)
 
                         if (coursearray[x]["Coursesize"] <= roomarray[y]["rooms_seats"])
 
-                        { if(roomarray[y]["leftslot"]===11) {
+                        { if(roomarray[y]["leftslot"]===15) {
                             console.log("case 1: leftslot 11"+coursearray[x]["leftsection"])
                             console.log("y :"+y)
-                            if (coursearray[x]["leftsection"] >= 11) {
+                            if (coursearray[x]["leftsection"] >= 15) {
                                // console.log("case 1: oversize"+coursearray[x]["leftsection"])
                                 //console.log("y :"+y)
                                 console.log("badcourse111"+badcourse)
-                                console.log(coursearray[x]["Sectionnumber"])
-                                badcourse += coursearray[x]["Sectionnumber"] - 11;
+                                console.log(coursearray[x]["leftsection"])
+                                badcourse += coursearray[x]["leftsection"] - 15;
+                               /* for(var b=0;b<coursearray[x]["Sectionnumber"] - 11;b++)
+                                {
+                                    badcoursearr.push(coursearray[x])
+                                }
+                                */
                                 console.log("badcourse"+badcourse)
                                 timetablearr[y]=[]
                                 for(var i=0;i<coursearray[x]["leftsection"];i++)
-                                {timetablearr[y].push(coursearray[x])
+                                {
+                                    timetablearr[y].push(coursearray[x])
                                 coursecount++;
                                 }
+
                                 rowmaintain = y + 1;
                                 roomarray[y]["leftslot"]=0
                                 coursearray[x]["leftsection"]=0
@@ -526,7 +533,7 @@ else if(filterresult.length===3)
                             console.log("case 3: oversize")
                             console.log("y :"+y)
                             console.log("leftslot"+roomarray[y]["leftslot"])
-                           if(leftsection<=11)
+                           if(leftsection<=15)
                            {
                                console.log("case 3: oversize1"+coursearray[x]["leftsection"])
                                console.log("y :"+y)
@@ -547,7 +554,7 @@ else if(filterresult.length===3)
                                {timetablearr[y].push(coursearray[x])
                                coursecount++
                                }
-                               coursearray[x]["leftsection"]= 11-roomarray[y]["leftslot"]
+                               coursearray[x]["leftsection"]= 15-roomarray[y]["leftslot"]
                                roomarray[y]["leftslot"] =  0
 
                             }}
@@ -560,11 +567,57 @@ else if(filterresult.length===3)
                     console.log("y"+y+"timetablearr"+JSON.stringify(timetablearr[y]))
                 }
             badcourse+=distributedsection-coursecount
-  console.log("badcourse"+badcourse)
+   console.log("badcourse"+badcourse)
    console.log(timetablearr);
+           /* for(var j=0;j<timetablearr.length;j++)
+            {
+               for(var i=0;i<11;i++)
+               {
+                   timetablearr[j][i]=JSON.stringify(timetablearr[j][i])
+            }}
+            */
+           var newtimetablearr=[]
             var quality=1-(badcourse/distributedsection)
-           alert("schedule quality: "+quality)
-       generateTable(timetablearr);
+            alert("schedule quality: "+quality)
+            for(var j=0;j<timetablearr.length;j++)
+            {
+               // console.log("jump in");
+
+                newtimetablearr[j]={};
+                if(timetablearr[j][0]!=null||timetablearr[j][0]!=undefined)
+                newtimetablearr[j]["MWF8am-9am"]=JSON.stringify(timetablearr[j][0]["courses_dept"]+timetablearr[j][0]["courses_id"]+":"+roomarray[j]["rooms_shortname"]+roomarray[j]["rooms_number"])
+                if(timetablearr[j][1]!=null||timetablearr[j][1]!=undefined)
+                newtimetablearr[j]["MWF9am-10am"]=JSON.stringify(timetablearr[j][1]["courses_dept"]+timetablearr[j][1]["courses_id"]+":"+roomarray[j]["rooms_shortname"]+roomarray[j]["rooms_number"])
+                if(timetablearr[j][2]!=null||timetablearr[j][2]!=undefined)
+                newtimetablearr[j]["MWF10am-11am"]=JSON.stringify(timetablearr[j][2]["courses_dept"]+timetablearr[j][2]["courses_id"]+":"+roomarray[j]["rooms_shortname"]+roomarray[j]["rooms_number"])
+                if(timetablearr[j][3]!=null||timetablearr[j][3]!=undefined)
+                newtimetablearr[j]["MWF11am-12pm"]=JSON.stringify(timetablearr[j][3]["courses_dept"]+timetablearr[j][3]["courses_id"]+":"+roomarray[j]["rooms_shortname"]+roomarray[j]["rooms_number"])
+                if(timetablearr[j][4]!=null||timetablearr[j][4]!=undefined)
+                newtimetablearr[j]["MWF12pm-1pm"]=JSON.stringify(timetablearr[j][4]["courses_dept"]+timetablearr[j][4]["courses_id"]+":"+roomarray[j]["rooms_shortname"]+roomarray[j]["rooms_number"])
+                if(timetablearr[j][5]!=null||timetablearr[j][5]!=undefined)
+                newtimetablearr[j]["MWF1pm-2pm"]=JSON.stringify(timetablearr[j][5]["courses_dept"]+timetablearr[j][5]["courses_id"]+":"+roomarray[j]["rooms_shortname"]+roomarray[j]["rooms_number"])
+                if(timetablearr[j][6]!=null||timetablearr[j][6]!=undefined)
+                newtimetablearr[j]["MWF2pm-3pm"]=JSON.stringify(timetablearr[j][6]["courses_dept"]+timetablearr[j][6]["courses_id"]+":"+roomarray[j]["rooms_shortname"]+roomarray[j]["rooms_number"])
+                if(timetablearr[j][7]!=null||timetablearr[j][7]!=undefined)
+                newtimetablearr[j]["MWF3pm-4pm"]=JSON.stringify(timetablearr[j][7]["courses_dept"]+timetablearr[j][7]["courses_id"]+":"+roomarray[j]["rooms_shortname"]+roomarray[j]["rooms_number"])
+                if(timetablearr[j][8]!=null||timetablearr[j][8]!=undefined)
+                newtimetablearr[j]["MWF4pm-5pm"]=JSON.stringify(timetablearr[j][8]["courses_dept"]+timetablearr[j][8]["courses_id"]+":"+roomarray[j]["rooms_shortname"]+roomarray[j]["rooms_number"])
+                if(timetablearr[j][9]!=null||timetablearr[j][9]!=undefined)
+                newtimetablearr[j]["TUTH8am-9:30am"]=JSON.stringify(timetablearr[j][9]["courses_dept"]+timetablearr[j][9]["courses_id"]+":"+roomarray[j]["rooms_shortname"]+roomarray[j]["rooms_number"])
+                if(timetablearr[j][10]!=null||timetablearr[j][10]!=undefined)
+                newtimetablearr[j]["TUTH9:30am-11:00am"]=JSON.stringify(timetablearr[j][10]["courses_dept"]+timetablearr[j][10]["courses_id"]+":"+roomarray[j]["rooms_shortname"]+roomarray[j]["rooms_number"])
+                if(timetablearr[j][11]!=null||timetablearr[j][11]!=undefined)
+                newtimetablearr[j]["TUTH11:00am-12:30pm"]=JSON.stringify(timetablearr[j][11]["courses_dept"]+timetablearr[j][11]["courses_id"]+":"+roomarray[j]["rooms_shortname"]+roomarray[j]["rooms_number"])
+                if(timetablearr[j][12]!=null||timetablearr[j][12]!=undefined)
+                newtimetablearr[j]["TUTH12:30pm-2:00pm"]=JSON.stringify(timetablearr[j][12]["courses_dept"]+timetablearr[j][12]["courses_id"]+":"+roomarray[j]["rooms_shortname"]+roomarray[j]["rooms_number"])
+                if(timetablearr[j][13]!=null||timetablearr[j][13]!=undefined)
+                newtimetablearr[j]["TUTH2:00pm-3:30pm"]=JSON.stringify(timetablearr[j][13]["courses_dept"]+timetablearr[j][13]["courses_id"]+":"+roomarray[j]["rooms_shortname"]+roomarray[j]["rooms_number"])
+                if(timetablearr[j][14]!=null||timetablearr[j][14]!=undefined)
+                newtimetablearr[j]["TUTH3:30pm-5:00pm"]=JSON.stringify(timetablearr[j][14]["courses_dept"]+timetablearr[j][14]["courses_id"]+":"+roomarray[j]["rooms_shortname"]+roomarray[j]["rooms_number"])
+
+                }
+            console.log(newtimetablearr)
+       generateTable(newtimetablearr);
 
         }
 
