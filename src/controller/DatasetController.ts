@@ -277,8 +277,6 @@ export default class DatasetController {
                                             //  Loop through room table
                                             var ArrayofRoomRows = parse5.treeAdapters.default.getChildNodes(BIOLrowChildNodes3)
 
-
-
                                             for (var i = 1; i < ArrayofRoomRows.length; i++) {
                                                 //Log.trace ("inside ArrayofRoomRows Loop START")
 
@@ -425,6 +423,8 @@ export default class DatasetController {
                     session.courses_fail = obj["Fail"]
                     session.courses_audit = obj["Audit"]
                     session.courses_uuid=obj["id"].toString();
+                    session.courses_size=obj["Pass"]+obj["Fail"];
+                    session.courses_year=obj["Year"];
                     sessions.push(session)
                 }
             }
