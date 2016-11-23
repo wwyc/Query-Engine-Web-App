@@ -6,6 +6,7 @@
 	<script src="./public/bootstrap.min.js"></script>
 	<script src="./public/d3.min.js"></script>
 	<script src="./public/main.js"></script>
+
 </head>
 <html>
 <body>
@@ -35,6 +36,8 @@
 				<input type="checkbox" name="getcoursebydept" value="courses_fail" > Courses Failing</input>
 				<input type="checkbox" name="getcoursebydept" value="courses_avg" > Courses avg</input>
 			</div>
+			<label for="coursenumber">Course number:</label>
+			<textarea class="form-control" rows="1" id="coursenumber"></textarea>
 			<h4>    </h4>
 			<label for="instructor">Instructor:</label>
 			<textarea class="form-control" rows="1" id="instructor"></textarea>
@@ -47,6 +50,7 @@
 			<textarea class="form-control" rows="1" id="sectionsize"></textarea>
 			<label for="title">Title:</label>
 			<textarea class="form-control" rows="1" id="title"></textarea>
+
 		</div>
 
         <div class="form-group">
@@ -59,12 +63,16 @@
 
         </div>
 
-        <div class="form-group">
-            <label>Choosing Filter</label>
+		<div class="form-group">
+            <label>Course Filter</label>
             <input type="checkbox" name="getcourse" value= "courses_dept" > Department</input>
             <input type="checkbox" name="getcourse" value="courses_title" > Title</input>
             <input type="checkbox" name="getcourse" value="courses_size" > Section Size </input><br>
+
+			<label>Section Filter</label>
+			<input type="checkbox" name="getcourse" value= "courses_dept" > Department</input>
 			<input type="checkbox" name="getcourse" value="courses_instructor" >Instructor </input>
+			<input type="checkbox" name="getcourse" value="courses_id" > Course Number</input>
         </div>
 
         <button type="submit" class="btn btn-primary">Submit</button>
@@ -96,27 +104,27 @@
 			<label for="furnituretype">Furniture type:</label>
 			<textarea class="form-control" rows="1" id="furnituretype"></textarea>
 			<h4>Location:</h4>
-			<label for="choosebuilding"> building name</label>
-			<textarea class="form-control" rows="1" id="choosebuilding"></textarea>
-			<label for="distance"> distance (meters)</label>
-			<textarea class="form-control" rows="1" id="distance"></textarea>
+			<label for="buildingname1"> building name</label>
+			<textarea class="form-control" rows="1" id="buildingname1"></textarea>
+			<label for="roomdistance"> distance (meters)</label>
+			<textarea class="form-control" rows="1" id="roomdistance"></textarea>
 
 		</div>
 
 		<div class="form-group">
-				<!--  order    多选 !-->
-		<label >Compare direction:</label>
-                    <select id="direction1">
-                        <option> UP </option>
-                        <option> DOWN </option>
-                    </select>    <br>
+			<!--  order    多选 !-->
+			<label >Compare direction:</label>
+			<select id="direction1">
+				<option> UP </option>
+				<option> DOWN </option>
+			</select>    <br>
 			<!--  order    多选 !-->
 
-        </div>
+		</div>
 
 		<div class="form-group">
 			<label>Choosing Filter</label>
-			<input type="checkbox" name="getroomfilter" value= "rooms_shortname" > Building Name</input>
+			<input type="checkbox" name="getroomfilter" value= "rooms_shortname" > Building Name</input><br>
 			<input type="checkbox" name="getroomfilter" value="rooms_seats" > Room Size </input>
 			<input type="checkbox" name="getroomfilter" value="rooms_type" > Room type </input>
 			<input type="checkbox" name="getroomfilter" value="rooms_furniture" > Furniture Type </input>
@@ -128,17 +136,24 @@
 	</form>
 </div>
 
-
 <div id="roomscheduling">
 <h3> Room Scheduling</h3>
 <form id="schedulingform">
+	<label>typing list of input</label>
 	<label> Room List</label>
-	<textarea class="form-control" rows="5" id="roomlist" ></textarea>
+	<textarea class="form-control" rows="3" id="roomlist" > </textarea>
 	<label> Course List</label>
-	<textarea class="form-control" rows="5" id="courselist"></textarea>
+	<textarea class="form-control" rows="3" id="courselist"> </textarea>
+	<label>filter by keyword</label>
+	<label> department</label>
+	<textarea class="form-control" rows="3" id="coursedept" > </textarea>
+	<label> building name</label>
+	<textarea class="form-control" rows="3" id="buildingname2"> </textarea>
+
 	<button type="submit" class="btn btn-primary">Submit</button>
 	</form>
 </div>
+
 
 
 
@@ -162,5 +177,11 @@
 		</div>
 	</div>
 </div>
+
+
+<div id="chart-container">
+	FusionCharts will render here
+</div>
+
 </body>
 </html>
