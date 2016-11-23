@@ -425,6 +425,7 @@ export default class DatasetController {
                     session.courses_uuid=obj["id"].toString();
                     session.courses_size=obj["Pass"]+obj["Fail"];
                     session.courses_year=obj["Year"];
+                    session.courses_name=obj["Subject"]+obj["Course"]
                     sessions.push(session)
                 }
             }
