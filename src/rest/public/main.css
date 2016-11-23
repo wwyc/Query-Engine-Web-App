@@ -1,10 +1,16 @@
-#container, #render, #dataset {
+#container1, #container,#container2, #render, #dataset,#roomscheduling{
     width:80%;
     margin:auto;
     margin-top:10px;
     border-style:solid;
     padding:10px;
+
 }
+
+#container1, #container,#container2,#roomscheduling,#render{
+    background-color: lightskyblue;
+}
+
 th {
     text-align: left;
 }
@@ -33,3 +39,20 @@ th.num, td.num {
     font-family: sans-serif;
     font-size: 11px;
 }
+
+
+
+
+/*
+.btn{
+
+    background-color:bisque;
+
+}
+*/
+/*
+#sectionsize,#buildingname,#coursenumber,#department,#furnituretype,#instructor,#roomtype,#title,#roomsize,#roomnumber
+,#location{
+    background-color: lightskyblue;
+}
+*/
