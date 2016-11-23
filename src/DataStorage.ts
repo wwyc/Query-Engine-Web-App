@@ -15,6 +15,7 @@ export default class Session{
     public courses_uuid: string
     public courses_size:number
     public courses_year:string
+    public courses_name:string
     constructor(){
         this.courses_dept = null
         this.courses_id = null
@@ -27,6 +28,7 @@ export default class Session{
         this.courses_uuid =null
         this.courses_size=null
         this.courses_year=null
+        this.courses_name=null
 
     }
 }
