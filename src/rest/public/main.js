@@ -24,102 +24,90 @@ $(function () {
     jQuery("#queryForm1").submit(function (e) {
         e.preventDefault();//don't want to refresh the entire page
         var query1;
-        var buildingname=jQuery("#buildingname").val();
-        var roomnumber=jQuery("#roomnumber").val();
-        var roomsize=jQuery("#roomsize").val();
-        var roomtype=jQuery("#roomtype").val();
-        var furnituretype=jQuery("#furnituretype").val();
-        var choosebuilding=jQuery("#choosebuilding").val();
-        var distance=jQuery("#distance").val();
-        var roomsizecompare=jQuery("#roomsizecompare").val();
-        var orderdirection=jQuery("#direction1").val();
-     //   var roomcomparison=jQuery("#roomcomparison").val();
+        var buildingname = jQuery("#buildingname").val();
+        var roomnumber = jQuery("#roomnumber").val();
+        var roomsize = jQuery("#roomsize").val();
+        var roomtype = jQuery("#roomtype").val();
+        var furnituretype = jQuery("#furnituretype").val();
+        var choosebuilding = jQuery("#choosebuilding").val();
+        var distance = jQuery("#distance").val();
+        var roomsizecompare = jQuery("#roomsizecompare").val();
+        var orderdirection = jQuery("#direction1").val();
+        //   var roomcomparison=jQuery("#roomcomparison").val();
 
-        var roomrfilteresult=[];
-        $("input:checkbox[name=getroomfilter]:checked").each(function(){
+        var buildingname1=jQuery("#buildingname1").val();
+        var distance1=jQuery("#roomdistance").val();
+
+        var roomrfilteresult = [];
+        $("input:checkbox[name=getroomfilter]:checked").each(function () {
             roomrfilteresult.push($(this).val());
         });
         var buildingquery;
         var furniturequery;
         var typequery;
-       if(roomrfilteresult.length===1&&roomrfilteresult[0]==="rooms_shortname")
-        {
-            buildingquery={"IS": {"rooms_shortname": buildingname}};
-            query1=JSON.stringify({
-                "GET": ["rooms_name","rooms_shortname","rooms_fullname"],
+        if (roomrfilteresult.length === 1 && roomrfilteresult[0] === "rooms_shortname") {
+            buildingquery = {"IS": {"rooms_shortname": buildingname}};
+            query1 = JSON.stringify({
+                "GET": ["rooms_name", "rooms_shortname", "rooms_fullname"],
                 "WHERE": buildingquery,
-                "ORDER": { "dir": orderdirection, "keys": ["rooms_shortname"]},
+                "ORDER": {"dir": orderdirection, "keys": ["rooms_shortname"]},
                 "AS": "TABLE"
             });
         }
 
-        else if(roomrfilteresult.length===1&&roomrfilteresult[0]==="rooms_seats")
-        {
-            if(roomsizecompare==="GT")
-                roomsizecompare={"GT":{"rooms_seats":parseInt(roomsize)}};
-            else if    (roomsizecompare==="EQ")
-                roomsizecompare={"EQ":{"rooms_seats":parseInt(roomsize)}};
-            else if    (roomsizecompare==="LT")
-                roomsizecompare={"LT":{"rooms_seats":parseInt( roomsize)}};
+        else if (roomrfilteresult.length === 1 && roomrfilteresult[0] === "rooms_seats") {
+            if (roomsizecompare === "GT")
+                roomsizecompare = {"GT": {"rooms_seats": parseInt(roomsize)}};
+            else if (roomsizecompare === "EQ")
+                roomsizecompare = {"EQ": {"rooms_seats": parseInt(roomsize)}};
+            else if (roomsizecompare === "LT")
+                roomsizecompare = {"LT": {"rooms_seats": parseInt(roomsize)}};
 
-          query1=JSON.stringify({
-                "GET": ["rooms_name","rooms_shortname","rooms_fullname"],
+            query1 = JSON.stringify({
+                "GET": ["rooms_name", "rooms_shortname", "rooms_fullname"],
                 "WHERE": roomsizecompare,
-                "ORDER": { "dir": orderdirection, "keys": ["rooms_seats"]},
+                "ORDER": {"dir": orderdirection, "keys": ["rooms_seats"]},
                 "AS": "TABLE"
             });
         }
-        else if(roomrfilteresult.length===1&&roomrfilteresult[0]==="rooms_type")
-       {
+        else if (roomrfilteresult.length === 1 && roomrfilteresult[0] === "rooms_type") {
 
-           typequery={"IS": {"rooms_type": roomtype}};
-           query1=JSON.stringify({
-               "GET": ["rooms_name","rooms_shortname","rooms_fullname"],
-               "WHERE": typequery,
-               "ORDER": { "dir": orderdirection, "keys": ["rooms_shortname"]},
-               "AS": "TABLE"
-           });
-
-
-       }
-
-       else if(roomrfilteresult.length===1&&roomrfilteresult[0]==="rooms_furniture")
-       {
-
-           furniturequery={"IS": {"rooms_furniture": furnituretype}};
-           query1=JSON.stringify({
-               "GET": ["rooms_name","rooms_shortname","rooms_fullname"],
-               "WHERE": furniturequery,
-               "ORDER": { "dir": orderdirection, "keys": ["rooms_shortname"]},
-               "AS": "TABLE"
-           });
-
-
-       }
-       else if(roomrfilteresult.length===1&&roomrfilteresult[0]==="roomsdistance")
-       {
-
-           furniturequery={"IS": {"rooms_furniture": furnituretype}};
-           query1=JSON.stringify({
-               "GET": ["rooms_name","rooms_shortname","rooms_fullname"],
-               "WHERE": furniturequery,
-               "ORDER": { "dir": orderdirection, "keys": ["rooms_shortname"]},
-               "AS": "TABLE"
-           });
-
-
-       }
-
-        else if(roomrfilteresult.length===2&&roomrfilteresult[0]==="rooms_type"&&
-        roomrfilteresult[1]==="rooms_furniture")
-        {
-            typequery={"OR":[{"IS": {"rooms_furniture": furnituretype}}
-            ,{"IS": {"rooms_type": roomtype}}]}
-            query1=JSON.stringify({
-                "GET": ["rooms_name","rooms_shortname","rooms_fullname",
-                    "rooms_furniture","rooms_type"],
+            typequery = {"IS": {"rooms_type": roomtype}};
+            query1 = JSON.stringify({
+                "GET": ["rooms_name", "rooms_shortname", "rooms_fullname"],
                 "WHERE": typequery,
-                "ORDER": { "dir": orderdirection, "keys": ["rooms_shortname"]},
+                "ORDER": {"dir": orderdirection, "keys": ["rooms_shortname"]},
+                "AS": "TABLE"
+            });
+
+
+        }
+
+        else if (roomrfilteresult.length === 1 && roomrfilteresult[0] === "rooms_furniture") {
+
+            furniturequery = {"IS": {"rooms_furniture": furnituretype}};
+            query1 = JSON.stringify({
+                "GET": ["rooms_name", "rooms_shortname", "rooms_fullname"],
+                "WHERE": furniturequery,
+                "ORDER": {"dir": orderdirection, "keys": ["rooms_shortname"]},
+                "AS": "TABLE"
+            });
+
+
+        }
+
+
+        else if (roomrfilteresult.length === 2 && roomrfilteresult[0] === "rooms_type" &&
+            roomrfilteresult[1] === "rooms_furniture") {
+            typequery = {
+                "OR": [{"IS": {"rooms_furniture": furnituretype}}
+                    , {"IS": {"rooms_type": roomtype}}]
+            }
+            query1 = JSON.stringify({
+                "GET": ["rooms_name", "rooms_shortname", "rooms_fullname",
+                    "rooms_furniture", "rooms_type"],
+                "WHERE": typequery,
+                "ORDER": {"dir": orderdirection, "keys": ["rooms_shortname"]},
                 "AS": "TABLE"
             });
 
@@ -128,53 +116,9 @@ $(function () {
 
 
 
-
-        try {
-            console.log("##### printing the query #####");
-            console.log(orderdirection);
-            console.log(roomrfilteresult);
-            console.log(query1);
-            console.log(buildingname);
-            console.log(roomsize);
-            $.ajax("/query", {type:"POST", data: query1, contentType: "application/json", dataType: "json", success: function(data) {
-                if (data["render"] == "TABLE"||"table") {
-                    generateTable(data["result"]);
-                }
-            }}).fail(function (e) {
-                spawnHttpErrorModal(e)
-            });
-        } catch (err) {
-            spawnErrorModal("Query Error", err);
-        }
-    });
-
-
-    jQuery("#queryForm2").submit(function (e) {
-        e.preventDefault();//don't want to refresh the entire page
-     //query 1 return building's lat lon
-       //query2 return all building's latlon
-        var buildingname=jQuery("#buildingname1").val();
-        var distance=jQuery("#roomdistance").val();
-        var distancecompare=jQuery("#distancecompare").val();
-        var orderdirection=jQuery("#direction2").val();
-
-
-        var buildingquery={"IS": {"rooms_shortname": buildingname}};
-            var givenbuildingquery=JSON.stringify({
-                "GET": ["rooms_shortname","buildingLat","buildingLon"],
-                "WHERE": buildingquery,
-                "GROUP":["rooms_shortname"],
-                "APPLY":[{"buildingLat":{"AVG":"rooms_lat"}}, {"buildingLon":{"AVG":"rooms_lon"}}],
-                "AS": "TABLE"
-            });
-
-
-        var allbuildingquery=JSON.stringify({
-            "GET": ["rooms_name","rooms_lat","rooms_lon"],
-            "WHERE": {},
-            "AS": "TABLE"
-        });
-
+        /*
+         http://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula
+         */
         function getDistanceFromLatLon(lat1,lon1,lat2,lon2) {
             var R = 6371; // Radius of the earth in km
             var dLat = (lat2-lat1)* (Math.PI/180);
@@ -202,16 +146,17 @@ $(function () {
             );
         }
 
-  function filterbuilding(data1,data2){
+
+        function filterbuilding(data1,data2){
             var givenbuildinglat=data1[0]["result"][0]["buildingLat"]
-          console.log(givenbuildinglat)
-             var givenbuildinglon=data1[0]["result"][0]["buildingLon"]
+            console.log(givenbuildinglat)
+            var givenbuildinglon=data1[0]["result"][0]["buildingLon"]
             console.log(givenbuildinglon)
             var buildinglist=data2[0]["result"]
             for(var i=0;i<buildinglist.length;i++)
             {  var realdistance=getDistanceFromLatLon(givenbuildinglat,givenbuildinglon,buildinglist[i]["rooms_lat"],
                 buildinglist[i]["rooms_lon"])
-                if(realdistance>distance)
+                if(realdistance>distance1)
                 {
                     buildinglist.splice(i,1);
                     i--;
@@ -221,36 +166,213 @@ $(function () {
                 }
 
             }
-      buildinglist.sort(function (a, b) {
+            console.log("building length"+buildinglist.length)
+            buildinglist.sort(function (a, b) {
 
 
-              //orderkey is a string
-              var value1 = a["realdistance(meter)"];
-              //Log.trace("value1  " + value1)
-              var value2 = b["realdistance(meter)"];
-              if (value1 < value2) {
-                  return -1;
-              }
-              if (value1 > value2) {
-                  return 1;
-              }
-              return 0;
+                //orderkey is a string
+                var value1 = a["realdistance(meter)"];
+                //Log.trace("value1  " + value1)
+                var value2 = b["realdistance(meter)"];
+                if (value1 < value2) {
+                    return -1;
+                }
+                if (value1 > value2) {
+                    return 1;
+                }
+                return 0;
 
-          });
+            });
 
             generateTable(buildinglist);
 
         }
 
-        try{
 
-            $.when(method1(),method2()).then(filterbuilding).fail(function(e){
-                spawnHttpErrorModal(e)
-            });}
-        catch (err) {
-            spawnErrorModal("Query Error", err);
+
+        if (!roomrfilteresult.includes("roomsdistance")) {
+            try {
+                console.log("##### printing the query #####");
+                console.log(orderdirection);
+                console.log(roomrfilteresult);
+                console.log(query1);
+                console.log(buildingname);
+                console.log(roomsize);
+                $.ajax("/query", {
+                    type: "POST",
+                    data: query1,
+                    contentType: "application/json",
+                    dataType: "json",
+                    success: function (data) {
+                        if (data["render"] == "TABLE" || "table") {
+                            generateTable(data["result"]);
+                        }
+                    }
+                }).fail(function (e) {
+                    spawnHttpErrorModal(e)
+                });
+            } catch (err) {
+                spawnErrorModal("Query Error", err);
+            }
         }
-});
+
+        else {
+
+                console.log("jump to distnace")
+            var buildingquery={"IS": {"rooms_shortname": buildingname1}};
+
+            var givenbuildingquery = JSON.stringify({
+                "GET": ["rooms_shortname", "buildingLat", "buildingLon"],
+                "WHERE": buildingquery,
+                "GROUP": ["rooms_shortname"],
+                "APPLY": [{"buildingLat": {"AVG": "rooms_lat"}}, {"buildingLon": {"AVG": "rooms_lon"}}],
+                "AS": "TABLE"
+            })
+            var allbuildingquery;
+           if(roomrfilteresult.length===1) {
+
+               allbuildingquery = JSON.stringify({
+                   "GET": ["rooms_name", "rooms_lat", "rooms_lon"],
+                   "WHERE": {},
+                   "AS": "TABLE"
+               });
+           }
+            else if(roomrfilteresult.length===2&&roomrfilteresult.includes("rooms_seats")) {
+               if (roomsizecompare === "GT")
+                   roomsizecompare = {"GT": {"rooms_seats": parseInt(roomsize)}};
+               else if (roomsizecompare === "EQ")
+                   roomsizecompare = {"EQ": {"rooms_seats": parseInt(roomsize)}};
+               else if (roomsizecompare === "LT")
+                   roomsizecompare = {"LT": {"rooms_seats": parseInt(roomsize)}};
+
+               allbuildingquery = JSON.stringify({
+                   "GET": ["rooms_name", "rooms_lat", "rooms_lon"],
+                   "WHERE": roomsizecompare,
+                   "ORDER": {"dir": orderdirection, "keys": ["rooms_seats"]},
+                   "AS": "TABLE"
+               });
+            }
+
+           else if(roomrfilteresult.length===2&&roomrfilteresult.includes("rooms_type")) {
+
+
+               typequery = {"IS": {"rooms_type": roomtype}};
+              allbuildingquery= JSON.stringify({
+                   "GET": ["rooms_name", "rooms_lat", "rooms_lon"],
+                   "WHERE": typequery,
+                   "ORDER": {"dir": orderdirection, "keys": ["rooms_shortname"]},
+                   "AS": "TABLE"
+               });
+
+           }
+           else if(roomrfilteresult.length===2&&roomrfilteresult.includes("rooms_furniture")) {
+
+
+               furniturequery = {"IS": {"rooms_furniture": furnituretype}};
+               allbuildingquery= JSON.stringify({
+                   "GET": ["rooms_name","rooms_lat", "rooms_lon"],
+                   "WHERE": furniturequery,
+                   "ORDER": {"dir": orderdirection, "keys": ["rooms_shortname"]},
+                   "AS": "TABLE"
+               });
+           }
+
+
+           else if(roomrfilteresult.length===3&&!roomrfilteresult.includes("rooms_seats"))
+           {
+
+             allbuildingquery = JSON.stringify({
+                   "GET": ["rooms_name", "rooms_lat", "rooms_lon"],
+                   "WHERE": {
+                       "OR": [{"IS": {"rooms_furniture": furnituretype}}
+                           , {"IS": {"rooms_type": roomtype}}]
+                   },
+                   "ORDER": {"dir": orderdirection, "keys": ["rooms_seats"]},
+                   "AS": "TABLE"
+               });
+
+           }
+           else if(roomrfilteresult.length===3&&!roomrfilteresult.includes("rooms_type"))
+           {
+               if (roomsizecompare === "GT")
+                   roomsizecompare = {"GT": {"rooms_seats": parseInt(roomsize)}};
+               else if (roomsizecompare === "EQ")
+                   roomsizecompare = {"EQ": {"rooms_seats": parseInt(roomsize)}};
+               else if (roomsizecompare === "LT")
+                   roomsizecompare = {"LT": {"rooms_seats": parseInt(roomsize)}};
+               allbuildingquery = JSON.stringify({
+                   "GET": ["rooms_name", "rooms_lat", "rooms_lon"],
+                   "WHERE": {
+                       "AND": [{"IS": {"rooms_furniture": furnituretype}}
+                           , roomsizecompare]
+                   },
+                   "ORDER": {"dir": orderdirection, "keys": ["rooms_seats"]},
+                   "AS": "TABLE"
+               });
+
+           }
+
+           else if(roomrfilteresult.length===3&&!roomrfilteresult.includes("rooms_furniture"))
+           {
+               if (roomsizecompare === "GT")
+                   roomsizecompare = {"GT": {"rooms_seats": parseInt(roomsize)}};
+               else if (roomsizecompare === "EQ")
+                   roomsizecompare = {"EQ": {"rooms_seats": parseInt(roomsize)}};
+               else if (roomsizecompare === "LT")
+                   roomsizecompare = {"LT": {"rooms_seats": parseInt(roomsize)}};
+               allbuildingquery = JSON.stringify({
+                   "GET": ["rooms_name", "rooms_lat", "rooms_lon"],
+                   "WHERE": {
+                       "AND": [{"IS": {"rooms_type": roomtype}}
+                           , roomsizecompare]
+                   },
+                   "ORDER": {"dir": orderdirection, "keys": ["rooms_seats"]},
+                   "AS": "TABLE"
+               });
+
+           }
+           else if(roomrfilteresult.length===4)
+           {
+
+               if (roomsizecompare === "GT")
+                   roomsizecompare = {"GT": {"rooms_seats": parseInt(roomsize)}};
+               else if (roomsizecompare === "EQ")
+                   roomsizecompare = {"EQ": {"rooms_seats": parseInt(roomsize)}};
+               else if (roomsizecompare === "LT")
+                   roomsizecompare = {"LT": {"rooms_seats": parseInt(roomsize)}};
+               typequery = {
+                   "OR": [{"IS": {"rooms_furniture": furnituretype}}
+                       , {"IS": {"rooms_type": roomtype}}]
+               }
+               allbuildingquery = JSON.stringify({
+                   "GET": ["rooms_name", "rooms_lat", "rooms_lon"],
+                   "WHERE": {
+                       "AND": [{"IS": {"rooms_type": roomtype}}
+                           , roomsizecompare,typequery]
+                   },
+                   "ORDER": {"dir": orderdirection, "keys": ["rooms_seats"]},
+                   "AS": "TABLE"
+               });
+
+
+
+
+           }
+
+            try {
+
+                $.when(method1(), method2()).then(filterbuilding).fail(function (e) {
+                    spawnHttpErrorModal(e)
+                });
+            }
+            catch (err) {
+                spawnErrorModal("Query Error", err);
+            }
+
+
+        }
+
+    });
 
 
 
@@ -325,6 +447,29 @@ $(function () {
                }
 
        }
+     else if(filterresult.length===1&&filterresult[0]==="courses_id")
+       {
+           query=JSON.stringify({
+               "GET": ["courses_dept", "courses_id","courses_avg","courses_fail","courses_pass"],
+               "WHERE":{"IS": {"courses_id": coursenumber}},
+               "ORDER": { "dir": orderdirection1, "keys": ["courses_id","courses_dept"]},
+               "AS":"TABLE"})
+       }
+
+  else if(filterresult.length===2&&filterresult[0]==="courses_dept"&& filterresult[1]==="courses_id")
+       {
+
+           query=JSON.stringify({
+               "GET": ["courses_dept", "courses_id","courses_avg","courses_fail","courses_pass"],
+               "WHERE":{"AND":[{"IS": {"courses_id": coursenumber}},{"IS": {"courses_dept": department}}]},
+               "ORDER": { "dir": orderdirection1, "keys": ["courses_id","courses_dept"]},
+               "AS":"TABLE"})
+
+
+       }
+
+
+
 
 
    else if(filterresult.length===1&&filterresult[0]==="courses_instructor")
@@ -405,6 +550,32 @@ $(function () {
                 })
 
             }
+
+            else if (filterresult[1]==="courses_size"){
+                if(sectionsizecompare==="GT")
+                    sectionsizecompare={"GT":{"courses_size":parseInt(sectionsize)}};
+                else if    (sectionsizecompare==="EQ")
+                    sectionsizecompare={"EQ":{"courses_size":parseInt(sectionsize)}};
+                else if    (sectionsizecompare==="LT")
+                    sectionsizecompare={"LT":{"courses_size":parseInt( sectionsize)}};
+
+                query = JSON.stringify({
+                    "GET": ["courses_dept", "courses_id", "AvgPass", "AvgFailing", "AvgGrade"],
+                    "WHERE":  {"AND":[{"IS": {"courses_dept": department}}
+                        ,sectionsizecompare]},
+                    "GROUP": ["courses_dept", "courses_id"],
+                    "APPLY": [{"AvgPass": {"AVG": "courses_pass"}},
+                        {"AvgFailing": {"AVG": "courses_fail"}}, {"AvgGrade": {"AVG": "courses_avg"}}],
+                    "ORDER": {"dir": orderdirection1, "keys": ["AvgPass", "AvgFailing", "AvgGrade"]},
+                    "AS": "TABLE"
+                })
+
+            }
+
+
+
+
+
         }
 else if (filterresult[0]==="courses_title") {
             if(sectionsizecompare==="GT")
@@ -473,6 +644,11 @@ else if(filterresult.length===3)
             spawnErrorModal("Query Error", err);
         }
     });
+
+
+
+
+
 
     jQuery("#schedulingform").submit(function(e) {
         e.preventDefault();
