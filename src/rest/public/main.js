@@ -1,3 +1,4 @@
+
 $(function () {
     $("#datasetAdd").click(function () {
         var id = $("#datasetId").val();
@@ -659,21 +660,88 @@ else if(filterresult.length===3)
 //coursequery need apply
         var roomquery;
         var coursequery;
-   roomquery=JSON.stringify({
-       "GET": ["rooms_shortname", "rooms_number","rooms_seats"],
-       "WHERE": {"IS": {"rooms_shortname": "DMP"}},
-       "ORDER": { "dir": "UP", "keys": ["rooms_seats"]},
-       "AS": "TABLE"
-   })
-        coursequery=JSON.stringify({
-            GET: ["courses_dept", "courses_id","Sectionnumber","Coursesize"],
-            WHERE: {"AND":[{"IS": {"courses_dept": "cpsc"}},
-                {"IS": {"courses_year": "2014"}}]},
-            GROUP:["courses_dept", "courses_id"],
-            APPLY:[{"Sectionnumber":{"COUNT":"courses_uuid"}}, {"Coursesize":{"MAX":"courses_size"}}],
-            ORDER: { "dir": "UP", "keys": [ "Coursesize","courses_dept", "courses_id",]},
-            AS:"TABLE"
-        })
+        console.log("roomlist"+roomlist.length)
+        console.log("courselist"+courselist.length)
+      if(roomlist!=null&&roomlist!=" "&&roomlist!=undefined &&
+          courselist!=null&&courselist!=" "&&courselist!=undefined) {
+          var roomarray1 = roomlist.split(',')
+          console.log(roomarray1)
+          var coursearray1 = courselist.split(',')
+          console.log(coursearray1)
+          var roomwhere = {"OR": []};
+          for (var a = 0; a < roomarray1.length; a++) {
+              roomwhere["OR"][a] = {"IS": {"rooms_name": roomarray1[a]}}
+          }
+          console.log(roomwhere)
+
+          var coursewhere = {"OR": []};
+          for (var a = 0; a < coursearray1.length; a++) {
+              coursewhere["OR"][a] = {"IS": {"courses_name": coursearray1[a]}}
+          }
+          console.log(coursewhere)
+
+          roomquery = JSON.stringify({
+              "GET": ["rooms_shortname", "rooms_number", "rooms_seats"],
+              "WHERE": roomwhere,
+              "ORDER": {"dir": "UP", "keys": ["rooms_seats"]},
+              "AS": "TABLE"
+          })
+          console.log(roomquery)
+          coursequery = JSON.stringify({
+              GET: ["courses_dept", "courses_id", "Sectionnumber", "Coursesize"],
+              WHERE: {
+                  "AND": [coursewhere,
+                      {"IS": {"courses_year": "2014"}}]
+              },
+              GROUP: ["courses_dept", "courses_id"],
+              APPLY: [{"Sectionnumber": {"COUNT": "courses_uuid"}}, {"Coursesize": {"MAX": "courses_size"}}],
+              ORDER: {"dir": "UP", "keys": ["Coursesize", "courses_dept", "courses_id",]},
+              AS: "TABLE"
+          })
+          console.log(coursequery)
+      }
+        else {
+            console.log("jump to else")
+            var department2=jQuery("#coursedept").val()
+            var buildingname2=jQuery("#buildingname2").val()
+          var roomarray1 = buildingname2.split(',')
+          console.log(roomarray1)
+          var coursearray1 =department2 .split(',')
+          console.log(coursearray1)
+          var roomwhere = {"OR": []};
+          for (var a = 0; a < roomarray1.length; a++) {
+              roomwhere["OR"][a] = {"IS": {"rooms_shortname": roomarray1[a]}}
+          }
+          console.log(roomwhere)
+
+          var coursewhere = {"OR": []};
+          for (var a = 0; a < coursearray1.length; a++) {
+              coursewhere["OR"][a] = {"IS": {"courses_dept": coursearray1[a]}}
+          }
+
+
+          coursequery = JSON.stringify({
+              GET: ["courses_dept", "courses_id", "Sectionnumber", "Coursesize"],
+              WHERE: {
+                  "AND": [coursewhere,
+                      {"IS": {"courses_year": "2014"}}]
+              },
+              GROUP: ["courses_dept", "courses_id"],
+              APPLY: [{"Sectionnumber": {"COUNT": "courses_uuid"}}, {"Coursesize": {"MAX": "courses_size"}}],
+              ORDER: {"dir": "UP", "keys": ["Coursesize", "courses_dept", "courses_id",]},
+              AS: "TABLE"
+          })
+          roomquery = JSON.stringify({
+              "GET": ["rooms_shortname", "rooms_number", "rooms_seats"],
+              "WHERE":roomwhere ,
+              "ORDER": {"dir": "UP", "keys": ["rooms_seats"]},
+              "AS": "TABLE"
+          })
+
+      }
+
+
+
 
         function arrangedata(data1, data2) {
           //  console.log(data2[0]["result"][0]["Sectionnumber"])
@@ -694,7 +762,7 @@ else if(filterresult.length===3)
             var leftsection = 0
             var badcourse=0;
             var rowmaintain=0
-            var badcoursearr=[]
+         //   var badcoursearr=[]
             for (var i = 0; i < coursearray.length; i++) {
                 //  sectionnumber /3 round
                 distributedsection += Math.ceil(coursearray[i]["Sectionnumber"]/3)
@@ -924,14 +992,40 @@ catch (err) {
 
 
 
-    function generateTimeTable(timetablearr,roomarray){
 
+/*
+    $("#chart-container").insertFusionCharts({
+        type: "column2d",
+        width: "400",
+        height: "350",
+        dataFormat: "json",
+        dataSource: {
+            chart: {
+                caption: "Harry's SuperMart",
+                subCaption: "Top 5 stores in last month by revenue",
+                numberPrefix: "$",
+                theme: "ocean"
+            },
+            data: [{
+                label: "Bakersfield Central",
+                value: "880000"
+            }, {
+                label: "Garden Groove harbour",
+                value: "730000"
+            }, {
+                label: "Los Angeles Topanga",
+                value: "590000"
+            }, {
+                label: "Compton-Rancho Dom",
+                value: "520000"
+            }, {
+                label: "Daly City Serramonte",
+                value: "330000"
+            }]
+        }
+    });
 
-
-
-    }
-
-
+*/
     function generateTable(data) {
         var columns = [];
         Object.keys(data[0]).forEach(function (title) {
@@ -999,5 +1093,16 @@ catch (err) {
             $("#errorModal").modal('show')
         }
     }
+
+    var chart = new FusionCharts ({
+        "type": "column2d",
+        "width": "500",
+        "height": "300",
+        "dataFormat": "json",
+        "dataSource": {
+            chart:{},
+            data: [{value: 500}, {value: 600}, {value: 700}]
+        }
+    }).render("chartContainer");
 });
 
