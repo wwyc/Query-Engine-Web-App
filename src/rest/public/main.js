@@ -124,19 +124,7 @@ $(function () {
             });
 
         }
-        var distancequery;
-        function getDistanceFromLatLon(lat1,lon1,lat2,lon2) {
-            var R = 6371; // Radius of the earth in km
-            var dLat = (lat2-lat1)* (Math.PI/180);
-            var dLon = (lon2-lon1)* (Math.PI/180);
-            var a =
-                    Math.sin(dLat/2) * Math.sin(dLat/2) +
-                    Math.cos((lat1)* (Math.PI/180)) * Math.cos((lat2)*(Math.PI/180)) *
-                    Math.sin(dLon/2) * Math.sin(dLon/2);
-            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            var d = R * c; // Distance in km
-            return d/1000;
-        }
+
 
 
 
@@ -160,7 +148,113 @@ $(function () {
         }
     });
 
-   jQuery("#queryForm").submit(function (e) {
+
+    jQuery("#queryForm2").submit(function (e) {
+        e.preventDefault();//don't want to refresh the entire page
+     //query 1 return building's lat lon
+       //query2 return all building's latlon
+        var buildingname=jQuery("#buildingname1").val();
+        var distance=jQuery("#roomdistance").val();
+        var distancecompare=jQuery("#distancecompare").val();
+        var orderdirection=jQuery("#direction2").val();
+
+
+        var buildingquery={"IS": {"rooms_shortname": buildingname}};
+            var givenbuildingquery=JSON.stringify({
+                "GET": ["rooms_shortname","buildingLat","buildingLon"],
+                "WHERE": buildingquery,
+                "GROUP":["rooms_shortname"],
+                "APPLY":[{"buildingLat":{"AVG":"rooms_lat"}}, {"buildingLon":{"AVG":"rooms_lon"}}],
+                "AS": "TABLE"
+            });
+
+
+        var allbuildingquery=JSON.stringify({
+            "GET": ["rooms_name","rooms_lat","rooms_lon"],
+            "WHERE": {},
+            "AS": "TABLE"
+        });
+
+        function getDistanceFromLatLon(lat1,lon1,lat2,lon2) {
+            var R = 6371; // Radius of the earth in km
+            var dLat = (lat2-lat1)* (Math.PI/180);
+            var dLon = (lon2-lon1)* (Math.PI/180);
+            var a =
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos((lat1)* (Math.PI/180)) * Math.cos((lat2)*(Math.PI/180)) *
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            var d = R * c; // Distance in km
+            return d*1000;
+        }
+
+        //room distance
+
+        function method1() {
+            return $.ajax("/query", {type:"POST",
+                data: givenbuildingquery, contentType: "application/json", dataType: "json"}
+            );
+        }
+
+        function method2() {
+            return $.ajax("/query", {type:"POST",
+                data: allbuildingquery, contentType: "application/json", dataType: "json"}
+            );
+        }
+
+  function filterbuilding(data1,data2){
+            var givenbuildinglat=data1[0]["result"][0]["buildingLat"]
+          console.log(givenbuildinglat)
+             var givenbuildinglon=data1[0]["result"][0]["buildingLon"]
+            console.log(givenbuildinglon)
+            var buildinglist=data2[0]["result"]
+            for(var i=0;i<buildinglist.length;i++)
+            {  var realdistance=getDistanceFromLatLon(givenbuildinglat,givenbuildinglon,buildinglist[i]["rooms_lat"],
+                buildinglist[i]["rooms_lon"])
+                if(realdistance>distance)
+                {
+                    buildinglist.splice(i,1);
+                    i--;
+                }
+                else {
+                    buildinglist[i]["realdistance(meter)"] = Math.ceil(realdistance)
+                }
+
+            }
+      buildinglist.sort(function (a, b) {
+
+
+              //orderkey is a string
+              var value1 = a["realdistance(meter)"];
+              //Log.trace("value1  " + value1)
+              var value2 = b["realdistance(meter)"];
+              if (value1 < value2) {
+                  return -1;
+              }
+              if (value1 > value2) {
+                  return 1;
+              }
+              return 0;
+
+          });
+
+            generateTable(buildinglist);
+
+        }
+
+        try{
+
+            $.when(method1(),method2()).then(filterbuilding).fail(function(e){
+                spawnHttpErrorModal(e)
+            });}
+        catch (err) {
+            spawnErrorModal("Query Error", err);
+        }
+});
+
+
+
+    jQuery("#queryForm").submit(function (e) {
         e.preventDefault();//don't want to refresh the entire page
        var query;
        var sectionsize=jQuery("#sectionsize").val();
@@ -391,13 +485,13 @@ else if(filterresult.length===3)
         var coursequery;
    roomquery=JSON.stringify({
        "GET": ["rooms_shortname", "rooms_number","rooms_seats"],
-       "WHERE": {"IS": {"rooms_shortname": "ANGU"}},
+       "WHERE": {"IS": {"rooms_shortname": "DMP"}},
        "ORDER": { "dir": "UP", "keys": ["rooms_seats"]},
        "AS": "TABLE"
    })
         coursequery=JSON.stringify({
             GET: ["courses_dept", "courses_id","Sectionnumber","Coursesize"],
-            WHERE: {"AND":[{"IS": {"courses_dept": "comm"}},
+            WHERE: {"AND":[{"IS": {"courses_dept": "cpsc"}},
                 {"IS": {"courses_year": "2014"}}]},
             GROUP:["courses_dept", "courses_id"],
             APPLY:[{"Sectionnumber":{"COUNT":"courses_uuid"}}, {"Coursesize":{"MAX":"courses_size"}}],
@@ -427,7 +521,7 @@ else if(filterresult.length===3)
             var badcoursearr=[]
             for (var i = 0; i < coursearray.length; i++) {
                 //  sectionnumber /3 round
-                distributedsection += coursearray[i]["Sectionnumber"]
+                distributedsection += Math.ceil(coursearray[i]["Sectionnumber"]/3)
                 console.log("distributed"+distributedsection)
             }
             for(var c=0;c<roomarray.length;c++){
@@ -436,10 +530,11 @@ else if(filterresult.length===3)
               //  console.log(JSON.stringify( roomarray[c]))
             }
             for(var d=0;d<coursearray.length;d++){
-                  var value=coursearray[d]["Sectionnumber"]
-                coursearray[d]["leftsection"]=value
+                  var value=Math.ceil(coursearray[d]["Sectionnumber"]/3)
+                 coursearray[d]["leftsection"]=value
                 console.log(JSON.stringify( coursearray[d]))
             }
+            console.log("coursearray length"+coursearray.length)
 
               for (var x = 0; x < coursearray.length; x++) {
 
@@ -566,6 +661,7 @@ else if(filterresult.length===3)
            var newtimetablearr=[]
             var quality=1-(badcourse/distributedsection)
             alert("schedule quality: "+quality)
+            console.log("schedule quality: "+quality)
             for(var j=0;j<timetablearr.length;j++)
             {
                console.log("jump in");
