@@ -426,6 +426,7 @@ export default class DatasetController {
                     session.courses_size=obj["Pass"]+obj["Fail"];
                     session.courses_year=obj["Year"];
                     session.courses_name=obj["Subject"]+obj["Course"]
+                    session.courses_passrate=(parseFloat((obj["Pass"]/(obj["Pass"]+obj["Fail"])).toFixed(2)))*100
                     sessions.push(session)
                 }
             }
