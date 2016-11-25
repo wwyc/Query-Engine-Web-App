@@ -15,7 +15,8 @@ export default class ValidKeyChecker {
             || key === "rooms_type"||key==="rooms_furniture"||key==="rooms_href"
             || key === "courses_audit"
             ||key==="rooms_lat"||key==="rooms_lon"||key==="rooms_seats"||key==="courses_size"||
-            key==="courses_year"||key==="courses_name"
+            key==="courses_year"||key==="courses_name"||key==="courses_passrate"
+
         ) {
             isvalidKeyResult = true;
         } else {
@@ -30,7 +31,7 @@ export default class ValidKeyChecker {
             key === "courses_pass" ||
             key === "courses_fail" || key === "courses_audit"
             ||key==="rooms_lat"
-            || key === "rooms_lon"||key==="rooms_seats"||key==="courses_size"
+            || key === "rooms_lon"||key==="rooms_seats"||key==="courses_size"||key==="courses_passrate"
 
         ) {
             isvalidKeyResult = true;
