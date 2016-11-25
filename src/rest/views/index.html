@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <head>
-	<link rel="stylesheet" href="../public/bootstrap.min.css">
-	<link rel="stylesheet" href="../public/main.css">
-	<script src="../public/jquery.min.js"></script>
-	<script src="../public/bootstrap.min.js"></script>
-	<script src="../public/d3.min.js"></script>
+	<link rel="stylesheet" href="./public/bootstrap.min.css">
+	<link rel="stylesheet" href="./public/main.css">
+	<script src="./public/jquery.min.js"></script>
+	<script src="./public/bootstrap.min.js"></script>
+	<script src="./public/d3.min.js"></script>
 	<script type="text/javascript" src="../public/fusioncharts.js"></script>
-	<script type="text/javascript" src="../public/fusioncharts-jquery-plugin.js"></script>
+		<script type="text/javascript" src="../public/fusioncharts-jquery-plugin.js"></script>
 
-    <script type="text/javascript" src="http://static.fusioncharts.com/code/latest/fusioncharts.charts.js?cacheBust=8232"></script>
-    <!-- <script type="text/javascript" src="js/fusioncharts.jqueryplugin.js"></script> -->
+	    <script type="text/javascript" src="http://static.fusioncharts.com/code/latest/fusioncharts.charts.js?cacheBust=8232"></script>
+	    <!-- <script type="text/javascript" src="js/fusioncharts.jqueryplugin.js"></script> -->
 
-    <script type="text/javascript" src="http://static.fusioncharts.com/code/latest/themes/fusioncharts.theme.zune.js?cacheBust=8232"></script>
-	<script src="../public/main.js"></script>
+	    <script type="text/javascript" src="http://static.fusioncharts.com/code/latest/themes/fusioncharts.theme.zune.js?cacheBust=8232"></script>
+	<script src="./public/main.js"></script>
 
 </head>
 <html>
@@ -164,6 +164,28 @@
 
 
 
+<div id="novelfunction">
+	<h3> render charts for useful data</h3>
+	<form id="datagathering">
+		<h4> Department Info</h4>
+		<label> choose department</label>
+		<textarea class="form-control" rows="1" id="departmentchart" > </textarea>
+		<select id="coursechooses">
+			<option  value="course" >group by course</option>
+			<option  value="instructor"> group by instructor  </option>
+		</select><br>
+		<label> choose course(coursename)</label>
+		<textarea class="form-control" rows="1" id="coursechart" > </textarea>
+		<h4> Room Info</h4>
+		<label> choose builing</label>
+		<textarea class="form-control" rows="1" id="buildingchart" > </textarea>
+		<select id="typechooses">
+			<option  value="roomtype" >show room type</option>
+			<option  value="roomfurniture"> show furniture type  </option>
+		</select><br>
+		<button type="submit" class="btn btn-primary">Submit</button>
+	</form>
+</div>
 
 <div id="render">
 	<h3>Result</h3>
@@ -183,12 +205,6 @@
 			</div>
 		</div>
 	</div>
-</div>
-
-<div id="chart-container">
-
-	FusionCharts will render here
-
 </div>
 
 
