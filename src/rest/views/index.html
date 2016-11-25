@@ -32,6 +32,38 @@
 			);
 		}
 
+		function returnroomtypedata(){
+			console.log("jump to return")
+			var query=JSON.stringify({
+				"GET":"rooms_type",
+				"WHERE":{},
+				"GROUP":["rooms_type"],
+				"APPLY":[],
+				"ORDER":"rooms_type",
+				"AS":"TABLE"
+			})
+			return $.ajax("/query", {type:"POST",
+						data: query, contentType: "application/json", dataType: "json"
+					}
+			);
+		}
+		function returnfurnituretypedata(){
+			console.log("jump to return")
+			var query=JSON.stringify({
+				"GET":"rooms_furniture",
+				"WHERE":{},
+				"GROUP":["rooms_furniture"],
+				"APPLY":[],
+				"ORDER":"rooms_furniture",
+				"AS":"TABLE"
+			})
+			return $.ajax("/query", {type:"POST",
+						data: query, contentType: "application/json", dataType: "json"
+					}
+			);
+		}
+
+
 		function returntitledata(){
 			console.log("jump to return")
 			var query=JSON.stringify({
@@ -94,11 +126,13 @@
 
 			$("#buildingname").html(listItems)
 			$("#buildingname1").html(listItems)
-			$("#buildingname2").html(listItems)
+			$("#buildingname5").html(listItems)
+			$("#buildingname3").html(listItems)
+			$("#buildingname4").html(listItems)
 			$("#buildingchart").html(listItems)
 
 		}
-		
+
 		function dropdowndeptfunction(data)
 		{
 			//console.log(jsonData.Table)
@@ -113,11 +147,41 @@
 			}
 
 			$("#department").html(listItems)
-			$("#coursedept").html(listItems)
+			$("#department1").html(listItems)
+			$("#coursedept1").html(listItems)
 			$("#departmentchart").html(listItems)
 
 		}
+		function dropdownroomtypefunction(data)
+		{
+			//console.log(jsonData.Table)
+			var jsonData={};
+			jsonData.Table=[]
+			jsonData.Table=data["result"]
+			console.log(jsonData.Table)
+			var listItems = '<option selected="selected" value=" ">- Select -</option>';
 
+			for (var i = 0; i < jsonData.Table.length; i++) {
+				listItems += "<option value='" + jsonData.Table[i].rooms_type+ "'>" + jsonData.Table[i].rooms_type + "</option>";
+			}
+			$("#roomtype").html(listItems)
+
+		}
+		function dropdownroomfurniturefunction(data)
+		{
+			//console.log(jsonData.Table)
+			var jsonData={};
+			jsonData.Table=[]
+			jsonData.Table=data["result"]
+			console.log(jsonData.Table)
+			var listItems = '<option selected="selected" value=" ">- Select -</option>';
+
+			for (var i = 0; i < jsonData.Table.length; i++) {
+				listItems += "<option value='" + jsonData.Table[i].rooms_furniture+ "'>" + jsonData.Table[i].rooms_furniture + "</option>";
+			}
+			$("#furnituretype").html(listItems)
+
+		}
 		function dropdowncoursenamefunction(data)
 		{
 			//console.log(jsonData.Table)
@@ -157,8 +221,13 @@
 		(dropdownbuildingfunction)
 		//$.when(returncoursenamedata()).then
 		//(dropdowncoursenamefunction)
+		$.when(returnroomtypedata()).then(dropdownroomtypefunction
+		)
+		$.when(returnfurnituretypedata()).then
+		(dropdownroomfurniturefunction)
 		$.when(returntitledata()).then
 		(dropdowntitlefunction)
+
 		</script>
 <title>
 	UBC Insight
@@ -181,23 +250,35 @@
 
 <div id="container">
 	<h3>Courses Explorer</h3>
-	<form id="queryForm">
+	<form id="sectionexplorer">
+		<label> section explorer</label>
 		<div class="form-group">
 			<label for="department">Department:</label>
-			<select id="department"></select>
-			<div class="form-group">
-				<label>Choosing Compare Key</label>
-				<input type="checkbox" name="getcoursebydept" value="courses_pass" > Courses Pass</input>
-				<input type="checkbox" name="getcoursebydept" value="courses_fail" > Courses Failing</input>
-				<input type="checkbox" name="getcoursebydept" value="courses_avg" > Courses avg</input>
-			</div>
+			<select id="department"></select><br>
 			<label for="coursenumber">Course number:</label>
 			<textarea class="form-control" rows="1" id="coursenumber"></textarea>
-			<h4>    </h4>
 			<label for="instructor">Instructor:</label>
 		<!--	<select id="instructor"></select>  !-->
 			<textarea class="form-control" rows="1" id="instructor"></textarea>
-			<label for="sectionsize">Section size:</label>
+			<label>Section Filter</label>
+			<input type="checkbox" name="getsection" value= "courses_dept" > Department</input>
+			<input type="checkbox" name="getsection" value="courses_instructor" >Instructor </input>
+			<input type="checkbox" name="getsection" value="courses_id" > Course Number</input>
+			</div>
+			<button type="submit" class="btn btn-primary">Submit</button>
+	</form>
+   <form id="courseexplore">
+	<label> course explorer</label>
+	<div class="form-group">
+		<label for="department1">Department:</label>
+		<select id="department1"></select>
+		<div class="form-group">
+			<label>Choosing Compare Key</label>
+			<input type="checkbox" name="getcoursebydept" value="courses_pass" > Courses Pass</input>
+			<input type="checkbox" name="getcoursebydept" value="courses_fail" > Courses Failing</input>
+			<input type="checkbox" name="getcoursebydept" value="courses_avg" > Courses avg</input>
+		</div>
+	<label for="sectionsize">Section size:</label>
 			<select id="sectionsizecompare">
 				<option value="GT"> > </option>
 				<option  value="EQ" > = </option>
@@ -210,7 +291,6 @@
 			<textarea class="form-control" rows="1" id="title"></textarea>
 !-->
 		</div>
-
         <div class="form-group">
             <!--  order    多选 !-->
             <label >Compare direction:</label>
@@ -218,28 +298,16 @@
                 <option value="UP"> UP </option>
                 <option value="DOWN"> DOWN </option>
             </select>    <br>
-
         </div>
-
 		<div class="form-group">
             <label>Course Filter</label>
             <input type="checkbox" name="getcourse" value= "courses_dept" > Department</input>
             <input type="checkbox" name="getcourse" value="courses_title" > Title</input>
             <input type="checkbox" name="getcourse" value="courses_size" > Section Size </input><br>
-
-			<label>Section Filter</label>
-			<input type="checkbox" name="getcourse" value= "courses_dept" > Department</input>
-			<input type="checkbox" name="getcourse" value="courses_instructor" >Instructor </input>
-			<input type="checkbox" name="getcourse" value="courses_id" > Course Number</input>
         </div>
-
         <button type="submit" class="btn btn-primary">Submit</button>
 	</form>
-
-
-
 </div>
-
 
 <div id="container1">
 	<h3>Rooms Explorer</h3>
@@ -261,9 +329,11 @@
 			</select>    <br>
 			<textarea class="form-control" rows="1" id="roomsize"></textarea>
 			<label for="roomtype">Room Type:</label>
-			<textarea class="form-control" rows="1" id="roomtype"></textarea>
+			<select id="roomtype"></select><br>
+			<!--<textarea class="form-control" rows="1" id="roomtype"></textarea>!-->
 			<label for="furnituretype">Furniture type:</label>
-			<textarea class="form-control" rows="1" id="furnituretype"></textarea>
+			<select id="furnituretype"></select><br>
+			<!--<textarea class="form-control" rows="1" id="furnituretype"></textarea>!-->
 			<h4>Location:</h4>
 			<label for="buildingname1"> building name</label>
 			<select id="buildingname1"></select><br>
@@ -302,23 +372,41 @@
 
 <div id="roomscheduling">
 <h3> Room Scheduling</h3>
-<form id="schedulingform">
+<form id="schedulingformbylist">
 	<label>typing list of input</label>
 	<label> Room List</label>
 	<textarea class="form-control" rows="1" id="roomlist" > </textarea>
 	<label> Course List</label>
 	<textarea class="form-control" rows="1" id="courselist"> </textarea>
-	<label>filter by keyword</label><br>
+	<button type="submit" class="btn btn-primary">Submit</button>
+	</form>
+
+	<form id="schedulingformbykeys">
+		<label>filter by keyword</label><br>
+		<label> department</label>
+		<textarea class="form-control" rows="3" id="coursedept" > </textarea>
+		<label> building name</label>
+		<textarea class="form-control" rows="3" id="buildingname2" > </textarea>
+		<h4>Location:</h4>
+		<label for="buildingname4"> building name</label>
+		<select id="buildingname4"></select><br>
+		<label for="roomdistance1"> distance (meters)</label>
+		<textarea class="form-control" rows="1" id="roomdistance1"></textarea>
+		<button type="submit" class="btn btn-primary">Submit</button>
+	</form>
+
+
+	<form id="schedulingformbykey">
+	<label>filter by single keyword</label><br>
 	<label> department</label>
-	<select id="coursedept"></select><br>
-	<!--
-	<textarea class="form-control" rows="3" id="coursedept" > </textarea>
-	!-->
+	<select id="coursedept1"></select><br>
 	<label> building name</label>
-	<select id="buildingname2"></select><br>
-	<!--
-	<textarea class="form-control" rows="3" id="buildingname2"> </textarea>
-!-->
+	<select id="buildingname3"></select><br>
+		<h4>Location:</h4>
+		<label for="buildingname5"> building name</label>
+		<select id="buildingname5"></select><br>
+		<label for="roomdistance2"> distance(meters)</label>
+		<textarea class="form-control" rows="1" id="roomdistance2"></textarea>
 	<button type="submit" class="btn btn-primary">Submit</button>
 	</form>
 </div>
@@ -343,7 +431,7 @@
 		<!--
     <select id="coursechart"></select><br>
     !-->
-    <textarea class="form-control" rows="0.5" id="coursechart" > </textarea>
+    <textarea class="form-control" rows="1" id="coursechart" > </textarea>
 
 		<h4> Room Info</h4>
 		<label> choose builing</label><br>
