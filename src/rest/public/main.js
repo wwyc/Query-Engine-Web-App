@@ -22,6 +22,7 @@ $(function () {
         });
     });
 
+
     jQuery("#queryForm1").submit(function (e) {
         e.preventDefault();//don't want to refresh the entire page
         var query1;
@@ -217,7 +218,14 @@ $(function () {
             }
         }
 
+
+
+
+
         else {
+
+
+
 
                 console.log("jump to distnace")
             var buildingquery={"IS": {"rooms_shortname": buildingname1}};
@@ -355,13 +363,9 @@ $(function () {
                    "AS": "TABLE"
                });
 
-
-
-
            }
 
             try {
-
                 $.when(method1(), method2()).then(filterbuilding).fail(function (e) {
                     spawnHttpErrorModal(e)
                 });
@@ -369,30 +373,141 @@ $(function () {
             catch (err) {
                 spawnErrorModal("Query Error", err);
             }
-
-
         }
-
     });
 
 
+    jQuery("#sectionexplorer").submit(function (e) {
+        e.preventDefault();
+        var query;
+        var department=jQuery("#department").val()
+        var coursenumber=jQuery("#coursenumber").val().trim()
+        var instructor=jQuery("#instructor").val()
+        var instructorquery;
+        var departmentquery;
+        var coursenumberquery;
 
-    jQuery("#queryForm").submit(function (e) {
+        var filterresult=[];
+        $("input:checkbox[name=getsection]:checked").each(function(){
+            filterresult.push($(this).val());
+        });
+        if(filterresult.length===1&&filterresult[0]==="courses_dept")
+        {
+            departmentquery={"IS": {"courses_dept": department}};
+             query=JSON.stringify({
+                "GET": ["courses_dept", "courses_id","courses_uuid","courses_title","courses_avg"],
+                "WHERE":departmentquery,
+                "ORDER": { "dir": "UP", "keys": ["courses_dept","courses_id"]},
+                "AS":"TABLE"})
+            }
+            else if(filterresult.length===1&&filterresult[0]==="courses_instructor")
+        {
+            instructorquery={"IS": {"courses_instructor": instructor}};
+            query=JSON.stringify({
+                "GET": ["courses_dept", "courses_id","courses_uuid","courses_title","courses_avg"],
+                "WHERE":instructorquery,
+                "ORDER": { "dir": "UP", "keys": ["courses_dept","courses_id"]},
+                "AS":"TABLE"})
+        }
+        else if(filterresult.length===1&&filterresult[0]==="courses_size")
+        {
+            coursenumberquery={"IS": {"courses_id": coursenumber}};
+            query=JSON.stringify({
+                "GET": ["courses_dept", "courses_id","courses_uuid","courses_title","courses_avg"],
+                "WHERE":coursenumberquery,
+                "ORDER": { "dir": "UP", "keys": ["courses_dept","courses_id"]},
+                "AS":"TABLE"})
+        }
+        else if(filterresult.length===2&&filterresult[0]==="courses_dept")
+        {
+            if(filterresult[1]==="courses_instructor")
+            {
+                instructorquery={"IS": {"courses_instructor": instructor}};
+                departmentquery={"IS": {"courses_dept": department}};
+                query=JSON.stringify({
+                    "GET": ["courses_dept", "courses_id","courses_uuid","courses_title","courses_avg"],
+                    "WHERE":{"AND":[instructorquery,departmentquery]},
+                    "ORDER": { "dir": "UP", "keys": ["courses_dept","courses_id"]},
+                    "AS":"TABLE"})
+            }
+           else if(filterresult[1]==="courses_id") {
+                coursenumberquery = {"IS": {"courses_id": coursenumber}};
+                departmentquery = {"IS": {"courses_dept": department}};
+                query = JSON.stringify({
+                    "GET": ["courses_dept", "courses_id","courses_uuid","courses_title","courses_avg"],
+                    "WHERE": {"AND": [coursenumberquery, departmentquery]},
+                    "ORDER": {"dir": "UP", "keys": ["courses_dept", "courses_id"]},
+                    "AS": "TABLE"
+                })
+            }
+        }
+        else if(filterresult.length===2&&filterresult[0]==="courses_instructor")
+        {
+
+            coursenumberquery = {"IS": {"courses_id": coursenumber}};
+            instructorquery={"IS": {"courses_instructor": instructor}};
+            query = JSON.stringify({
+                "GET": ["courses_dept", "courses_id","courses_uuid","courses_title","courses_avg"],
+                "WHERE": {"AND": [coursenumberquery, instructorquery]},
+                "ORDER": {"dir": "UP", "keys": ["courses_dept", "courses_id"]},
+                "AS": "TABLE"
+            })
+        }
+
+
+            else if(filterresult.length===3)
+            {    departmentquery={"IS": {"courses_dept": department}};
+                coursenumberquery = {"IS": {"courses_id": coursenumber}};
+                instructorquery={"IS": {"courses_instructor": instructor}};
+                query = JSON.stringify({
+                    "GET": ["courses_dept", "courses_id","courses_uuid","courses_title","courses_avg"],
+                    "WHERE": {"AND": [coursenumberquery, instructorquery,departmentquery]},
+                    "ORDER": {"dir": "UP", "keys": ["courses_dept", "courses_id"]},
+                    "AS": "TABLE"
+                })
+            }
+
+
+        try {
+            console.log("#### printing the query ####");
+            // console.log(sectionsizecompare);
+            console.log(departmentquery);
+            console.log(instructor);
+            console.log(filterresult);
+
+            //console.log("result1"+coursedeptresult[0]);
+            //console.log("result1"+coursedeptresult[1]);
+            console.log(query);
+
+            $.ajax("/query", {type:"POST", data: query, contentType: "application/json", dataType: "json", success: function(data) {
+                if (data["render"] == "TABLE"||"table") {
+                    generateTable(data["result"]);
+                }
+            }}).fail(function (e) {
+                spawnHttpErrorModal(e)
+            });
+        } catch (err) {
+            spawnErrorModal("Query Error", err);
+        }
+
+
+    })
+
+
+    jQuery("#courseexplore").submit(function (e) {
         e.preventDefault();//don't want to refresh the entire page
        var query;
        var sectionsize=jQuery("#sectionsize").val().trim();
-       var department=jQuery("#department").val().trim();
-       var coursenumber=jQuery("#coursenumber").val().trim();
-
-       var instructor=jQuery("#instructor").val().trim();
-        console.log(instructor)
+       var department=jQuery("#department1").val()
+     //  var instructor=jQuery("#instructor").val().trim();
+       // console.log(instructor)
        var title=jQuery("#title").val().trim();
        var sectionsizecompare=$("#sectionsizecompare").val();
-       var coursenumbercompare=jQuery("#coursenumbercompare").val()
+     //  var coursenumbercompare=jQuery("#coursenumbercompare").val()
        var orderdirection1=jQuery("#direction0").val();
        var coursecomparison=jQuery("#coursecomparison").val();
        var departmentquery;
-       var instructorquery;
+     //  var instructorquery;
        var filterresult=[];
        $("input:checkbox[name=getcourse]:checked").each(function(){
            filterresult.push($(this).val());
@@ -408,57 +523,56 @@ $(function () {
        {
            departmentquery={"IS": {"courses_dept": department}};
 
-           if(coursedeptresult!=null&&coursedeptresult.length>0)
-           {  if(coursedeptresult.length===1)
-           { query=JSON.stringify({
-                   "GET": ["courses_dept", "courses_id","AvgPass"],
-                   "WHERE":departmentquery,
-                    "GROUP": ["courses_dept","courses_id" ],
-                    "APPLY": [ {"AvgPass": {"AVG": coursedeptresult[0]}}],
-                    "ORDER": { "dir": orderdirection1, "keys": ["AvgPass"]},
-                   "AS":"TABLE"})  }
+           if(coursedeptresult!=null&&coursedeptresult.length>0) {
+               if (coursedeptresult.length === 1) {
+                   query = JSON.stringify({
+                       "GET": ["courses_dept", "courses_id", "AvgPass"],
+                       "WHERE": departmentquery,
+                       "GROUP": ["courses_dept", "courses_id"],
+                       "APPLY": [{"AvgPass": {"AVG": coursedeptresult[0]}}],
+                       "ORDER": {"dir": orderdirection1, "keys": ["AvgPass"]},
+                       "AS": "TABLE"
+                   })
+               }
 
 
-           else if(coursedeptresult.length===2)
-           {   console.log("jump to 2");
-               query=JSON.stringify({
-                   "GET": ["courses_dept", "courses_id","AvgPass","AvgFailing"],
-                   "WHERE": departmentquery,
-                   "GROUP": ["courses_dept","courses_id"],
-                   "APPLY": [ {"AvgPass": {"AVG": coursedeptresult[0]}},{"AvgFailing": {"AVG":coursedeptresult[1]}}],
-                   "ORDER": { "dir": orderdirection1, "keys": ["AvgPass","AvgFailing"]},
-                   "AS":"TABLE"})
+               else if (coursedeptresult.length === 2) {
+                   console.log("jump to 2");
+                   query = JSON.stringify({
+                       "GET": ["courses_dept", "courses_id", "AvgPass", "AvgFailing"],
+                       "WHERE": departmentquery,
+                       "GROUP": ["courses_dept", "courses_id"],
+                       "APPLY": [{"AvgPass": {"AVG": coursedeptresult[0]}}, {"AvgFailing": {"AVG": coursedeptresult[1]}}],
+                       "ORDER": {"dir": orderdirection1, "keys": ["AvgPass", "AvgFailing"]},
+                       "AS": "TABLE"
+                   })
+               }
+               else if (coursedeptresult.length === 3) {
+                   query = JSON.stringify({
+                       "GET": ["courses_dept", "courses_id", "AvgPass", "AvgFailing", "AvgGrade"],
+                       "WHERE": departmentquery,
+                       "GROUP": ["courses_dept", "courses_id"],
+                       "APPLY": [{"AvgPass": {"AVG": coursedeptresult[0]}},
+                           {"AvgFailing": {"AVG": coursedeptresult[1]}}, {"AvgGrade": {"AVG": coursedeptresult[2]}}],
+                       "ORDER": {"dir": orderdirection1, "keys": ["AvgPass", "AvgFailing", "AvgGrade"]},
+                       "AS": "TABLE"
+                   })
+               }
            }
-           else if(coursedeptresult.length===3)
-           { query=JSON.stringify({
+           else
+               query=JSON.stringify({
                    "GET": ["courses_dept", "courses_id","AvgPass","AvgFailing","AvgGrade"],
                    "WHERE":departmentquery,
                    "GROUP": ["courses_dept","courses_id" ],
-                   "APPLY": [ {"AvgPass": {"AVG": coursedeptresult[0]}},
-                     {"AvgFailing": {"AVG":coursedeptresult[1]}},{"AvgGrade": {"AVG": coursedeptresult[2]}}],
-                   "ORDER": { "dir": orderdirection1, "keys": ["AvgPass","AvgFailing","AvgGrade"]},
+                   "APPLY": [ {"AvgPass": {"AVG": "courses_pass"}},
+                       {"AvgFailing": {"AVG":"courses_fail"}},{"AvgGrade": {"AVG":"courses_avg" }}],
                    "AS":"TABLE"})
-           }
-           }
-           else
-               {
-           query=JSON.stringify({
-               "GET": ["courses_dept", "courses_id","courses_uuid","courses_avg","courses_pass"],
-               "WHERE":departmentquery,
-               "ORDER": { "dir": orderdirection1, "keys":["courses_id"]},
-               "AS":"TABLE"})
-               }
-
-       }
-     else if(filterresult.length===1&&filterresult[0]==="courses_id")
-       {
-           query=JSON.stringify({
-               "GET": ["courses_dept", "courses_id","courses_avg","courses_fail","courses_pass"],
-               "WHERE":{"IS": {"courses_id": coursenumber}},
-               "ORDER": { "dir": orderdirection1, "keys": ["courses_id","courses_dept"]},
-               "AS":"TABLE"})
        }
 
+
+
+
+ /*
   else if(filterresult.length===2&&filterresult[0]==="courses_dept"&& filterresult[1]==="courses_id")
        {
 
@@ -479,7 +593,7 @@ $(function () {
                "WHERE":instructorquery,
                "ORDER": { "dir": orderdirection1, "keys":["courses_id"]},
                "AS":"TABLE"})
-       }
+       }*/
        else if (filterresult.length===1&&filterresult[0]==="courses_title"){
            query = JSON.stringify({
                "GET": ["courses_dept", "courses_id", "AvgPass", "AvgFailing", "AvgGrade"],
@@ -550,26 +664,6 @@ $(function () {
 
             }
 
-            else if (filterresult[1]==="courses_size"){
-                if(sectionsizecompare==="GT")
-                    sectionsizecompare={"GT":{"courses_size":parseInt(sectionsize)}};
-                else if    (sectionsizecompare==="EQ")
-                    sectionsizecompare={"EQ":{"courses_size":parseInt(sectionsize)}};
-                else if    (sectionsizecompare==="LT")
-                    sectionsizecompare={"LT":{"courses_size":parseInt( sectionsize)}};
-
-                query = JSON.stringify({
-                    "GET": ["courses_dept", "courses_id", "AvgPass", "AvgFailing", "AvgGrade"],
-                    "WHERE":  {"AND":[{"IS": {"courses_dept": department}}
-                        ,sectionsizecompare]},
-                    "GROUP": ["courses_dept", "courses_id"],
-                    "APPLY": [{"AvgPass": {"AVG": "courses_pass"}},
-                        {"AvgFailing": {"AVG": "courses_fail"}}, {"AvgGrade": {"AVG": "courses_avg"}}],
-                    "ORDER": {"dir": orderdirection1, "keys": ["AvgPass", "AvgFailing", "AvgGrade"]},
-                    "AS": "TABLE"
-                })
-
-            }
         }
 else if (filterresult[0]==="courses_title") {
             if(sectionsizecompare==="GT")
@@ -644,7 +738,7 @@ else if(filterresult.length===3)
 
 
 
-    jQuery("#schedulingform").submit(function(e) {
+    jQuery("#schedulingformbylist").submit(function(e) {
         e.preventDefault();
         var roomlist = jQuery("#roomlist").val().trim();
         var courselist = jQuery("#courselist").val().trim();
@@ -655,8 +749,7 @@ else if(filterresult.length===3)
         var coursequery;
         console.log("roomlist"+roomlist.length)
         console.log("courselist"+courselist.length)
-      if(roomlist!=null&&roomlist!=" "&&roomlist!=undefined &&
-          courselist!=null&&courselist!=" "&&courselist!=undefined) {
+
           var roomarray1 = roomlist.split(',')
           console.log(roomarray1)
           var coursearray1 = courselist.split(',')
@@ -692,49 +785,148 @@ else if(filterresult.length===3)
               AS: "TABLE"
           })
           console.log(coursequery)
-      }
-        else {
-            console.log("jump to else")
-            var department2=jQuery("#coursedept").val().trim()
-            var buildingname2=jQuery("#buildingname2").val().trim()
-          var roomarray1 = buildingname2.split(',')
-          console.log(roomarray1)
-          var coursearray1 =department2 .split(',')
-          console.log(coursearray1)
-          var roomwhere = {"OR": []};
-          for (var a = 0; a < roomarray1.length; a++) {
-              roomwhere["OR"][a] = {"IS": {"rooms_shortname": roomarray1[a]}}
-          }
-          console.log(roomwhere)
-
-          var coursewhere = {"OR": []};
-          for (var a = 0; a < coursearray1.length; a++) {
-              coursewhere["OR"][a] = {"IS": {"courses_dept": coursearray1[a]}}
-          }
 
 
-          coursequery = JSON.stringify({
-              GET: ["courses_dept", "courses_id", "Sectionnumber", "Coursesize"],
-              WHERE: {
-                  "AND": [coursewhere,
-                      {"IS": {"courses_year": "2014"}}]
-              },
-              GROUP: ["courses_dept", "courses_id"],
-              APPLY: [{"Sectionnumber": {"COUNT": "courses_uuid"}}, {"Coursesize": {"MAX": "courses_size"}}],
-              ORDER: {"dir": "UP", "keys": ["Coursesize", "courses_dept", "courses_id",]},
-              AS: "TABLE"
-          })
-          roomquery = JSON.stringify({
-              "GET": ["rooms_shortname", "rooms_number", "rooms_seats"],
-              "WHERE":roomwhere ,
-              "ORDER": {"dir": "UP", "keys": ["rooms_seats"]},
-              "AS": "TABLE"
-          })
+        function method1() {
+            return $.ajax("/query", {type:"POST",
+                data: roomquery, contentType: "application/json", dataType: "json"}
+            );
+        }
 
-      }
+        function method2() {
+            return $.ajax("/query", {type:"POST",
+                data: coursequery, contentType: "application/json", dataType: "json"}
+            );
+        }
+
+          try{
+
+              $.when(method1(),method2()).then(arrangedata).fail(function(e){
+                  spawnHttpErrorModal(e)
+              });}
+          catch (err) {
+              spawnErrorModal("Query Error", err);
+          }});
 
 
 
+
+
+    jQuery("#schedulingformbykeys").submit(function(e) {
+        e.preventDefault();
+        console.log("jump to else")
+        var department2 = jQuery("#coursedept").val().trim()
+        var buildingname2 = jQuery("#buildingname2").val().trim()
+        var roomarray1 = buildingname2.split(',')
+        console.log(roomarray1)
+        var coursearray1 = department2.split(',')
+        console.log(coursearray1)
+        var roomwhere = {"OR": []};
+        for (var a = 0; a < roomarray1.length; a++) {
+            roomwhere["OR"][a] = {"IS": {"rooms_shortname": roomarray1[a]}}
+        }
+        console.log(roomwhere)
+
+        var coursewhere = {"OR": []};
+        for (var a = 0; a < coursearray1.length; a++) {
+            coursewhere["OR"][a] = {"IS": {"courses_dept": coursearray1[a]}}
+        }
+
+
+        var coursequery = JSON.stringify({
+            GET: ["courses_dept", "courses_id", "Sectionnumber", "Coursesize"],
+            WHERE: {
+                "AND": [coursewhere,
+                    {"IS": {"courses_year": "2014"}}]
+            },
+            GROUP: ["courses_dept", "courses_id"],
+            APPLY: [{"Sectionnumber": {"COUNT": "courses_uuid"}}, {"Coursesize": {"MAX": "courses_size"}}],
+            ORDER: {"dir": "UP", "keys": ["Coursesize", "courses_dept", "courses_id",]},
+            AS: "TABLE"
+        })
+        var roomquery = JSON.stringify({
+            "GET": ["rooms_shortname", "rooms_number", "rooms_seats"],
+            "WHERE": roomwhere,
+            "ORDER": {"dir": "UP", "keys": ["rooms_seats"]},
+            "AS": "TABLE"
+        })
+
+
+        function method1() {
+            return $.ajax("/query", {type:"POST",
+                data: roomquery, contentType: "application/json", dataType: "json"}
+            );
+        }
+
+        function method2() {
+            return $.ajax("/query", {type:"POST",
+                data: coursequery, contentType: "application/json", dataType: "json"}
+            );
+        }
+
+        try{
+
+            $.when(method1(),method2()).then(arrangedata).fail(function(e){
+                spawnHttpErrorModal(e)
+            });}
+        catch (err) {
+            spawnErrorModal("Query Error", err);
+        }
+
+
+    });
+
+    jQuery("#schedulingformbykey").submit(function(e) {
+        e.preventDefault();
+        console.log("jump to else")
+        var department = jQuery("#coursedept1").val()
+        var buildingname = jQuery("#buildingname3").val()
+
+
+
+
+        var coursequery = JSON.stringify({
+            GET: ["courses_dept", "courses_id", "Sectionnumber", "Coursesize"],
+            WHERE: {
+                "AND": [{"IS":{"courses_dept":department}},
+                    {"IS": {"courses_year": "2014"}}]
+            },
+            GROUP: ["courses_dept", "courses_id"],
+            APPLY: [{"Sectionnumber": {"COUNT": "courses_uuid"}}, {"Coursesize": {"MAX": "courses_size"}}],
+            ORDER: {"dir": "UP", "keys": ["Coursesize", "courses_dept", "courses_id",]},
+            AS: "TABLE"
+        })
+        var roomquery = JSON.stringify({
+            "GET": ["rooms_shortname", "rooms_number", "rooms_seats"],
+            "WHERE": {"IS":{"rooms_shortname":buildingname}},
+            "ORDER": {"dir": "UP", "keys": ["rooms_seats"]},
+            "AS": "TABLE"
+        })
+
+
+        function method1() {
+            return $.ajax("/query", {type:"POST",
+                data: roomquery, contentType: "application/json", dataType: "json"}
+            );
+        }
+
+        function method2() {
+            return $.ajax("/query", {type:"POST",
+                data: coursequery, contentType: "application/json", dataType: "json"}
+            );
+        }
+
+        try{
+
+            $.when(method1(),method2()).then(arrangedata).fail(function(e){
+                spawnHttpErrorModal(e)
+            });}
+        catch (err) {
+            spawnErrorModal("Query Error", err);
+        }
+
+
+    });
 
         function arrangedata(data1, data2) {
           //  console.log(data2[0]["result"][0]["Sectionnumber"])
@@ -946,48 +1138,16 @@ else if(filterresult.length===3)
         }
 
 
-        function method1() {
-            return $.ajax("/query", {type:"POST",
-                data: roomquery, contentType: "application/json", dataType: "json"}
-            );
-        }
-
-        function method2() {
-            return $.ajax("/query", {type:"POST",
-                data: coursequery, contentType: "application/json", dataType: "json"}
-            );
-        }
 
 
-/*
-        function method2() {
-            $.ajax("/query", {type:"POST", data: coursequery, contentType: "application/json", dataType: "json",
-                success: function(data) {
-                    console.log (data["result"])
-                    return data;
-                }}).fail(function (e) {
-                spawnHttpErrorModal(e)
-            });
-        }
-*/
-try{
 
-        $.when(method1(),method2()).then(arrangedata).fail(function(e){
-            spawnHttpErrorModal(e)
-        });}
-catch (err) {
-    spawnErrorModal("Query Error", err);
-}
-
-
-    });
 
 jQuery("#datagathering").submit(function(e){
     e.preventDefault();
-var department=jQuery("#departmentchart").val().trim()
+var department=jQuery("#departmentchart").val()
 var departmentchoose=jQuery("#coursechooses").val()
 var course=jQuery("#coursechart").val().trim()
-var building=jQuery("#buildingchart").val().trim()
+var building=jQuery("#buildingchart").val()
 var buildingchoose=jQuery("#typechooses").val()
 var query;
 
@@ -1103,10 +1263,7 @@ else{
             AS: "TABLE"
         })
 
-
-
     }
-
 
 
     try {
