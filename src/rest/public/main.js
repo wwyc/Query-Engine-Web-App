@@ -989,6 +989,108 @@ catch (err) {
 
     });
 
+jQuery("#datagathering").submit(function(e){
+    e.preventDefault();
+var department=jQuery("#departmentchart").val()
+var departmentchoose=jQuery("#coursechooses").val()
+var course=jQuery("#coursechart").val()
+var building=jQuery("#buildingchart").val()
+var buildingchoose=jQuery("#typechooses").val()
+var query;
+    if(department!=null&&department!=undefined&&department!=""&&department!=" ")
+    {   if(departmentchoose==="course")
+    {query=JSON.stringify({
+
+            GET: ["courses_dept", "courses_id", "Passrate(%)", "AverageGrade"],
+                WHERE:
+                {"IS": {"courses_dept": department}
+        },
+            GROUP: ["courses_dept", "courses_id"],
+                APPLY: [{"Passrate(%)": {"AVG": "courses_passrate"}},
+                    {"AverageGrade":{"AVG":"courses_avg"}}],
+            ORDER: {"dir": "UP", "keys": ["Passrate(%)","AverageGrade","courses_dept", "courses_id"]},
+            AS: "TABLE"
+
+        })}
+        else
+    {query=JSON.stringify({
+
+            GET: ["courses_dept", "courses_instructor","Passrate(%)"],
+            WHERE:
+            {"IS": {"courses_dept": department}
+            },
+            GROUP: ["courses_dept", "courses_instructor"],
+            APPLY: [{"Passrate(%)": {"AVG": "courses_passrate"}}],
+            ORDER: {"dir": "UP", "keys": ["Passrate(%)", "courses_dept", "courses_id"]},
+            AS: "TABLE"
+        })
+    }
+    }
+    else if (course!=null&&course!=undefined&&course!=""&&course!=" ")
+    {
+        query=JSON.stringify({
+
+            GET: ["courses_dept","courses_instructor","Passrate(%)", "AverageGrade"],
+            WHERE:
+            {"IS": {"courses_name": course}
+            },
+            GROUP: ["courses_dept", "courses_instructor"],
+            APPLY: [{"Passrate(%)": {"AVG": "courses_passrate"}},
+                {"AverageGrade":{"AVG":"courses_avg"}}
+            ],
+            ORDER: {"dir": "UP", "keys": ["AverageGrade","Passrate(%)","courses_instructor"]},
+            AS: "TABLE"
+        })
+
+
+
+    }
+else if(building!=null&&building!=undefined&&building!=""&&building!=" ")
+    {
+
+if(buildingchoose==="roomtype") {
+    query = JSON.stringify(
+        {"GET": ["rooms_type","Roomnumber"],
+        "WHERE": {"IS": {"rooms_shortname": building}},
+            "GROUP":["rooms_type"],
+            "APPLY":[{"Roomnumber":{"COUNT":"rooms_name"}}],
+    "ORDER": {"dir": "UP", "keys": ["Roomnumber"]},
+    "AS": "TABLE"
+})
+
+}
+else{
+    query = JSON.stringify(
+    {"GET": ["rooms_furniture","Roomnumber"],
+        "WHERE": {"IS": {"rooms_shortname": building}},
+        "GROUP":["rooms_furniture"],
+        "APPLY":[{"Roomnumber":{"COUNT":"rooms_name"}}],
+        "ORDER": {"dir": "UP", "keys": ["Roomnumber"]},
+        "AS": "TABLE"
+    })
+
+
+}}
+
+
+    try {
+        console.log("department"+department)
+        console.log("course"+course)
+        console.log("building"+building)
+        console.log(query)
+
+        $.ajax("/query", {type:"POST", data: query, contentType: "application/json", dataType: "json", success: function(data) {
+            if (data["render"] == "TABLE"||"table") {
+                generateTable(data["result"]);
+            }   //renderchart function here
+        }}).fail(function (e) {
+            spawnHttpErrorModal(e)
+        });
+    } catch (err) {
+        spawnErrorModal("Query Error", err);
+    }
+});
+
 
 
 
@@ -1045,7 +1147,39 @@ catch (err) {
                 return d["cl"]
             });
     }
-
+/*  $(function () {
+           $("#chart-container").insertFusionCharts({
+                   type: "column2d",
+                    width: "800",
+                    height: "700",
+                    dataFormat: "json",
+                    dataSource: {
+                        chart: {
+                                caption: "Enter Title of Chart",
+                            subCaption: "Enter SubCaption of Chart",
+                                    numberPrefix: "$",
+                                    theme: "ocean"
+                            },
+                        data: [{
+                            label: "Bakersfield Central",
+                                value: "880000"
+                        }, {
+                                label: "Garden Groove harbour",
+                                    value: "730000"
+                           }, {
+                               label: "Los Angeles Topanga",
+                                value: "590000"
+                     }, {
+                             label: "Compton-Rancho Dom",
+                         value: "520000"
+                         }, {
+                    label: "Daly City Srramonte",
+                 value: "330000"
+                  }]
+               }
+         });
+       });
+       */
 
     function spawnHttpErrorModal(e) {
         $("#errorModal .modal-title").html(e.status);
@@ -1064,38 +1198,5 @@ catch (err) {
     }
 
 
-});
-
-$(function() {
-    $("#chart-container").insertFusionCharts({
-        type: "column2d",
-        width: "800",
-        height: "700",
-        dataFormat: "json",
-        dataSource: {
-            chart: {
-                caption: "Enter Title of Chart",
-                subCaption: "Enter SubCaption of Chart",
-                numberPrefix: "$",
-                theme: "ocean"
-            },
-            data: [{
-                label: "Bakersfield Central",
-                value: "880000"
-            }, {
-                label: "Garden Groove harbour",
-                value: "730000"
-            }, {
-                label: "Los Angeles Topanga",
-                value: "590000"
-            }, {
-                label: "Compton-Rancho Dom",
-                value: "520000"
-            }, {
-                label: "Daly City Serramonte",
-                value: "330000"
-            }]
-        }
-    });
 });
 
