@@ -16,6 +16,7 @@ export default class Session{
     public courses_size:number
     public courses_year:string
     public courses_name:string
+    public courses_passrate:number
     constructor(){
         this.courses_dept = null
         this.courses_id = null
@@ -29,7 +30,7 @@ export default class Session{
         this.courses_size=null
         this.courses_year=null
         this.courses_name=null
-
+        this.courses_passrate=null
     }
 }
 
