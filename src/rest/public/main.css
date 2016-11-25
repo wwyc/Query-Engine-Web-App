@@ -1,4 +1,4 @@
-#container1, #container,#chart-container,#container2, #render, #dataset,#roomscheduling{
+#container1, #container,#container2, #render, #dataset,#roomscheduling,#novelfunction{
     width:80%;
     margin:auto;
     margin-top:10px;
@@ -7,7 +7,7 @@
 
 }
 
-#container1, #container,#chart-container,#container2,#roomscheduling,#render{
+#container1, #container,#container2,#roomscheduling,#render,#novelfunction{
     background-color: lightskyblue;
 }
 
