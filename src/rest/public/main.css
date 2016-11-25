@@ -6,8 +6,27 @@
     padding:10px;
 
 }
+#chart-container{
 
-#container1, #container,#container2,#roomscheduling,#render,#novelfunction{
+    width:80%;
+    margin:auto;
+    text-align:center;
+    margin-top:10px;
+    border-style:solid;
+    padding:10px;
+
+
+}
+
+#headtitle
+{
+    text-align: center;
+    color:darkcyan;
+
+  size:50px;
+
+}
+#container1, #container,#container2,#roomscheduling,#render,#novelfunction,#chart-container{
     background-color: lightskyblue;
 }
 

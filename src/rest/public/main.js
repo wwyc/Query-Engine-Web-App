@@ -25,19 +25,19 @@ $(function () {
     jQuery("#queryForm1").submit(function (e) {
         e.preventDefault();//don't want to refresh the entire page
         var query1;
-        var buildingname = jQuery("#buildingname").val();
-        var roomnumber = jQuery("#roomnumber").val();
-        var roomsize = jQuery("#roomsize").val();
-        var roomtype = jQuery("#roomtype").val();
-        var furnituretype = jQuery("#furnituretype").val();
-        var choosebuilding = jQuery("#choosebuilding").val();
-        var distance = jQuery("#distance").val();
+        var buildingname = jQuery("#buildingname").val().trim()
+        var roomnumber = jQuery("#roomnumber").val().trim()
+        var roomsize = jQuery("#roomsize").val().trim();
+        var roomtype = jQuery("#roomtype").val().trim();
+        var furnituretype = jQuery("#furnituretype").val().trim();
+        var choosebuilding = jQuery("#choosebuilding").val()
+        var distance = jQuery("#distance").val()
         var roomsizecompare = jQuery("#roomsizecompare").val();
         var orderdirection = jQuery("#direction1").val();
         //   var roomcomparison=jQuery("#roomcomparison").val();
 
-        var buildingname1=jQuery("#buildingname1").val();
-        var distance1=jQuery("#roomdistance").val();
+        var buildingname1=jQuery("#buildingname1").val().trim();
+        var distance1=jQuery("#roomdistance").val().trim();
 
         var roomrfilteresult = [];
         $("input:checkbox[name=getroomfilter]:checked").each(function () {
@@ -380,11 +380,13 @@ $(function () {
     jQuery("#queryForm").submit(function (e) {
         e.preventDefault();//don't want to refresh the entire page
        var query;
-       var sectionsize=jQuery("#sectionsize").val();
-       var department=jQuery("#department").val();
-       var coursenumber=jQuery("#coursenumber").val();
-       var instructor=jQuery("#instructor").val();
-       var title=jQuery("#title").val();
+       var sectionsize=jQuery("#sectionsize").val().trim();
+       var department=jQuery("#department").val().trim();
+       var coursenumber=jQuery("#coursenumber").val().trim();
+
+       var instructor=jQuery("#instructor").val().trim();
+        console.log(instructor)
+       var title=jQuery("#title").val().trim();
        var sectionsizecompare=$("#sectionsizecompare").val();
        var coursenumbercompare=jQuery("#coursenumbercompare").val()
        var orderdirection1=jQuery("#direction0").val();
@@ -653,8 +655,8 @@ else if(filterresult.length===3)
 
     jQuery("#schedulingform").submit(function(e) {
         e.preventDefault();
-        var roomlist = jQuery("#roomlist").val();
-        var courselist = jQuery("#courselist").val();
+        var roomlist = jQuery("#roomlist").val().trim();
+        var courselist = jQuery("#courselist").val().trim();
 //calculate section number , group course key
 //同一节课不同section放在同一个room不同时间
 //coursequery need apply
@@ -702,8 +704,8 @@ else if(filterresult.length===3)
       }
         else {
             console.log("jump to else")
-            var department2=jQuery("#coursedept").val()
-            var buildingname2=jQuery("#buildingname2").val()
+            var department2=jQuery("#coursedept").val().trim()
+            var buildingname2=jQuery("#buildingname2").val().trim()
           var roomarray1 = buildingname2.split(',')
           console.log(roomarray1)
           var coursearray1 =department2 .split(',')
@@ -991,12 +993,80 @@ catch (err) {
 
 jQuery("#datagathering").submit(function(e){
     e.preventDefault();
-var department=jQuery("#departmentchart").val()
+var department=jQuery("#departmentchart").val().trim()
 var departmentchoose=jQuery("#coursechooses").val()
-var course=jQuery("#coursechart").val()
-var building=jQuery("#buildingchart").val()
+var course=jQuery("#coursechart").val().trim()
+var building=jQuery("#buildingchart").val().trim()
 var buildingchoose=jQuery("#typechooses").val()
 var query;
+
+
+    if(building!=null&&building!=undefined&&building!=""&&building!=" ")
+    {
+
+        if(buildingchoose==="roomtype") {
+            query = JSON.stringify(
+                {"GET": ["rooms_type","Roomnumber"],
+                    "WHERE": {"IS": {"rooms_shortname": building}},
+                    "GROUP":["rooms_type"],
+                    "APPLY":[{"Roomnumber":{"COUNT":"rooms_name"}}],
+                    "ORDER": {"dir": "UP", "keys": ["Roomnumber"]},
+                    "AS": "TABLE"
+                })
+
+        }
+        else{
+            query = JSON.stringify(
+                {"GET": ["rooms_furniture","Roomnumber"],
+                    "WHERE": {"IS": {"rooms_shortname": building}},
+                    "GROUP":["rooms_furniture"],
+                    "APPLY":[{"Roomnumber":{"COUNT":"rooms_name"}}],
+                    "ORDER": {"dir": "UP", "keys": ["Roomnumber"]},
+                    "AS": "TABLE"
+                })
+
+
+        }
+        try {
+            console.log("department"+department)
+            console.log("course"+course)
+            console.log("building"+building)
+            console.log(query)
+
+            $.ajax("/query", {type:"POST", data: query, contentType: "application/json", dataType: "json", success: function(data) {
+                var rawdata=data["result"]
+                var length=rawdata.length
+                var newdata=[]
+                for (var i=0;i<length;i++){
+                    newdata[i]={}
+                    if(Object.keys(rawdata[i])[0]==="rooms_furniture") {
+                        newdata[i]["label"] = rawdata[i]["rooms_furniture"]
+                        newdata[i]["value"] = rawdata[i]["Roomnumber"]
+                    }
+                    else
+                    {
+
+                        newdata[i]["label"] = rawdata[i]["rooms_type"]
+                        newdata[i]["value"] = rawdata[i]["Roomnumber"]
+
+                    }
+                }
+              generatepiechart(newdata)
+
+            }}).fail(function (e) {
+                spawnHttpErrorModal(e)
+            });
+        } catch (err) {
+            spawnErrorModal("Query Error", err);
+        }
+
+
+
+
+    }
+
+else{
+
     if(department!=null&&department!=undefined&&department!=""&&department!=" ")
     {   if(departmentchoose==="course")
     {query=JSON.stringify({
@@ -1045,32 +1115,7 @@ var query;
 
 
     }
-else if(building!=null&&building!=undefined&&building!=""&&building!=" ")
-    {
 
-if(buildingchoose==="roomtype") {
-    query = JSON.stringify(
-        {"GET": ["rooms_type","Roomnumber"],
-        "WHERE": {"IS": {"rooms_shortname": building}},
-            "GROUP":["rooms_type"],
-            "APPLY":[{"Roomnumber":{"COUNT":"rooms_name"}}],
-    "ORDER": {"dir": "UP", "keys": ["Roomnumber"]},
-    "AS": "TABLE"
-})
-
-}
-else{
-    query = JSON.stringify(
-    {"GET": ["rooms_furniture","Roomnumber"],
-        "WHERE": {"IS": {"rooms_shortname": building}},
-        "GROUP":["rooms_furniture"],
-        "APPLY":[{"Roomnumber":{"COUNT":"rooms_name"}}],
-        "ORDER": {"dir": "UP", "keys": ["Roomnumber"]},
-        "AS": "TABLE"
-    })
-
-
-}}
 
 
     try {
@@ -1080,21 +1125,39 @@ else{
         console.log(query)
 
         $.ajax("/query", {type:"POST", data: query, contentType: "application/json", dataType: "json", success: function(data) {
-            if (data["render"] == "TABLE"||"table") {
-                generateTable(data["result"]);
-            }   //renderchart function here
+        var rawdata=data["result"]
+        var length=rawdata.length
+         var newdata=[]
+            for(var i=0;i<length;i++){
+            newdata[i]={};
+            if(rawdata[i]["courses_id"]!=undefined)
+            {
+                newdata[i]["label"]=rawdata[i]["courses_id"]+rawdata[i]["courses_instructor"]
+            }
+            else
+                {
+                newdata[i]["label"] = rawdata[i]["courses_instructor"]
+            }
+            newdata[i]["value"]=rawdata[i]["Passrate(%)"]
+            }
+             generate2dcolumn(newdata)
+
+
         }}).fail(function (e) {
             spawnHttpErrorModal(e)
         });
     } catch (err) {
         spawnErrorModal("Query Error", err);
     }
-});
+}});
 
 
+/*
+function dealwithdcourseatachart(data) {
+}
 
 
-
+*/
 
 
     function generateTable(data) {
@@ -1147,39 +1210,41 @@ else{
                 return d["cl"]
             });
     }
-/*  $(function () {
+ function generatepiechart (data) {
            $("#chart-container").insertFusionCharts({
-                   type: "column2d",
-                    width: "800",
-                    height: "700",
+                   type: "pie3d",
+                    width: "700",
+                    height: "600",
                     dataFormat: "json",
                     dataSource: {
                         chart: {
-                                caption: "Enter Title of Chart",
-                            subCaption: "Enter SubCaption of Chart",
-                                    numberPrefix: "$",
+                                caption: "UBC room",
+                          // subCaption: "Enter SubCaption of Chart",
+                                  //  numberPrefix: "",
                                     theme: "ocean"
                             },
-                        data: [{
-                            label: "Bakersfield Central",
-                                value: "880000"
-                        }, {
-                                label: "Garden Groove harbour",
-                                    value: "730000"
-                           }, {
-                               label: "Los Angeles Topanga",
-                                value: "590000"
-                     }, {
-                             label: "Compton-Rancho Dom",
-                         value: "520000"
-                         }, {
-                    label: "Daly City Srramonte",
-                 value: "330000"
-                  }]
+                        data: data
                }
          });
-       });
-       */
+       }
+
+    function generate2dcolumn (data) {
+        $("#chart-container").insertFusionCharts({
+            type: "column2d",
+            width: "100%",
+            height: "100%",
+            dataFormat: "json",
+            dataSource: {
+                chart: {
+                    caption: "UBC course passrate",
+                    // subCaption: "Enter SubCaption of Chart",
+                    numberPrefix: "%",
+                    theme: "ocean"
+                },
+                data:data
+            }
+        });
+    }
 
     function spawnHttpErrorModal(e) {
         $("#errorModal .modal-title").html(e.status);
