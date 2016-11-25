@@ -471,10 +471,6 @@ $(function () {
 
        }
 
-
-
-
-
    else if(filterresult.length===1&&filterresult[0]==="courses_instructor")
        {
            instructorquery={"IS": {"courses_instructor": instructor}};
@@ -574,11 +570,6 @@ $(function () {
                 })
 
             }
-
-
-
-
-
         }
 else if (filterresult[0]==="courses_title") {
             if(sectionsizecompare==="GT")
