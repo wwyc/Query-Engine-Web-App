@@ -315,7 +315,7 @@ $(function () {
         /*
          http://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula
          */
-        function getDistanceFromLatLon(lat1,lon1,lat2,lon2) {
+   /*     function getDistanceFromLatLon(lat1,lon1,lat2,lon2) {
             var R = 6371; // Radius of the earth in km
             var dLat = (lat2-lat1)* (Math.PI/180);
             var dLon = (lon2-lon1)* (Math.PI/180);
@@ -327,7 +327,7 @@ $(function () {
             var d = R * c; // Distance in km
             return d*1000;
         }
-
+*/
         //room distance
 
         function method1() {
@@ -363,6 +363,7 @@ $(function () {
                 }
 
             }
+
             console.log("building length"+buildinglist.length)
             buildinglist.sort(function (a, b) {
 
@@ -1012,8 +1013,11 @@ else if(filterresult.length===3)
         console.log("jump to else")
         var department2 = jQuery("#coursedept").val().trim()
         var buildingname2 = jQuery("#buildingname2").val().trim()
+        var buildinglocation=jQuery("#buildingname4").val()
+        var realdistance=jQuery("#roomdistance1").val()
         var roomarray1 = buildingname2.split(',')
         console.log(roomarray1)
+        var roomquery
         var coursearray1 = department2.split(',')
         console.log(coursearray1)
         var roomwhere = {"OR": []};
@@ -1039,33 +1043,117 @@ else if(filterresult.length===3)
             ORDER: {"dir": "UP", "keys": ["Coursesize", "courses_dept", "courses_id",]},
             AS: "TABLE"
         })
-        var roomquery = JSON.stringify({
-            "GET": ["rooms_shortname", "rooms_number", "rooms_seats"],
-            "WHERE": roomwhere,
-            "ORDER": {"dir": "UP", "keys": ["rooms_seats"]},
-            "AS": "TABLE"
-        })
+        if(buildingname2!=""&&buildingname2!=" "&&buildingname2!=undefined&&buildingname2!=null) {
+            console.log("jump to building")
+            roomquery = JSON.stringify({
+                "GET": ["rooms_shortname", "rooms_number", "rooms_seats"],
+                "WHERE": roomwhere,
+                "ORDER": {"dir": "UP", "keys": ["rooms_seats"]},
+                "AS": "TABLE"
+            })
+
+            function method1() {
+                return $.ajax("/query", {type:"POST",
+                    data: roomquery, contentType: "application/json", dataType: "json"}
+                );
+            }
+
+            function method2() {
+                return $.ajax("/query", {type:"POST",
+                    data: coursequery, contentType: "application/json", dataType: "json"}
+                );
+            }
+            try{
+                $.when(method1(),method2()).then(arrangedata).fail(function(e){
+                    spawnHttpErrorModal(e)
+                });}
+            catch (err) {
+                spawnErrorModal("Query Error", err);
+            }
+
+        }
+        else{
+            var buildingquery={"IS": {"rooms_shortname": buildinglocation}};
+
+            var givenbuildingquery = JSON.stringify({
+                "GET": ["rooms_shortname", "buildingLat", "buildingLon"],
+                "WHERE": buildingquery,
+                "GROUP": ["rooms_shortname"],
+                "APPLY": [{"buildingLat": {"AVG": "rooms_lat"}}, {"buildingLon": {"AVG": "rooms_lon"}}],
+                "AS": "TABLE"
+            })
+            var    allbuildingquery = JSON.stringify({
+                "GET": ["rooms_shortname", "rooms_number","rooms_seats", "rooms_lat", "rooms_lon"],
+                "WHERE": {},
+                "ORDER":{"dir": "UP", "keys": ["rooms_seats"]},
+                "AS": "TABLE"
+            });
+
+            try{
+
+                $.when(method3(),method4(),method5()).then(filterbuilding1).fail(function(e){
+                    spawnHttpErrorModal(e)
+                });}
+            catch (err) {
+                spawnErrorModal("Query Error", err);
+            }
 
 
-        function method1() {
+        }
+
+        function method3() {
             return $.ajax("/query", {type:"POST",
-                data: roomquery, contentType: "application/json", dataType: "json"}
+                data: givenbuildingquery, contentType: "application/json", dataType: "json"}
             );
         }
 
-        function method2() {
+        function method4() {
+            console.log(allbuildingquery)
+            return $.ajax("/query", {type:"POST",
+                data: allbuildingquery, contentType: "application/json", dataType: "json"}
+            );
+        }
+        function method5() {
             return $.ajax("/query", {type:"POST",
                 data: coursequery, contentType: "application/json", dataType: "json"}
             );
         }
 
-        try{
 
-            $.when(method1(),method2()).then(arrangedata).fail(function(e){
-                spawnHttpErrorModal(e)
-            });}
-        catch (err) {
-            spawnErrorModal("Query Error", err);
+        function filterbuilding1(data1,data2,data3){
+            console.log(data3)
+            var givenbuildinglat=data1[0]["result"][0]["buildingLat"]
+            console.log(givenbuildinglat)
+            var givenbuildinglon=data1[0]["result"][0]["buildingLon"]
+            console.log(givenbuildinglon)
+            var buildinglist=data2[0]["result"]
+            for(var i=0;i<buildinglist.length;i++)
+            {  var realdistance=getDistanceFromLatLon(givenbuildinglat,givenbuildinglon,buildinglist[i]["rooms_lat"],
+                buildinglist[i]["rooms_lon"])
+                if(realdistance>realdistance)
+                {
+                    buildinglist.splice(i,1);
+                    i--;
+                }
+
+            }
+            console.log(buildinglist)
+             var roomdata;
+            roomdata=[]
+            roomdata[0]={}
+            roomdata[0]["result"]=[]
+            console.log("building length"+buildinglist.length)
+
+            for (var a = 0; a < buildinglist.length; a++) {
+                roomdata[0]["result"][a]={}
+                roomdata[0]["result"][a]["rooms_shortname"] = buildinglist[a]["rooms_shortname"]
+                roomdata[0]["result"][a]["rooms_number"] = buildinglist[a]["rooms_number"]
+                roomdata[0]["result"][a]["rooms_seats"] = buildinglist[a]["rooms_seats"]
+            }
+
+            console.log(roomdata[0]["result"])
+           arrangedata(roomdata,data3)//bugs may happens here here
+
         }
 
 
@@ -1076,8 +1164,6 @@ else if(filterresult.length===3)
         console.log("jump to else")
         var department = jQuery("#coursedept1").val()
         var buildingname = jQuery("#buildingname3").val()
-
-
 
 
         var coursequery = JSON.stringify({
@@ -1124,9 +1210,8 @@ else if(filterresult.length===3)
     });
 
         function arrangedata(data1, data2) {
-          //  console.log(data2[0]["result"][0]["Sectionnumber"])
-           // console.log(data2[0]["result"][0]["Coursesize"])
-            //console.log(data1[0]["result"][0]["rooms_seats"])
+            console.log(data1)
+            console.log(data2)
             alert(JSON.stringify(data1[0]["result"]));//room
             alert(JSON.stringify(data2[0]["result"]));//course
 
@@ -1134,24 +1219,29 @@ else if(filterresult.length===3)
           //  sectionnumber /3 round
             var roomarray = data1[0]["result"];
             var coursearray = data2[0]["result"];
-            console.log(roomarray[0]["rooms_fullname"])
+          console.log(roomarray.length)
             var timetablearr = [];
             var distributedsection = 0;
             var coursecount = 0
-            var leftslot = 11
+            var leftslot = 15
             var leftsection = 0
             var badcourse=0;
             var rowmaintain=0
-         //   var badcoursearr=[]
+            var badcoursearr=[]
+
+            console.log(coursearray.length)
             for (var i = 0; i < coursearray.length; i++) {
                 //  sectionnumber /3 round
                 distributedsection += Math.ceil(coursearray[i]["Sectionnumber"]/3)
-                console.log("distributed"+distributedsection)
+                badcoursearr[i]={}
+                badcoursearr[i]["coursename"]=coursearray[i]["courses_dept"]+coursearray[i]["courses_id"]
+                badcoursearr[i]["leftsection"]=Math.ceil(coursearray[i]["Sectionnumber"]/3)
             }
-            for(var c=0;c<roomarray.length;c++){
 
+            console.log("distributed"+distributedsection)
+            for(var c=0;c<roomarray.length;c++){
                 roomarray[c]["leftslot"]=15
-              //  console.log(JSON.stringify( roomarray[c]))
+            console.log(JSON.stringify( roomarray[c]))
             }
             for(var d=0;d<coursearray.length;d++){
                   var value=Math.ceil(coursearray[d]["Sectionnumber"]/3)
@@ -1160,125 +1250,129 @@ else if(filterresult.length===3)
             }
             console.log("coursearray length"+coursearray.length)
 
-              for (var x = 0; x < coursearray.length; x++) {
-
-                    for (var y = rowmaintain; y < roomarray.length; y++)
-                    {
-
-                        if (coursearray[x]["Coursesize"] <= roomarray[y]["rooms_seats"])
-
-                        { if(roomarray[y]["leftslot"]===15) {
-                            console.log("case 1: leftslot 11"+coursearray[x]["leftsection"])
-                            console.log("y :"+y)
-                            if (coursearray[x]["leftsection"] >= 15) {
-                                badcourse += coursearray[x]["leftsection"] - 15;
-                               /* for(var b=0;b<coursearray[x]["Sectionnumber"] - 11;b++)
-                                {
-                                    badcoursearr.push(coursearray[x])
-                                }
-                                */
-                                console.log("badcourse"+badcourse)
-                                timetablearr[y]=[]
-                                for(var i=0;i<coursearray[x]["leftsection"];i++)
-                                {
-                                    timetablearr[y].push(coursearray[x])
-                                coursecount++;
-                                }
-
-                                rowmaintain = y + 1;
-                                roomarray[y]["leftslot"]=0
-                                coursearray[x]["leftsection"]=0
-                                break;
-                            }
-                            else {
-                                timetablearr[y]=[]
-                                for(var i=0;i<coursearray[x]["leftsection"];i++)
-                                {timetablearr[y].push(coursearray[x])
-                                coursecount++
-                                }
-                                rowmaintain = y;
-                                roomarray[y]["leftslot"] =  roomarray[y]["leftslot"]- coursearray[x]["leftsection"]
-                                coursearray[x]["leftsection"]=0
-                                break;
-                            }
-                        }
-
-                        else if(coursearray[x]["leftsection"]< roomarray[y]["leftslot"]){
-                           // console.log("case 2: undersize"+coursearray[x]["leftsection"])
-                            //console.log("y :"+y)
-                            //console.log(coursearray[x])
-                            //console.log("leftslot"+ roomarray[y]["leftslot"])
-                            for(var i=0;i<coursearray[x]["leftsection"];i++)
-                            {     console.log(coursearray[x])
-                                timetablearr[y].push(coursearray[x])
-                                coursecount++
-                            }   //push
-
-                            rowmaintain = y;
-                            roomarray[y]["leftslot"] =  roomarray[y]["leftslot"]- coursearray[x]["leftsection"]
-                            coursearray[x]["leftsection"]= 0
-                           // console.log("leftslot"+roomarray[y]["leftslot"])
-                            //console.log("what happends here")
-                            break;
-                        }
-
-                    else if(coursearray[x]["leftsection"]===roomarray[y]["leftslot"]){
-                            console.log("case 2: samesize"+coursearray[x]["leftsection"])
-                            console.log("y :"+y)
-                            console.log(coursearray[x])
-                            console.log("leftslot"+roomarray[y]["leftslot"])
-                            for(var i=0;i<coursearray[x]["leftsection"];i++)
-                            {     console.log(coursearray[x])
-                                timetablearr[y].push(coursearray[x])
-                                coursecount++
-                            }   //push
-
-                            rowmaintain = y+1;
-                            roomarray[y]["leftslot"] =  0
-                            coursearray[x]["leftsection"]= 0
-                            console.log("what happends here")
-                           break;
-                        }
-
-                        else if(coursearray[x]["leftsection"]>roomarray[y]["leftslot"]){
-                            console.log("case 3: oversize")
-                            console.log("y :"+y)
-                            console.log("leftslot"+roomarray[y]["leftslot"])
-                           if(leftsection<=15)
-                           {
-                               console.log("case 3: oversize1"+coursearray[x]["leftsection"])
-                               console.log("y :"+y)
-                               for(var i=0;i<roomarray[y]["leftslot"];i++)
-                               {
-                                   timetablearr[y].push(coursearray[x])
-                                   coursecount++
+                    for (var x = 0; x < coursearray.length; x++) {
+                    for (var y = rowmaintain; y < roomarray.length; y++) {
+                        if (coursearray[x]["Coursesize"] <= roomarray[y]["rooms_seats"]) {
+                            if (roomarray[y]["leftslot"] === 15) {
+                                   console.log("case 1: leftslot 11" + coursearray[x]["leftsection"])
+                                   console.log("y :" + y)
+                                if (coursearray[x]["leftsection"] >= 15) {
+                                       console.log("greater 15 case")
+                                       badcourse += coursearray[x]["leftsection"] - 15;
+                                       console.log("badcourse" + badcourse)
+                                       timetablearr[y] = []
+                                       for (var i = 0; i < coursearray[x]["leftsection"]; i++) {
+                                           timetablearr[y].push(coursearray[x])
+                                           coursecount++;
+                                           badcoursearr[x]["leftsection"]--;
+                                           console.log(timetablearr[y])
+                                       }
+                                       rowmaintain = y + 1;
+                                       roomarray[y]["leftslot"] = 0
+                                       coursearray[x]["leftsection"] = 0
+                                       break;
+                                   }
+                                   else {
+                                       timetablearr[y] = []
+                                       for (var i = 0; i < coursearray[x]["leftsection"]; i++) {
+                                           timetablearr[y].push(coursearray[x])
+                                           coursecount++
+                                           badcoursearr[x]["leftsection"]--;
+                                           console.log("y"+y)
+                                           console.log(timetablearr[y])
+                                       }
+                                       console.log(timetablearr[y])
+                                       rowmaintain = y;
+                                       console.log(timetablearr[y])
+                                       roomarray[y]["leftslot"] = roomarray[y]["leftslot"] - coursearray[x]["leftsection"]
+                                       coursearray[x]["leftsection"] = 0
+                                       break;
+                                   }
                                }
-                               coursearray[x]["leftsection"]=coursearray[x]["leftsection"]-roomarray[y]["leftslot"]
-                               roomarray[y]["leftslot"] =  0
-                               console.log("leftsection"+coursearray[x]["leftsection"])
-                        }
+                               else if (coursearray[x]["leftsection"] < roomarray[y]["leftslot"]) {
 
-                         else{
-                               console.log("case 3: oversize2"+coursearray[x]["leftsection"])
-                               console.log("y :"+y)
-                               for(var i=0;i<roomarray[y]["leftslot"];i++)
-                               {timetablearr[y].push(coursearray[x])
-                               coursecount++
+                                   for (var i = 0; i < coursearray[x]["leftsection"]; i++) {
+                                       console.log(coursearray[x])
+                                       timetablearr[y].push(coursearray[x])
+                                       coursecount++
+                                       badcoursearr[x]["leftsection"]--;
+                                   }   //push
+
+                                   rowmaintain = y;
+                                   roomarray[y]["leftslot"] = roomarray[y]["leftslot"] - coursearray[x]["leftsection"]
+                                   coursearray[x]["leftsection"] = 0
+                                   // console.log("leftslot"+roomarray[y]["leftslot"])
+                                   //console.log("what happends here")
+                                   break;
                                }
-                               coursearray[x]["leftsection"]= 15-roomarray[y]["leftslot"]
-                               roomarray[y]["leftslot"] =  0
 
-                            }
-                        }
+                               else if (coursearray[x]["leftsection"] === roomarray[y]["leftslot"]) {
+                                   console.log("case 2: samesize" + coursearray[x]["leftsection"])
+                                   console.log("y :" + y)
+                                   console.log(coursearray[x])
+                                   console.log("leftslot" + roomarray[y]["leftslot"])
+                                   for (var i = 0; i < coursearray[x]["leftsection"]; i++) {
+                                       console.log(coursearray[x])
+                                       timetablearr[y].push(coursearray[x])
+                                       coursecount++
+                                       badcoursearr[x]["leftsection"]--;
+                                   }   //push
+                                   rowmaintain = y + 1;
+                                   roomarray[y]["leftslot"] = 0
+                                   coursearray[x]["leftsection"] = 0
+                                   console.log("what happends here")
+                                   break;
+                               }
 
-                        }
+                               else if (coursearray[x]["leftsection"] > roomarray[y]["leftslot"]) {
+                                   console.log("case 3: oversize")
+                                   console.log("y :" + y)
+                                   console.log("leftslot" + roomarray[y]["leftslot"])
+                                   if (leftsection <= 15) {
+                                       console.log("case 3: oversize1" + coursearray[x]["leftsection"])
+                                       console.log("y :" + y)
+                                       for (var i = 0; i < roomarray[y]["leftslot"]; i++) {
+                                           timetablearr[y].push(coursearray[x])
+                                           coursecount++
+                                           badcoursearr[x]["leftsection"]--;
+                                       }
 
-                    }
+                                       coursearray[x]["leftsection"] = coursearray[x]["leftsection"] - roomarray[y]["leftslot"]
+                                       roomarray[y]["leftslot"] = 0
+                                       console.log("leftsection" + coursearray[x]["leftsection"])
+                                   }
 
-                    console.log("badcourse"+badcourse)
-                    console.log("y"+y+"timetablearr"+JSON.stringify(timetablearr[y]))
-                }
+                                   else {
+                                       console.log("case 3: oversize2" + coursearray[x]["leftsection"])
+                                       console.log("y :" + y)
+                                       for (var i = 0; i < roomarray[y]["leftslot"]; i++) {
+                                           timetablearr[y].push(coursearray[x])
+                                           coursecount++
+                                           badcoursearr[x]["leftsection"]--;
+                                       }
+                                       coursearray[x]["leftsection"] = 15 - roomarray[y]["leftslot"]
+                                       console.log("jump to bad course")
+                                       roomarray[y]["leftslot"] = 0
+
+                                   }
+                               }
+
+                           }
+
+                       }
+
+                       console.log("badcourse" + badcourse)
+                       console.log("y" + y + "timetablearr" + JSON.stringify(timetablearr[y]))
+                   }
+
             badcourse+=distributedsection-coursecount
+for (var i=0;i<badcoursearr.length;i++){
+      if(badcoursearr[i]["leftsection"]<=0)
+      { badcoursearr.splice(i,1);
+        i--;}
+
+}
+    alert(JSON.stringify(badcoursearr))
    console.log("badcourse"+badcourse)
    console.log(timetablearr);
 
@@ -1333,10 +1427,6 @@ else if(filterresult.length===3)
         }
 
 
-
-
-
-
 jQuery("#datagathering2").submit(function(e) {
     console.log("jump to chart")
     e.preventDefault();
@@ -1361,7 +1451,7 @@ jQuery("#datagathering2").submit(function(e) {
             })
 
     }
-    else {
+    else if(buildingchoose==="roomfurniture") {
         query = JSON.stringify(
             {
                 "GET": ["rooms_furniture", "Roomnumber"],
@@ -1371,8 +1461,18 @@ jQuery("#datagathering2").submit(function(e) {
                 "ORDER": {"dir": "UP", "keys": ["Roomnumber"]},
                 "AS": "TABLE"
             })
-
-
+    }
+    else{
+        console.log("rooms jump here")
+        query = JSON.stringify(
+            {
+                "GET": ["rooms_seats", "Roomnumber"],
+                "WHERE": {"IS": {"rooms_shortname": building}},
+                "GROUP": ["rooms_seats"],
+                "APPLY": [{"Roomnumber": {"COUNT": "rooms_name"}}],
+                "ORDER": {"dir": "UP", "keys": ["Roomnumber"]},
+                "AS": "TABLE"
+            })
     }
     try {
 
@@ -1384,18 +1484,30 @@ jQuery("#datagathering2").submit(function(e) {
                 var rawdata = data["result"]
                 var length = rawdata.length
                 var newdata = []
+                console.log(rawdata)
                 for (var i = 0; i < length; i++) {
                     newdata[i] = {}
                     if (Object.keys(rawdata[i])[0] === "rooms_furniture") {
                         newdata[i]["label"] = rawdata[i]["rooms_furniture"]
                         newdata[i]["value"] = rawdata[i]["Roomnumber"]
+                        console.log(newdata[i])
                     }
-                    else {
+                    else if (Object.keys(rawdata[i])[0] === "rooms_type"){
 
                         newdata[i]["label"] = rawdata[i]["rooms_type"]
                         newdata[i]["value"] = rawdata[i]["Roomnumber"]
 
                     }
+                    else
+                    {
+
+                      //  newdata[i]["label"] = rawdata[i]["rooms_seats"]
+                        newdata[i]["value"] = rawdata[i]["rooms_seats"]
+                        newdata[i]["label"] = rawdata[i]["Roomnumber"]
+                       // console.log(newdata[i])
+
+                    }
+
                 }
                 generatepiechart(newdata)
 
@@ -1450,9 +1562,6 @@ jQuery("#datagathering2").submit(function(e) {
 
     try {
         console.log("query"+query)
-
-
-
         $.ajax("/query", {type:"POST", data: query, contentType: "application/json", dataType: "json", success: function(data) {
         var rawdata=data["result"]
         var length=rawdata.length
@@ -1489,7 +1598,7 @@ jQuery("#datagathering2").submit(function(e) {
 
             GET: ["courses_dept","courses_instructor","Passrate(%)", "AverageGrade"],
             WHERE:
-            {"IS": {"courses_name": department+course}
+            {"IS": {"courses_name": course}
             },
             GROUP: ["courses_dept", "courses_instructor"],
             APPLY: [{"Passrate(%)": {"AVG": "courses_passrate"}},
@@ -1639,7 +1748,18 @@ jQuery("#datagathering2").submit(function(e) {
             $("#errorModal").modal('show')
         }
     }
-
+    function getDistanceFromLatLon(lat1,lon1,lat2,lon2) {
+        var R = 6371; // Radius of the earth in km
+        var dLat = (lat2-lat1)* (Math.PI/180);
+        var dLon = (lon2-lon1)* (Math.PI/180);
+        var a =
+            Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos((lat1)* (Math.PI/180)) * Math.cos((lat2)*(Math.PI/180)) *
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        var d = R * c; // Distance in km
+        return d*1000;
+    }
 
 });
 
