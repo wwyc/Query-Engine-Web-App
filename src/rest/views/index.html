@@ -31,55 +31,6 @@
 			}
 			);
 		}
-
-		function returnroomtypedata(){
-			console.log("jump to return")
-			var query=JSON.stringify({
-				"GET":"rooms_type",
-				"WHERE":{},
-				"GROUP":["rooms_type"],
-				"APPLY":[],
-				"ORDER":"rooms_type",
-				"AS":"TABLE"
-			})
-			return $.ajax("/query", {type:"POST",
-						data: query, contentType: "application/json", dataType: "json"
-					}
-			);
-		}
-		function returnfurnituretypedata(){
-			console.log("jump to return")
-			var query=JSON.stringify({
-				"GET":"rooms_furniture",
-				"WHERE":{},
-				"GROUP":["rooms_furniture"],
-				"APPLY":[],
-				"ORDER":"rooms_furniture",
-				"AS":"TABLE"
-			})
-			return $.ajax("/query", {type:"POST",
-						data: query, contentType: "application/json", dataType: "json"
-					}
-			);
-		}
-
-
-		function returntitledata(){
-			console.log("jump to return")
-			var query=JSON.stringify({
-				"GET":"courses_title",
-				"WHERE":{},
-				"GROUP":["courses_title"],
-				"APPLY":[],
-				"ORDER":"courses_title",
-				"AS":"TABLE"
-			})
-			return $.ajax("/query", {type:"POST",
-						data: query, contentType: "application/json", dataType: "json"
-					}
-			);
-		}
-
 		function returnbuildingnamedata(){
 			console.log("jump to return")
 			var query=JSON.stringify({
@@ -95,14 +46,14 @@
 					}
 			);
 		}
-		function returncoursenamedata(){
+		function returnroomtypedata1(){
 			console.log("jump to return")
 			var query=JSON.stringify({
-				"GET":"courses_name",
+				"GET":"rooms_type",
 				"WHERE":{},
-				"GROUP":["courses_name"],
+				"GROUP":["rooms_type"],
 				"APPLY":[],
-				"ORDER":"courses_name",
+				"ORDER":"rooms_type",
 				"AS":"TABLE"
 			})
 			return $.ajax("/query", {type:"POST",
@@ -110,7 +61,21 @@
 					}
 			);
 		}
-
+		function returnfurnituretypedata1(){
+			console.log("jump to return")
+			var query=JSON.stringify({
+				"GET":"rooms_furniture",
+				"WHERE":{},
+				"GROUP":["rooms_furniture"],
+				"APPLY":[],
+				"ORDER":"rooms_furniture",
+				"AS":"TABLE"
+			})
+			return $.ajax("/query", {type:"POST",
+						data: query, contentType: "application/json", dataType: "json"
+					}
+			);
+		}
 		function dropdownbuildingfunction(data)
 		{
 			//console.log(jsonData.Table)
@@ -150,6 +115,328 @@
 			$("#department1").html(listItems)
 			$("#coursedept1").html(listItems)
 			$("#departmentchart").html(listItems)
+			$("#departmentchart1").html(listItems)
+		}
+		function dropdownroomtypefunction1(data)
+		{
+			//console.log(jsonData.Table)
+			var jsonData={};
+			jsonData.Table=[]
+			jsonData.Table=data["result"]
+			console.log(jsonData.Table)
+			var listItems = '<option selected="selected" value=" ">- Select -</option>';
+
+			for (var i = 0; i < jsonData.Table.length; i++) {
+				listItems += "<option value='" + jsonData.Table[i].rooms_type+ "'>" + jsonData.Table[i].rooms_type + "</option>";
+			}
+			$("#roomtype").html(listItems)
+
+		}
+		function dropdownroomfurniturefunction1(data)
+		{
+			//console.log(jsonData.Table)
+			var jsonData={};
+			jsonData.Table=[]
+			jsonData.Table=data["result"]
+			console.log(jsonData.Table)
+			var listItems = '<option selected="selected" value=" ">- Select -</option>';
+
+			for (var i = 0; i < jsonData.Table.length; i++) {
+				listItems += "<option value='" + jsonData.Table[i].rooms_furniture+ "'>" + jsonData.Table[i].rooms_furniture + "</option>";
+			}
+			$("#furnituretype").html(listItems)
+
+		}
+
+
+		$.when(returndepartmentdata()).then
+		(dropdowndeptfunction)
+		$.when(returnbuildingnamedata()).then
+		(dropdownbuildingfunction)
+		$.when(returnroomtypedata1()).
+		then(dropdownroomtypefunction1)
+		$.when(returnfurnituretypedata1()).then
+		(dropdownroomfurniturefunction1)
+
+		</script>
+
+	<script type="text/javascript">
+
+		$(document).ready(function() {
+			$("#department").change(function(){
+				var department=$("#department").val()
+			//    var instructor=$("#instructor").val()
+
+				$.when(returncoursenumberdata(department)).then
+				(dropdowncoursenumberfunction)
+
+			$.when( returninstructordata(department)).then
+			(dropdowninstructorfunction)
+			});
+		});
+
+		function returncoursenumberdata(department){
+			console.log("jump to return")
+			var query=JSON.stringify({
+				"GET":"courses_id",
+				"WHERE":{"IS":{"courses_dept":department}},
+				"GROUP":["courses_id"],
+				"APPLY":[],
+				"ORDER":"courses_id",
+				"AS":"TABLE"
+			})
+			return $.ajax("/query", {type:"POST",
+						data: query, contentType: "application/json", dataType: "json"
+					}
+			);
+		}
+
+		function returninstructordata(department){
+			console.log("jump to return")
+			var query=JSON.stringify({
+				"GET":"courses_instructor",
+				"WHERE":{"IS":{"courses_dept":department}},
+				"GROUP":["courses_instructor"],
+				"APPLY":[],
+				"ORDER":"courses_instructor",
+				"AS":"TABLE"
+			})
+			return $.ajax("/query", {type:"POST",
+						data: query, contentType: "application/json", dataType: "json"
+					}
+			);
+		}
+		function dropdowncoursenumberfunction(data) {
+			//console.log(jsonData.Table)
+			var jsonData = {};
+			jsonData.Table = []
+			jsonData.Table = data["result"]
+			console.log(jsonData.Table)
+			var listItems = '<option selected="selected" value=" ">- Select -</option>';
+
+			for (var i = 0; i < jsonData.Table.length; i++) {
+				listItems += "<option value='" + jsonData.Table[i].courses_id + "'>" + jsonData.Table[i].courses_id + "</option>";
+			}
+			console.log("listitem"+listItems)
+          console.log("whathappenshere")
+			$("#coursenumber").html(listItems)
+
+		}
+
+		function dropdowninstructorfunction(data)
+		{
+			//console.log(jsonData.Table)
+			var jsonData={};
+			jsonData.Table=[]
+			jsonData.Table=data["result"]
+			console.log(jsonData.Table)
+			var listItems = '<option selected="selected" value=" ">- Select -</option>';
+
+			for (var i = 0; i < jsonData.Table.length; i++)
+			{
+				listItems += "<option value='" + jsonData.Table[i].courses_instructor + "'>" + jsonData.Table[i].courses_instructor  + "</option>";
+			}
+			$("#instructor").html(listItems)
+
+
+		}
+
+
+
+
+	</script>
+	<script type="text/javascript">
+
+		$(document).ready(function() {
+			$("#departmentchart").change(function(){
+				var department=$("#departmentchart").val()
+
+				$.when(returncoursenumberdata1(department)).then
+				(dropdowncoursenumberfunction1)
+
+			});
+		});
+
+		function returncoursenumberdata1(department){
+			console.log("jump to return")
+			var query=JSON.stringify({
+				"GET":"courses_name",
+				"WHERE":{"IS":{"courses_dept":department}},
+				"GROUP":["courses_name"],
+				"APPLY":[],
+				"ORDER":"courses_name",
+				"AS":"TABLE"
+			})
+			return $.ajax("/query", {type:"POST",
+						data: query, contentType: "application/json", dataType: "json"
+					}
+			);
+		}
+		function dropdowncoursenumberfunction1(data)
+		{
+			//console.log(jsonData.Table)
+			var jsonData={};
+			jsonData.Table=[]
+			jsonData.Table=data["result"]
+			console.log(jsonData.Table)
+			var listItems = '<option selected="selected" value=" ">- Select -</option>';
+
+			for (var i = 0; i < jsonData.Table.length; i++) {
+				listItems += "<option value='" + jsonData.Table[i].courses_name + "'>" + jsonData.Table[i].courses_name  + "</option>";
+			}
+			$("#coursechart").html(listItems)
+
+
+		}
+
+	</script>
+	<script type="text/javascript">
+
+	$(document).ready(function() {
+		$("#department1").change(function(){
+			var department=$("#department1").val()
+
+			$.when(returntitledata(department)).then
+			(dropdowntitlefunction)
+
+		});
+	});
+
+	function returntitledata(department){
+		console.log("jump to return")
+		var query=JSON.stringify({
+			"GET":"courses_title",
+			"WHERE":{"IS":{"courses_dept":department}},
+			"GROUP":["courses_title"],
+			"APPLY":[],
+			"ORDER":"courses_title",
+			"AS":"TABLE"
+		})
+		return $.ajax("/query", {type:"POST",
+					data: query, contentType: "application/json", dataType: "json"
+				}
+		);
+	}
+	function dropdowntitlefunction(data)
+	{
+
+		var jsonData={};
+		jsonData.Table=[]
+		jsonData.Table=data["result"]
+		console.log(jsonData.Table)
+		var listItems = '<option selected="selected" value=" ">- Select -</option>';
+
+		for (var i = 0; i < jsonData.Table.length; i++) {
+			listItems += "<option value='" + jsonData.Table[i].courses_title + "'>" + jsonData.Table[i].courses_title  + "</option>";
+		}
+		$("#title").html(listItems)
+
+
+	}
+
+
+
+
+
+	</script >
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$("#buildingname").change(function(){
+				var building=$("#buildingname").val()
+
+				$.when(returnumberedata(building)).then
+				(dropdownnumberfunction)
+				$.when(returnroomtypedata(building)).
+				then(dropdownroomtypefunction)
+				$.when(returnfurnituretypedata(building)).then
+					(dropdownroomfurniturefunction)
+
+			});
+		});
+
+		function returnumberedata(building){
+			console.log("jump to return")
+			var query=JSON.stringify({
+				"GET":"rooms_number",
+				"WHERE":{"IS":{"rooms_shortname":building}},
+				"GROUP":["rooms_number"],
+				"APPLY":[],
+				"ORDER":"rooms_number",
+				"AS":"TABLE"
+			})
+			return $.ajax("/query", {type:"POST",
+						data: query, contentType: "application/json", dataType: "json"
+					}
+			);
+		}
+		function returnroomtypedata(building){
+			console.log("jump to return")
+			var query;
+			if(building!=" ")
+			{ query=JSON.stringify({
+				"GET":"rooms_type",
+				"WHERE":{"IS":{"rooms_shortname":building}},
+				"GROUP":["rooms_type"],
+				"APPLY":[],
+				"ORDER":"rooms_type",
+				"AS":"TABLE"
+			})}
+			else
+			{ query=JSON.stringify({
+				"GET":"rooms_type",
+				"WHERE":{},
+				"GROUP":["rooms_type"],
+				"APPLY":[],
+				"ORDER":"rooms_type",
+				"AS":"TABLE"
+			})}
+			return $.ajax("/query", {type:"POST",
+						data: query, contentType: "application/json", dataType: "json"
+					}
+			);
+		}
+		function returnfurnituretypedata(building){
+			console.log("jump to return")
+			var query
+			if(building!=" ")
+			{ query=JSON.stringify({
+				"GET":"rooms_furniture",
+				"WHERE":{"IS":{"rooms_shortname":building}},
+				"GROUP":["rooms_furniture"],
+				"APPLY":[],
+				"ORDER":"rooms_furniture",
+				"AS":"TABLE"
+			})}
+			else
+			{ query=JSON.stringify({
+				"GET":"rooms_furniture",
+				"WHERE":{},
+				"GROUP":["rooms_furniture"],
+				"APPLY":[],
+				"ORDER":"rooms_furniture",
+				"AS":"TABLE"
+			})}
+			return $.ajax("/query", {type:"POST",
+						data: query, contentType: "application/json", dataType: "json"
+					}
+			);
+		}
+
+
+		function dropdownnumberfunction(data)
+		{
+			//console.log(jsonData.Table)
+			var jsonData={};
+			jsonData.Table=[]
+			jsonData.Table=data["result"]
+			console.log(jsonData.Table)
+			var listItems = '<option selected="selected" value=" ">- Select -</option>';
+
+			for (var i = 0; i < jsonData.Table.length; i++) {
+				listItems += "<option value='" + jsonData.Table[i].rooms_number + "'>" + jsonData.Table[i].rooms_number  + "</option>";
+			}
+			$("#roomnumber").html(listItems)
+
 
 		}
 		function dropdownroomtypefunction(data)
@@ -182,54 +469,11 @@
 			$("#furnituretype").html(listItems)
 
 		}
-		function dropdowncoursenamefunction(data)
-		{
-			//console.log(jsonData.Table)
-			var jsonData={};
-			jsonData.Table=[]
-			jsonData.Table=data["result"]
-			console.log(jsonData.Table)
-			var listItems = '<option selected="selected" value=" ">- Select -</option>';
-
-			for (var i = 0; i < jsonData.Table.length; i++) {
-				listItems += "<option value='" + jsonData.Table[i].courses_name + "'>" + jsonData.Table[i].courses_name  + "</option>";
-			}
-			$("#coursechart").html(listItems)
 
 
-		}
-		function dropdowntitlefunction(data)
-		{
-			//console.log(jsonData.Table)
-			var jsonData={};
-			jsonData.Table=[]
-			jsonData.Table=data["result"]
-			console.log(jsonData.Table)
-			var listItems = '<option selected="selected" value=" ">- Select -</option>';
 
-			for (var i = 0; i < jsonData.Table.length; i++) {
-				listItems += "<option value='" + jsonData.Table[i].courses_title + "'>" + jsonData.Table[i].courses_title  + "</option>";
-			}
-			$("#title").html(listItems)
-
-
-		}
-
-		$.when(returndepartmentdata()).then
-		(dropdowndeptfunction)
-		$.when(returnbuildingnamedata()).then
-		(dropdownbuildingfunction)
-		//$.when(returncoursenamedata()).then
-		//(dropdowncoursenamefunction)
-		$.when(returnroomtypedata()).then(dropdownroomtypefunction
-		)
-		$.when(returnfurnituretypedata()).then
-		(dropdownroomfurniturefunction)
-		$.when(returntitledata()).then
-		(dropdowntitlefunction)
-
-		</script>
-<title>
+	</script>
+	<title>
 	UBC Insight
 	</title>
 </head>
@@ -256,10 +500,11 @@
 			<label for="department">Department:</label>
 			<select id="department"></select><br>
 			<label for="coursenumber">Course number:</label>
-			<textarea class="form-control" rows="1" id="coursenumber"></textarea>
+			<select id="coursenumber"></select><br>
+		<!--	<textarea class="form-control" rows="1" id="coursenumber"></textarea>  !-->
 			<label for="instructor">Instructor:</label>
-		<!--	<select id="instructor"></select>  !-->
-			<textarea class="form-control" rows="1" id="instructor"></textarea>
+		<select id="instructor"></select> <br>
+		<!--	<textarea class="form-control" rows="1" id="instructor"></textarea>   !-->
 			<label>Section Filter</label>
 			<input type="checkbox" name="getsection" value= "courses_dept" > Department</input>
 			<input type="checkbox" name="getsection" value="courses_instructor" >Instructor </input>
@@ -271,7 +516,9 @@
 	<label> course explorer</label>
 	<div class="form-group">
 		<label for="department1">Department:</label>
-		<select id="department1"></select>
+		<select id="department1"></select><br>
+		<label for="title">Title:</label><br>
+		<select id="title"></select><br>
 		<div class="form-group">
 			<label>Choosing Compare Key</label>
 			<input type="checkbox" name="getcoursebydept" value="courses_pass" > Courses Pass</input>
@@ -285,11 +532,7 @@
 				<option  value="LT" > < </option>
 			</select>    <br>
 			<textarea class="form-control" rows="1" id="sectionsize"></textarea>
-			<label for="title">Title:</label><br>
-			<select id="title"></select>
-			<!--
-			<textarea class="form-control" rows="1" id="title"></textarea>
-!-->
+
 		</div>
         <div class="form-group">
             <!--  order    多选 !-->
@@ -320,7 +563,13 @@
 				<textarea class="form-control" rows="1" id="buildingname"></textarea>
 				!-->
 			<label for="roomnumber">Room Number:</label>
-			<textarea class="form-control" rows="1" id="roomnumber"></textarea>
+			<select id="roomnumber"></select><br>
+
+			<label for="roomtype">Room Type:</label>
+			<select id="roomtype"></select><br>
+
+			<label for="furnituretype">Furniture type:</label>
+			<select id="furnituretype"></select><br>
 			<label for="roomsize">Room Size:</label>
 			<select id="roomsizecompare">
 				<option value="GT" > > </option>
@@ -328,12 +577,6 @@
 				<option value="LT"> < </option>
 			</select>    <br>
 			<textarea class="form-control" rows="1" id="roomsize"></textarea>
-			<label for="roomtype">Room Type:</label>
-			<select id="roomtype"></select><br>
-			<!--<textarea class="form-control" rows="1" id="roomtype"></textarea>!-->
-			<label for="furnituretype">Furniture type:</label>
-			<select id="furnituretype"></select><br>
-			<!--<textarea class="form-control" rows="1" id="furnituretype"></textarea>!-->
 			<h4>Location:</h4>
 			<label for="buildingname1"> building name</label>
 			<select id="buildingname1"></select><br>
@@ -384,9 +627,9 @@
 	<form id="schedulingformbykeys">
 		<label>filter by keyword</label><br>
 		<label> department</label>
-		<textarea class="form-control" rows="3" id="coursedept" > </textarea>
+		<textarea class="form-control" rows="1" id="coursedept" > </textarea>
 		<label> building name</label>
-		<textarea class="form-control" rows="3" id="buildingname2" > </textarea>
+		<textarea class="form-control" rows="1" id="buildingname2" > </textarea>
 		<h4>Location:</h4>
 		<label for="buildingname4"> building name</label>
 		<select id="buildingname4"></select><br>
@@ -416,29 +659,28 @@
 
 <div id="novelfunction">
 	<h3> render charts for useful data</h3>
-	<form id="datagathering">
+	<form id="datagathering1">
 		<h4> Department Info</h4>
 		<label> choose department</label><br>
-		<select id="departmentchart"></select><br>
-		<!--
-		<textarea class="form-control" rows="1" id="departmentchart" > </textarea>
-		!-->
+		<select id="departmentchart1"></select><br>
 		<select id="coursechooses">
 			<option  value="course" >group by course</option>
 			<option  value="instructor"> group by instructor  </option>
 		</select><br>
+		<button type="submit" class="btn btn-primary">Submit</button>
+		</form>
+	<form id="datagathering3">
+		<label> choose department</label><br>
+		<select id="departmentchart"></select><br>
 		<label> choose course(coursename)</label><br>
-		<!--
     <select id="coursechart"></select><br>
-    !-->
-    <textarea class="form-control" rows="1" id="coursechart" > </textarea>
-
+		<button type="submit" class="btn btn-primary">Submit</button>
+</form>
+<form id="datagathering2">
 		<h4> Room Info</h4>
 		<label> choose builing</label><br>
 		<select id="buildingchart"></select><br>
-		<!--
-		<textarea class="form-control" rows="1" id="buildingchart" > </textarea>
-		!-->
+
 		<select id="typechooses">
 			<option  value="roomtype" >show room type</option>
 			<option  value="roomfurniture"> show furniture type  </option>
