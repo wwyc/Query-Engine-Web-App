@@ -1360,7 +1360,6 @@ else if(filterresult.length===3)
                            }
 
                        }
-
                        console.log("badcourse" + badcourse)
                        console.log("y" + y + "timetablearr" + JSON.stringify(timetablearr[y]))
                    }
@@ -1375,11 +1374,13 @@ for (var i=0;i<badcoursearr.length;i++){
     alert(JSON.stringify(badcoursearr))
    console.log("badcourse"+badcourse)
    console.log(timetablearr);
+            console.log(timetablearr.length)
 
            var newtimetablearr=[]
             var quality=1-(badcourse/distributedsection)
             alert("schedule quality: "+quality)
             console.log("schedule quality: "+quality)
+            console.log(timetablearr.length)
             for(var j=0;j<timetablearr.length;j++)
             {
                console.log("jump in");
@@ -1388,38 +1389,69 @@ for (var i=0;i<badcoursearr.length;i++){
                     newtimetablearr[j] = {};
                     if (timetablearr[j][0] != null || timetablearr[j][0] != undefined)
                         newtimetablearr[j]["MWF8am-9am"] = JSON.stringify(timetablearr[j][0]["courses_dept"] + timetablearr[j][0]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
+                    else
+                        newtimetablearr[j]["MWF8am-9am"]=""
                     if (timetablearr[j][1] != null || timetablearr[j][1] != undefined)
                         newtimetablearr[j]["MWF9am-10am"] = JSON.stringify(timetablearr[j][1]["courses_dept"] + timetablearr[j][1]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
+                    else
+                        newtimetablearr[j]["MWF9am-10am"]=""
                     if (timetablearr[j][2] != null || timetablearr[j][2] != undefined)
                         newtimetablearr[j]["MWF10am-11am"] = JSON.stringify(timetablearr[j][2]["courses_dept"] + timetablearr[j][2]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
+                    else
+                        newtimetablearr[j]["MWF10am-11am"]=""
                     if (timetablearr[j][3] != null || timetablearr[j][3] != undefined)
                         newtimetablearr[j]["MWF11am-12pm"] = JSON.stringify(timetablearr[j][3]["courses_dept"] + timetablearr[j][3]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
+                    else
+                        newtimetablearr[j]["MWF11am-12am"]=""
                     if (timetablearr[j][4] != null || timetablearr[j][4] != undefined)
                         newtimetablearr[j]["MWF12pm-1pm"] = JSON.stringify(timetablearr[j][4]["courses_dept"] + timetablearr[j][4]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
+                    else
+                        newtimetablearr[j]["MWF12pm-1pm"]=""
                     if (timetablearr[j][5] != null || timetablearr[j][5] != undefined)
                         newtimetablearr[j]["MWF1pm-2pm"] = JSON.stringify(timetablearr[j][5]["courses_dept"] + timetablearr[j][5]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
+                    else
+                        newtimetablearr[j]["MWF1pm-2pm"]=""
                     if (timetablearr[j][6] != null || timetablearr[j][6] != undefined)
                         newtimetablearr[j]["MWF2pm-3pm"] = JSON.stringify(timetablearr[j][6]["courses_dept"] + timetablearr[j][6]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
+                    else
+                        newtimetablearr[j]["MWF2pm-3pm"]=""
                     if (timetablearr[j][7] != null || timetablearr[j][7] != undefined)
                         newtimetablearr[j]["MWF3pm-4pm"] = JSON.stringify(timetablearr[j][7]["courses_dept"] + timetablearr[j][7]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
+                    else
+                        newtimetablearr[j]["MWF3pm-4pm"]=""
                     if (timetablearr[j][8] != null || timetablearr[j][8] != undefined)
                         newtimetablearr[j]["MWF4pm-5pm"] = JSON.stringify(timetablearr[j][8]["courses_dept"] + timetablearr[j][8]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
+                    else
+                        newtimetablearr[j]["MWF4pm-5pm"]=""
                     if (timetablearr[j][9] != null || timetablearr[j][9] != undefined)
                         newtimetablearr[j]["TUTH8am-9:30am"] = JSON.stringify(timetablearr[j][9]["courses_dept"] + timetablearr[j][9]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
+                    else
+                        newtimetablearr[j]["TUTH8am-9:30am"]=""
                     if (timetablearr[j][10] != null || timetablearr[j][10] != undefined)
                         newtimetablearr[j]["TUTH9:30am-11:00am"] = JSON.stringify(timetablearr[j][10]["courses_dept"] + timetablearr[j][10]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
+                    else
+                        newtimetablearr[j]["TUTH9:30am-11:00am"]=""
                     if (timetablearr[j][11] != null || timetablearr[j][11] != undefined)
                         newtimetablearr[j]["TUTH11:00am-12:30pm"] = JSON.stringify(timetablearr[j][11]["courses_dept"] + timetablearr[j][11]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
+                    else
+                        newtimetablearr[j]["TUTH11:00am-12:30pm"]=""
                     if (timetablearr[j][12] != null || timetablearr[j][12] != undefined)
                         newtimetablearr[j]["TUTH12:30pm-2:00pm"] = JSON.stringify(timetablearr[j][12]["courses_dept"] + timetablearr[j][12]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
+                    else
+                        newtimetablearr[j]["TUTH12:30pm-2:00pm"]=""
+
                     if (timetablearr[j][13] != null || timetablearr[j][13] != undefined)
                         newtimetablearr[j]["TUTH2:00pm-3:30pm"] = JSON.stringify(timetablearr[j][13]["courses_dept"] + timetablearr[j][13]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
+                    else
+                        newtimetablearr[j]["TUTH2:00pm-3:30pm"]=""
                     if (timetablearr[j][14] != null || timetablearr[j][14] != undefined)
                         newtimetablearr[j]["TUTH3:30pm-5:00pm"] = JSON.stringify(timetablearr[j][14]["courses_dept"] + timetablearr[j][14]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
+                    else
+                        newtimetablearr[j]["TUTH3:30pm-5:00pm"]=""
                 }
                 else
                 {  newtimetablearr[j]={}
-                    newtimetablearr[j]=JSON.stringify(roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"]+ "haven't been used")
+                   newtimetablearr[j]=JSON.stringify(roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"]+ "haven't been used")
                 }}
             console.log(newtimetablearr)
        generateTable(newtimetablearr);
