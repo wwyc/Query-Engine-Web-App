@@ -1,7 +1,7 @@
 Explaination / Intructions on how to build and launch UI:
 ### (I) Course Explorer:
 
-*Section Explorer
+#####Section Explorer
 
 - Procedure
 
@@ -13,7 +13,7 @@ Explaination / Intructions on how to build and launch UI:
 
 4)  Select filter for results (any from department/instructor/number) [mandatory]
 
-*Course Explorer
+#####Course Explorer
 - Purpose
 - Procedure
 
