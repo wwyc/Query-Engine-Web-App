@@ -1,7 +1,7 @@
 Explanation / Intructions on how to build and launch UI:
 
 ### (I) Course Explorer:
-1）Section explorer
+1Section explorer
 - Purpose: render a table of sections according to filter chosen by clients
 - Procedure:
 client can choose one or two or all of the three filters to get sections information:
