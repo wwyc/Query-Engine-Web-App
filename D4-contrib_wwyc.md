@@ -7,6 +7,7 @@
 - novel exploration ideas research & testing
 - fushionchart library testing 
 - tested system overall functionality
+- edited UI layout
 - drafted UI documentation
 
 Major Commits:
