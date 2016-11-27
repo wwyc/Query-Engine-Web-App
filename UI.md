@@ -26,7 +26,7 @@ for the department, there are three order keys(you can choose either one or many
 1) filter not contain distance:
 client can choose one or many of four filters to get sections info:
 building name, room number, room type, furniture type
-(once you choose the building name, room number, room type, furniture type will render corresponding available course number and title in given department)
+(once you choose the building name, room number, room type, furniture type will render corresponding available rooms data)
 
 2) filter contain distance
 client can choose one or many of four filters to get sections info:
