@@ -31,7 +31,5 @@ Explaination / Intructions on how to build and launch UI:
 Department Info:
 
 Room Info:
-\s
 Step 1)  Choose Building of interest
-\s
 Step 2)  Choose one option from drop down menu:  room seat/room type/furniture type
