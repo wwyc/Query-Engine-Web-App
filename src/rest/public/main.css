@@ -1,4 +1,4 @@
-#container1, #container,#container2, #render, #dataset,#roomscheduling,#novelfunction{
+#container1, #container,#container2, #render,#render1,#dataset,#roomscheduling,#novelfunction,#chart-container{
     width:80%;
     margin:auto;
     margin-top:10px;
@@ -6,27 +6,19 @@
     padding:10px;
 
 }
-#chart-container{
 
-    width:80%;
-    margin:auto;
-    text-align:center;
-    margin-top:10px;
-    border-style:solid;
-    padding:10px;
-
-
+#googlemap{
+    height: 100%;
 }
 
 #headtitle
 {
     text-align: center;
     color:darkcyan;
-
   size:50px;
 
 }
-#container1, #container,#container2,#roomscheduling,#render,#novelfunction,#chart-container,#dataset{
+#container1, #container,#container2,#roomscheduling,#render,#novelfunction,#chart-container,#dataset,#render1{
     background-color: lightblue;
 }
 

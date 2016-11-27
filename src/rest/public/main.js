@@ -26,18 +26,18 @@ $(function () {
     jQuery("#queryForm1").submit(function (e) {
         e.preventDefault();//don't want to refresh the entire page
         var query1;
-        var buildingname = jQuery("#buildingname").val().trim()
-        var roomnumber = jQuery("#roomnumber").val().trim()
-        var roomsize = jQuery("#roomsize").val().trim();
-        var roomtype = jQuery("#roomtype").val().trim();
-        var furnituretype = jQuery("#furnituretype").val().trim();
+        var buildingname = jQuery("#buildingname").val()
+        var roomnumber = jQuery("#roomnumber").val()
+        var roomsize = jQuery("#roomsize").val()
+        var roomtype = jQuery("#roomtype").val()
+        var furnituretype = jQuery("#furnituretype").val()
         var choosebuilding = jQuery("#choosebuilding").val()
         var distance = jQuery("#distance").val()
         var roomsizecompare = jQuery("#roomsizecompare").val();
         var orderdirection = jQuery("#direction1").val();
         //   var roomcomparison=jQuery("#roomcomparison").val();
 
-        var buildingname1=jQuery("#buildingname1").val().trim();
+        var buildingname1=jQuery("#buildingname1").val()
         var distance1=jQuery("#roomdistance").val().trim();
 
         var roomrfilteresult = [];
@@ -407,10 +407,10 @@ $(function () {
                         }
                     }
                 }).fail(function (e) {
-                    spawnHttpErrorModal(e)
+                    spawnErrorModal("Query Error", "can't find such room");
                 });
             } catch (err) {
-                spawnErrorModal("Query Error", err);
+                spawnErrorModal("Query Error", "can't find such room");
             }
         }
 
@@ -563,7 +563,7 @@ $(function () {
 
             try {
                 $.when(method1(), method2()).then(filterbuilding).fail(function (e) {
-                    spawnHttpErrorModal(e)
+                    spawnErrorModal("Query Error", "can't find such room");
                 });
             }
             catch (err) {
@@ -577,7 +577,7 @@ $(function () {
         e.preventDefault();
         var query;
         var department=jQuery("#department").val()
-        var coursenumber=jQuery("#coursenumber").val().trim()
+        var coursenumber=jQuery("#coursenumber").val()
         var instructor=jQuery("#instructor").val()
         var instructorquery;
         var departmentquery;
@@ -637,7 +637,7 @@ $(function () {
                 })
             }
         }
-        else if(filterresult.length===2&&filterresult[0]==="courses_instructor")
+        else if(filterresult.length===2&&filterresult[0]==="courses_id")
         {
 
             coursenumberquery = {"IS": {"courses_id": coursenumber}};
@@ -667,9 +667,9 @@ $(function () {
         try {
             console.log("#### printing the query ####");
             // console.log(sectionsizecompare);
-            console.log(departmentquery);
-            console.log(instructor);
-            console.log(filterresult);
+           // console.log(departmentquery);
+          //  console.log(instructor);
+          //  console.log(filterresult);
 
             //console.log("result1"+coursedeptresult[0]);
             //console.log("result1"+coursedeptresult[1]);
@@ -683,7 +683,7 @@ $(function () {
                 spawnHttpErrorModal(e)
             });
         } catch (err) {
-            spawnErrorModal("Query Error", err);
+            spawnErrorModal("Query Error", "can't find such sections");
         }
 
 
@@ -936,8 +936,8 @@ else if(filterresult.length===3)
 
     jQuery("#schedulingformbylist").submit(function(e) {
         e.preventDefault();
-        var roomlist = jQuery("#roomlist").val().trim();
-        var courselist = jQuery("#courselist").val().trim();
+        var roomlist = jQuery("#roomlist").val().replace(/ /g, '')
+        var courselist = jQuery("#courselist").val().replace(/ /g, '')
 //calculate section number , group course key
 //同一节课不同section放在同一个room不同时间
 //coursequery need apply
@@ -1011,8 +1011,8 @@ else if(filterresult.length===3)
     jQuery("#schedulingformbykeys").submit(function(e) {
         e.preventDefault();
         console.log("jump to else")
-        var department2 = jQuery("#coursedept").val().trim()
-        var buildingname2 = jQuery("#buildingname2").val().trim()
+        var department2 = jQuery("#coursedept").val().replace(/ /g, '')
+        var buildingname2 = jQuery("#buildingname2").val().replace(/ /g, '')
         var buildinglocation=jQuery("#buildingname4").val()
         var realdistance=jQuery("#roomdistance1").val()
         var roomarray1 = buildingname2.split(',')
@@ -1097,8 +1097,6 @@ else if(filterresult.length===3)
             catch (err) {
                 spawnErrorModal("Query Error", err);
             }
-
-
         }
 
         function method3() {
@@ -1371,90 +1369,107 @@ for (var i=0;i<badcoursearr.length;i++){
         i--;}
 
 }
-    alert(JSON.stringify(badcoursearr))
+
+    alert("Courses haven't been scheduled: "+JSON.stringify(badcoursearr))
+
    console.log("badcourse"+badcourse)
    console.log(timetablearr);
             console.log(timetablearr.length)
 
            var newtimetablearr=[]
             var quality=1-(badcourse/distributedsection)
-            alert("schedule quality: "+quality)
+
+            $("#quality").html(quality)
             console.log("schedule quality: "+quality)
             console.log(timetablearr.length)
-            for(var j=0;j<timetablearr.length;j++)
-            {
-               console.log("jump in");
-                if(timetablearr[j]!=null&&timetablearr[j]!=undefined&&timetablearr[j].length>0&&
+            for(var j=0;j<timetablearr.length;j++) {
+                console.log("jump in");
+                    if(timetablearr[j]!=null&&timetablearr[j]!=undefined&&timetablearr[j].length>0&&
                 timetablearr[j]!="") {
-                    newtimetablearr[j] = {};
-                    if (timetablearr[j][0] != null || timetablearr[j][0] != undefined)
-                        newtimetablearr[j]["MWF8am-9am"] = JSON.stringify(timetablearr[j][0]["courses_dept"] + timetablearr[j][0]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
-                    else
-                        newtimetablearr[j]["MWF8am-9am"]=""
-                    if (timetablearr[j][1] != null || timetablearr[j][1] != undefined)
-                        newtimetablearr[j]["MWF9am-10am"] = JSON.stringify(timetablearr[j][1]["courses_dept"] + timetablearr[j][1]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
-                    else
-                        newtimetablearr[j]["MWF9am-10am"]=""
-                    if (timetablearr[j][2] != null || timetablearr[j][2] != undefined)
-                        newtimetablearr[j]["MWF10am-11am"] = JSON.stringify(timetablearr[j][2]["courses_dept"] + timetablearr[j][2]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
-                    else
-                        newtimetablearr[j]["MWF10am-11am"]=""
-                    if (timetablearr[j][3] != null || timetablearr[j][3] != undefined)
-                        newtimetablearr[j]["MWF11am-12pm"] = JSON.stringify(timetablearr[j][3]["courses_dept"] + timetablearr[j][3]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
-                    else
-                        newtimetablearr[j]["MWF11am-12am"]=""
-                    if (timetablearr[j][4] != null || timetablearr[j][4] != undefined)
-                        newtimetablearr[j]["MWF12pm-1pm"] = JSON.stringify(timetablearr[j][4]["courses_dept"] + timetablearr[j][4]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
-                    else
-                        newtimetablearr[j]["MWF12pm-1pm"]=""
-                    if (timetablearr[j][5] != null || timetablearr[j][5] != undefined)
-                        newtimetablearr[j]["MWF1pm-2pm"] = JSON.stringify(timetablearr[j][5]["courses_dept"] + timetablearr[j][5]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
-                    else
-                        newtimetablearr[j]["MWF1pm-2pm"]=""
-                    if (timetablearr[j][6] != null || timetablearr[j][6] != undefined)
-                        newtimetablearr[j]["MWF2pm-3pm"] = JSON.stringify(timetablearr[j][6]["courses_dept"] + timetablearr[j][6]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
-                    else
-                        newtimetablearr[j]["MWF2pm-3pm"]=""
-                    if (timetablearr[j][7] != null || timetablearr[j][7] != undefined)
-                        newtimetablearr[j]["MWF3pm-4pm"] = JSON.stringify(timetablearr[j][7]["courses_dept"] + timetablearr[j][7]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
-                    else
-                        newtimetablearr[j]["MWF3pm-4pm"]=""
-                    if (timetablearr[j][8] != null || timetablearr[j][8] != undefined)
-                        newtimetablearr[j]["MWF4pm-5pm"] = JSON.stringify(timetablearr[j][8]["courses_dept"] + timetablearr[j][8]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
-                    else
-                        newtimetablearr[j]["MWF4pm-5pm"]=""
-                    if (timetablearr[j][9] != null || timetablearr[j][9] != undefined)
-                        newtimetablearr[j]["TUTH8am-9:30am"] = JSON.stringify(timetablearr[j][9]["courses_dept"] + timetablearr[j][9]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
-                    else
-                        newtimetablearr[j]["TUTH8am-9:30am"]=""
-                    if (timetablearr[j][10] != null || timetablearr[j][10] != undefined)
-                        newtimetablearr[j]["TUTH9:30am-11:00am"] = JSON.stringify(timetablearr[j][10]["courses_dept"] + timetablearr[j][10]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
-                    else
-                        newtimetablearr[j]["TUTH9:30am-11:00am"]=""
-                    if (timetablearr[j][11] != null || timetablearr[j][11] != undefined)
-                        newtimetablearr[j]["TUTH11:00am-12:30pm"] = JSON.stringify(timetablearr[j][11]["courses_dept"] + timetablearr[j][11]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
-                    else
-                        newtimetablearr[j]["TUTH11:00am-12:30pm"]=""
-                    if (timetablearr[j][12] != null || timetablearr[j][12] != undefined)
-                        newtimetablearr[j]["TUTH12:30pm-2:00pm"] = JSON.stringify(timetablearr[j][12]["courses_dept"] + timetablearr[j][12]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
-                    else
-                        newtimetablearr[j]["TUTH12:30pm-2:00pm"]=""
+                newtimetablearr[j] = {};
+                if (timetablearr[j][0] != null || timetablearr[j][0] != undefined)
+                    newtimetablearr[j]["MWF8am-9am"] = JSON.stringify(timetablearr[j][0]["courses_dept"] + timetablearr[j][0]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
+                else
+                    newtimetablearr[j]["MWF8am-9am"] = ""
+                if (timetablearr[j][1] != null || timetablearr[j][1] != undefined)
+                    newtimetablearr[j]["MWF9am-10am"] = JSON.stringify(timetablearr[j][1]["courses_dept"] + timetablearr[j][1]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
+                else
+                    newtimetablearr[j]["MWF9am-10am"] = ""
+                if (timetablearr[j][2] != null || timetablearr[j][2] != undefined)
+                    newtimetablearr[j]["MWF10am-11am"] = JSON.stringify(timetablearr[j][2]["courses_dept"] + timetablearr[j][2]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
+                else
+                    newtimetablearr[j]["MWF10am-11am"] = ""
+                if (timetablearr[j][3] != null || timetablearr[j][3] != undefined)
+                    newtimetablearr[j]["MWF11am-12pm"] = JSON.stringify(timetablearr[j][3]["courses_dept"] + timetablearr[j][3]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
+                else
+                    newtimetablearr[j]["MWF11am-12am"] = ""
+                if (timetablearr[j][4] != null || timetablearr[j][4] != undefined)
+                    newtimetablearr[j]["MWF12pm-1pm"] = JSON.stringify(timetablearr[j][4]["courses_dept"] + timetablearr[j][4]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
+                else
+                    newtimetablearr[j]["MWF12pm-1pm"] = ""
+                if (timetablearr[j][5] != null || timetablearr[j][5] != undefined)
+                    newtimetablearr[j]["MWF1pm-2pm"] = JSON.stringify(timetablearr[j][5]["courses_dept"] + timetablearr[j][5]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
+                else
+                    newtimetablearr[j]["MWF1pm-2pm"] = ""
+                if (timetablearr[j][6] != null || timetablearr[j][6] != undefined)
+                    newtimetablearr[j]["MWF2pm-3pm"] = JSON.stringify(timetablearr[j][6]["courses_dept"] + timetablearr[j][6]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
+                else
+                    newtimetablearr[j]["MWF2pm-3pm"] = ""
+                if (timetablearr[j][7] != null || timetablearr[j][7] != undefined)
+                    newtimetablearr[j]["MWF3pm-4pm"] = JSON.stringify(timetablearr[j][7]["courses_dept"] + timetablearr[j][7]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
+                else
+                    newtimetablearr[j]["MWF3pm-4pm"] = ""
+                if (timetablearr[j][8] != null || timetablearr[j][8] != undefined)
+                    newtimetablearr[j]["MWF4pm-5pm"] = JSON.stringify(timetablearr[j][8]["courses_dept"] + timetablearr[j][8]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
+                else
+                    newtimetablearr[j]["MWF4pm-5pm"] = ""
+                if (timetablearr[j][9] != null || timetablearr[j][9] != undefined)
+                    newtimetablearr[j]["TUTH8am-9:30am"] = JSON.stringify(timetablearr[j][9]["courses_dept"] + timetablearr[j][9]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
+                else
+                    newtimetablearr[j]["TUTH8am-9:30am"] = ""
+                if (timetablearr[j][10] != null || timetablearr[j][10] != undefined)
+                    newtimetablearr[j]["TUTH9:30am-11:00am"] = JSON.stringify(timetablearr[j][10]["courses_dept"] + timetablearr[j][10]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
+                else
+                    newtimetablearr[j]["TUTH9:30am-11:00am"] = ""
+                if (timetablearr[j][11] != null || timetablearr[j][11] != undefined)
+                    newtimetablearr[j]["TUTH11:00am-12:30pm"] = JSON.stringify(timetablearr[j][11]["courses_dept"] + timetablearr[j][11]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
+                else
+                    newtimetablearr[j]["TUTH11:00am-12:30pm"] = ""
+                if (timetablearr[j][12] != null || timetablearr[j][12] != undefined)
+                    newtimetablearr[j]["TUTH12:30pm-2:00pm"] = JSON.stringify(timetablearr[j][12]["courses_dept"] + timetablearr[j][12]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
+                else
+                    newtimetablearr[j]["TUTH12:30pm-2:00pm"] = ""
 
-                    if (timetablearr[j][13] != null || timetablearr[j][13] != undefined)
-                        newtimetablearr[j]["TUTH2:00pm-3:30pm"] = JSON.stringify(timetablearr[j][13]["courses_dept"] + timetablearr[j][13]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
-                    else
-                        newtimetablearr[j]["TUTH2:00pm-3:30pm"]=""
-                    if (timetablearr[j][14] != null || timetablearr[j][14] != undefined)
-                        newtimetablearr[j]["TUTH3:30pm-5:00pm"] = JSON.stringify(timetablearr[j][14]["courses_dept"] + timetablearr[j][14]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
-                    else
-                        newtimetablearr[j]["TUTH3:30pm-5:00pm"]=""
-                }
+                if (timetablearr[j][13] != null || timetablearr[j][13] != undefined)
+                    newtimetablearr[j]["TUTH2:00pm-3:30pm"] = JSON.stringify(timetablearr[j][13]["courses_dept"] + timetablearr[j][13]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
+                else
+                    newtimetablearr[j]["TUTH2:00pm-3:30pm"] = ""
+                if (timetablearr[j][14] != null || timetablearr[j][14] != undefined)
+                    newtimetablearr[j]["TUTH3:30pm-5:00pm"] = JSON.stringify(timetablearr[j][14]["courses_dept"] + timetablearr[j][14]["courses_id"] + ":" + roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"])
+                else
+                    newtimetablearr[j]["TUTH3:30pm-5:00pm"] = ""
+            }
                 else
                 {  newtimetablearr[j]={}
-                   newtimetablearr[j]=JSON.stringify(roomarray[j]["rooms_shortname"] + roomarray[j]["rooms_number"]+ "haven't been used")
-                }}
+                    newtimetablearr[j]["MWF8am-9am"] = ""
+                    newtimetablearr[j]["MWF9am-10am"] = ""
+                    newtimetablearr[j]["MWF10am-11am"] = ""
+                    newtimetablearr[j]["MWF11am-12am"] = ""
+                    newtimetablearr[j]["MWF12pm-1pm"] = ""
+                    newtimetablearr[j]["MWF1pm-2pm"] = ""
+                    newtimetablearr[j]["MWF2pm-3pm"] = ""
+                    newtimetablearr[j]["MWF3pm-4pm"] = ""
+                    newtimetablearr[j]["MWF4pm-5pm"] = ""
+                    newtimetablearr[j]["TUTH8am-9:30am"] = ""
+                    newtimetablearr[j]["TUTH9:30am-11:00am"] = ""
+                    newtimetablearr[j]["TUTH11:00am-12:30pm"] = ""
+                    newtimetablearr[j]["TUTH12:30pm-2:00pm"] = ""
+                    newtimetablearr[j]["TUTH2:00pm-3:30pm"] = ""
+                    newtimetablearr[j]["TUTH3:30pm-5:00pm"] = ""
+                }
+            }
             console.log(newtimetablearr)
-       generateTable(newtimetablearr);
+       generateTable1(newtimetablearr);
 
         }
 
@@ -1519,28 +1534,25 @@ jQuery("#datagathering2").submit(function(e) {
                 console.log(rawdata)
                 for (var i = 0; i < length; i++) {
                     newdata[i] = {}
-                    if (Object.keys(rawdata[i])[0] === "rooms_furniture") {
+                    if (Object.keys(rawdata[i])[0] === "rooms_furniture")
+                    {
                         newdata[i]["label"] = rawdata[i]["rooms_furniture"]
                         newdata[i]["value"] = rawdata[i]["Roomnumber"]
-                        console.log(newdata[i])
-                    }
-                    else if (Object.keys(rawdata[i])[0] === "rooms_type"){
 
+                    }
+                    else if (Object.keys(rawdata[i])[0] === "rooms_type")
+                    {
                         newdata[i]["label"] = rawdata[i]["rooms_type"]
                         newdata[i]["value"] = rawdata[i]["Roomnumber"]
-
                     }
                     else
                     {
-
-                      //  newdata[i]["label"] = rawdata[i]["rooms_seats"]
-                        newdata[i]["value"] = rawdata[i]["rooms_seats"]
-                        newdata[i]["label"] = rawdata[i]["Roomnumber"]
-                       // console.log(newdata[i])
-
+                        newdata[i]["label"] =JSON.stringify(rawdata[i]["rooms_seats"])
+                        newdata[i]["value"] = rawdata[i]["Roomnumber"]
                     }
 
                 }
+                console.log(newdata)
                 generatepiechart(newdata)
 
             }
@@ -1602,7 +1614,7 @@ jQuery("#datagathering2").submit(function(e) {
             newdata[i]={};
             if(rawdata[i]["courses_id"]!=undefined)
             {
-                newdata[i]["label"]=rawdata[i]["courses_id"]+rawdata[i]["courses_instructor"]
+                newdata[i]["label"]=rawdata[i]["courses_id"]
             }
             else
                 {
@@ -1610,6 +1622,7 @@ jQuery("#datagathering2").submit(function(e) {
             }
             newdata[i]["value"]=rawdata[i]["Passrate(%)"]
             }
+            console.log(newdata)
              generate2dcolumn(newdata)
 
 
@@ -1655,7 +1668,7 @@ jQuery("#datagathering2").submit(function(e) {
                     newdata[i]={};
                     if(rawdata[i]["courses_id"]!=undefined)
                     {
-                        newdata[i]["label"]=rawdata[i]["courses_id"]+rawdata[i]["courses_instructor"]
+                        newdata[i]["label"]=rawdata[i]["courses_id"]
                     }
                     else
                     {
@@ -1674,14 +1687,47 @@ jQuery("#datagathering2").submit(function(e) {
             spawnErrorModal("Query Error", err);
         }
     });
+/*
+    function initMap() {
+        var map = new google.maps.Map(document.getElementById("googlemap"), {
+            center: { lat: 34.397, lng: 150.644 },
+            scrollwheel: false,
+            zoom: 2
+        });
+
+        setPath(function(data) {
+            addPath(map,data);
+        });
+    }
+
+    function setPath(callback) {
+        $.getJSON('https://gist.githubusercontent.com/vgrem/91ba4d694157169b112c/raw/5bdd81c6f5bdfa5ba2d0ca8d5494129b329399d8/expOneActivityData.json',
+            function (data) {
+                callback(data);
+            }
+        );
+    };
+
+    function addPath(map,expeditionCoordinates) {
+        var trekLine = new google.maps.Polyline({
+            path: expeditionCoordinates,
+            geodisc: true,
+            stokeColor: '#FF0000',
+            strokeOpacity: 1.0,
+            strokeWeight: 2
+        });
+        trekLine.setMap(map);
+    }
 
 
 
+    */
 
 
     function generateTable(data) {
         var columns = [];
-        Object.keys(data[0]).forEach(function (title) {
+        if(data.length>0)
+        {   Object.keys(data[0]).forEach(function (title) {
             columns.push({
                 head: title,
                 cl: "title",
@@ -1728,8 +1774,73 @@ jQuery("#datagathering2").submit(function(e) {
             .attr("class", function (d) {
                 return d["cl"]
             });
-    }
- function generatepiechart (data) {
+        }
+
+        else{
+            alert("oops, can't find anything")
+            $("#render").html("No corresponding data to display")
+
+        }}
+
+    function generateTable1(data) {
+        var columns = [];
+        if(data.length>0)
+        {   Object.keys(data[0]).forEach(function (title) {
+            columns.push({
+                head: title,
+                cl: "title",
+                html: function (d) {
+                    return d[title]
+                }
+            });
+        });
+            var container = d3.select("#render1");
+            container.html("");
+            container.selectAll("*").remove();
+            var table = container.append("table").style("margin", "auto");
+
+            table.append("thead").append("tr")
+                .selectAll("th")
+                .data(columns).enter()
+                .append("th")
+                .attr("class", function (d) {
+                    return d["cl"]
+                })
+                .text(function (d) {
+                    return d["head"]
+                });
+
+            table.append("tbody")
+                .selectAll("tr")
+                .data(data).enter()
+                .append("tr")
+                .selectAll("td")
+                .data(function (row, i) {
+                    return columns.map(function (c) {
+                        // compute cell values for this specific row
+                        var cell = {};
+                        d3.keys(c).forEach(function (k) {
+                            cell[k] = typeof c[k] == "function" ? c[k](row, i) : c[k];
+                        });
+                        return cell;
+                    });
+                }).enter()
+                .append("td")
+                .html(function (d) {
+                    return d["html"]
+                })
+                .attr("class", function (d) {
+                    return d["cl"]
+                });
+        }
+
+        else{
+
+            $("#render").html("No corresponding data to display")
+
+        }}
+
+    function generatepiechart (data) {
            $("#chart-container").insertFusionCharts({
                    type: "pie3d",
                     width: "700",
