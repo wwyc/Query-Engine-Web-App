@@ -11,7 +11,7 @@ Explaination / Intructions on how to build and launch UI:
 
 3)  Choose instructor from the drop down menu
 
-4)  Select filter for results (any from department/instructor/number) [mandatory]
+4)  Select filter for results (any from department/instructor/number) [Required]
 
 #####Course Explorer
 - Purpose
