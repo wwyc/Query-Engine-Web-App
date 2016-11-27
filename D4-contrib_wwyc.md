@@ -1,8 +1,8 @@
 
-continued discussion of progress
-met frequently to discuss progress
-clarified and confirmed requirements of deliverable
-supported research on questions
+- continued discussion of progress
+- met frequently to discuss progress
+- clarified and confirmed requirements of deliverable
+- supported research on questions
 
 jquery drop down menu research & testing
 novel exploration ideas research & testing
