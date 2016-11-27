@@ -3,12 +3,11 @@
 - met frequently to discuss progress
 - clarified and confirmed requirements of deliverable
 - supported research on questions
-
-jquery drop down menu research & testing
-novel exploration ideas research & testing
+- jquery drop down menu research & testing
+- novel exploration ideas research & testing
 - fushionchart library testing 
-
-tested system overall functionality
+- tested system overall functionality
+- drafted UI documentation
 
 Major Commits:
 
