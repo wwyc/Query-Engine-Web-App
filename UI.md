@@ -1,4 +1,4 @@
-Explaination / Intructions on how to build and launch UI:
+Explanation / Intructions on how to build and launch UI:
 ### (I) Course Explorer:
 
 - Section Explorer
