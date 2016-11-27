@@ -1,6 +1,6 @@
 Explaination / Intructions on how to build and launch UI:
 
-Course Explorer:
+(I) Course Explorer:
 
 *Section Explorer
 
@@ -19,14 +19,18 @@ Course Explorer:
 - Procedure
 
 
-Room Explorer:
+(II)  Room Explorer:
 - Purpose
 - Procedure
 
-Room Scheduling:
+(III) Room Scheduling:
 - Purpose
 - Procedure
 
-Novel Function - Render Charts for Useful Data:
-- Purpose
-- Procedure
+(IV) Novel Function - Render Charts for Useful Data:
+
+Department Info:
+
+Room Info:
+1)  Choose Building of interest
+2)  Choose one option from drop down menu:  room seat/room type/furniture type
