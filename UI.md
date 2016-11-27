@@ -1,6 +1,5 @@
 Explaination / Intructions on how to build and launch UI:
-
-#h3 (I) Course Explorer:
+### (I) Course Explorer:
 
 *Section Explorer
 
@@ -19,15 +18,15 @@ Explaination / Intructions on how to build and launch UI:
 - Procedure
 
 
-(II)  Room Explorer:
+###(II)  Room Explorer:
 - Purpose
 - Procedure
 
-(III) Room Scheduling:
+###(III) Room Scheduling:
 - Purpose
 - Procedure
 
-(IV) Novel Function - Render Charts for Useful Data:
+###(IV) Novel Function - Render Charts for Useful Data:
 
 Department Info:
 
