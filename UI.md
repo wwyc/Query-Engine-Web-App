@@ -23,6 +23,7 @@ for the department, there are three order keys(you can choose either one or many
 ###(II)  Room Explorer:
 - Purpose: render a table of rooms according to filter chosen by clients
 - Procedure:
+
 1) filter not contain distance:
 client can choose one or many of four filters to get sections info:
 building name, room number, room type, furniture type
