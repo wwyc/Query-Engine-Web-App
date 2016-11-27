@@ -1,6 +1,6 @@
 Explaination / Intructions on how to build and launch UI:
 
-#h4 (I) Course Explorer:
+#h3 (I) Course Explorer:
 
 *Section Explorer
 
