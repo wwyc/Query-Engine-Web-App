@@ -9,9 +9,15 @@
 		<script type="text/javascript" src="../public/fusioncharts-jquery-plugin.js"></script>
 
 	    <script type="text/javascript" src="http://static.fusioncharts.com/code/latest/fusioncharts.charts.js?cacheBust=8232"></script>
-	    <!-- <script type="text/javascript" src="js/fusioncharts.jqueryplugin.js"></script> -->
+	<!--
 
+		<script async defer
+			src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA2unPYnEp0F2gUmgTdNacSrr_qhpQDgPw&callback=initMap">
+	</script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+!-->
 	    <script type="text/javascript" src="http://static.fusioncharts.com/code/latest/themes/fusioncharts.theme.zune.js?cacheBust=8232"></script>
+
 	<script src="./public/main.js"></script>
 	<script type="text/javascript">
 
@@ -76,13 +82,62 @@
 					}
 			);
 		}
+		function returninstructor1data(){
+			console.log("jump to return")
+			var query=JSON.stringify({
+				"GET":"courses_instructor",
+				"WHERE":{},
+				"GROUP":["courses_instructor"],
+				"APPLY":[],
+				"ORDER":"courses_instructor",
+				"AS":"TABLE"
+			})
+
+			return $.ajax("/query", {type:"POST",
+						data: query, contentType: "application/json", dataType: "json"
+					}
+			);
+		}
+		function returntitledata1(){
+			console.log("jump to return")
+			var query=JSON.stringify({
+				"GET":"courses_title",
+				"WHERE":{},
+				"GROUP":["courses_title"],
+				"APPLY":[],
+				"ORDER":"courses_title",
+				"AS":"TABLE"
+			})
+			return $.ajax("/query", {type:"POST",
+						data: query, contentType: "application/json", dataType: "json"
+					}
+			);
+		}
+		function returncoursenumberdata2(){
+			console.log("jump to return")
+			var query=JSON.stringify({
+				"GET":"courses_id",
+				"WHERE":{},
+				"GROUP":["courses_id"],
+				"APPLY":[],
+				"ORDER":"courses_id",
+				"AS":"TABLE"
+			})
+			return $.ajax("/query", {type:"POST",
+						data: query, contentType: "application/json", dataType: "json"
+					}
+			);
+		}
+
+
+
 		function dropdownbuildingfunction(data)
 		{
 			//console.log(jsonData.Table)
 			var jsonData={};
 			jsonData.Table=[]
 			jsonData.Table=data["result"]
-			console.log(jsonData.Table)
+
 			var listItems = '<option selected="selected" value=" ">- Select -</option>';
 
 			for (var i = 0; i < jsonData.Table.length; i++) {
@@ -104,7 +159,7 @@
 			var jsonData={};
 			jsonData.Table=[]
 			jsonData.Table=data["result"]
-			console.log(jsonData.Table)
+
 			var listItems = '<option selected="selected" value=" ">- Select -</option>';
 
 			for (var i = 0; i < jsonData.Table.length; i++) {
@@ -123,7 +178,7 @@
 			var jsonData={};
 			jsonData.Table=[]
 			jsonData.Table=data["result"]
-			console.log(jsonData.Table)
+
 			var listItems = '<option selected="selected" value=" ">- Select -</option>';
 
 			for (var i = 0; i < jsonData.Table.length; i++) {
@@ -148,7 +203,54 @@
 
 		}
 
+		function dropdowninstructorfunction1(data)
+		{
+			//console.log(jsonData.Table)
+			var jsonData={};
+			jsonData.Table=[]
+			jsonData.Table=data["result"]
 
+			var listItems = '<option selected="selected" value=" ">- Select -</option>';
+
+			for (var i = 0; i < jsonData.Table.length; i++)
+			{
+				listItems += "<option value='" + jsonData.Table[i].courses_instructor + "'>" + jsonData.Table[i].courses_instructor  + "</option>";
+			}
+			$("#instructor").html(listItems)
+
+		}
+		function dropdowntitlefunction1(data)
+		{
+
+			var jsonData={};
+			jsonData.Table=[]
+			jsonData.Table=data["result"]
+
+			var listItems = '<option selected="selected" value=" ">- Select -</option>';
+
+			for (var i = 0; i < jsonData.Table.length; i++) {
+				listItems += "<option value='" + jsonData.Table[i].courses_title + "'>" + jsonData.Table[i].courses_title  + "</option>";
+			}
+			$("#title").html(listItems)
+
+		}
+
+		function dropdowncoursenumberfunction1(data) {
+			//console.log(jsonData.Table)
+			var jsonData = {};
+			jsonData.Table = []
+			jsonData.Table = data["result"]
+			console.log(jsonData.Table)
+			var listItems = '<option selected="selected" value=" ">- Select -</option>';
+
+			for (var i = 0; i < jsonData.Table.length; i++) {
+				listItems += "<option value='" + jsonData.Table[i].courses_id + "'>" + jsonData.Table[i].courses_id + "</option>";
+			}
+			console.log("listitem"+listItems)
+			console.log("whathappenshere")
+			$("#coursenumber").html(listItems)
+
+		}
 		$.when(returndepartmentdata()).then
 		(dropdowndeptfunction)
 		$.when(returnbuildingnamedata()).then
@@ -157,7 +259,12 @@
 		then(dropdownroomtypefunction1)
 		$.when(returnfurnituretypedata1()).then
 		(dropdownroomfurniturefunction1)
-
+		$.when(returninstructor1data()).then
+		(dropdowninstructorfunction1)
+		$.when(returntitledata1()).then
+		(dropdowntitlefunction1)
+		$.when(returncoursenumberdata2()).then
+		(dropdowncoursenumberfunction1)
 		</script>
 
 	<script type="text/javascript">
@@ -177,14 +284,28 @@
 
 		function returncoursenumberdata(department){
 			console.log("jump to return")
-			var query=JSON.stringify({
+			var query
+			if(department!=" ")
+			{ query=JSON.stringify({
 				"GET":"courses_id",
 				"WHERE":{"IS":{"courses_dept":department}},
 				"GROUP":["courses_id"],
 				"APPLY":[],
 				"ORDER":"courses_id",
 				"AS":"TABLE"
-			})
+			})}
+			else
+			{
+				query=JSON.stringify({
+					"GET":"courses_id",
+					"WHERE":{},
+					"GROUP":["courses_id"],
+					"APPLY":[],
+					"ORDER":"courses_id",
+					"AS":"TABLE"
+				})
+
+			}
 			return $.ajax("/query", {type:"POST",
 						data: query, contentType: "application/json", dataType: "json"
 					}
@@ -193,14 +314,26 @@
 
 		function returninstructordata(department){
 			console.log("jump to return")
-			var query=JSON.stringify({
+			var query
+			if(department!=" ")
+			{ query=JSON.stringify({
 				"GET":"courses_instructor",
 				"WHERE":{"IS":{"courses_dept":department}},
 				"GROUP":["courses_instructor"],
 				"APPLY":[],
 				"ORDER":"courses_instructor",
 				"AS":"TABLE"
-			})
+			})}
+			else
+			{
+				query=JSON.stringify({
+					"GET":"courses_instructor",
+					"WHERE":{},
+					"GROUP":["courses_instructor"],
+					"APPLY":[],
+					"ORDER":"courses_instructor",
+					"AS":"TABLE"})
+			}
 			return $.ajax("/query", {type:"POST",
 						data: query, contentType: "application/json", dataType: "json"
 					}
@@ -211,7 +344,7 @@
 			var jsonData = {};
 			jsonData.Table = []
 			jsonData.Table = data["result"]
-			console.log(jsonData.Table)
+
 			var listItems = '<option selected="selected" value=" ">- Select -</option>';
 
 			for (var i = 0; i < jsonData.Table.length; i++) {
@@ -259,7 +392,8 @@
 
 		function returncoursenumberdata1(department){
 			console.log("jump to return")
-			var query=JSON.stringify({
+			var query
+			query=JSON.stringify({
 				"GET":"courses_name",
 				"WHERE":{"IS":{"courses_dept":department}},
 				"GROUP":["courses_name"],
@@ -267,6 +401,7 @@
 				"ORDER":"courses_name",
 				"AS":"TABLE"
 			})
+
 			return $.ajax("/query", {type:"POST",
 						data: query, contentType: "application/json", dataType: "json"
 					}
@@ -304,14 +439,30 @@
 
 	function returntitledata(department){
 		console.log("jump to return")
-		var query=JSON.stringify({
+		var query
+		if(department!=" ")
+		{query=JSON.stringify({
 			"GET":"courses_title",
 			"WHERE":{"IS":{"courses_dept":department}},
 			"GROUP":["courses_title"],
 			"APPLY":[],
 			"ORDER":"courses_title",
 			"AS":"TABLE"
-		})
+		})}
+		else
+		{
+			query=JSON.stringify({
+				"GET":"courses_title",
+				"WHERE":{},
+				"GROUP":["courses_title"],
+				"APPLY":[],
+				"ORDER":"courses_title",
+				"AS":"TABLE"
+			})
+
+
+
+		}
 		return $.ajax("/query", {type:"POST",
 					data: query, contentType: "application/json", dataType: "json"
 				}
@@ -344,8 +495,8 @@
 			$("#buildingname").change(function(){
 				var building=$("#buildingname").val()
 
-				$.when(returnumberedata(building)).then
-				(dropdownnumberfunction)
+				//$.when(returnumberedata(building)).then
+				//(dropdownnumberfunction)
 				$.when(returnroomtypedata(building)).
 				then(dropdownroomtypefunction)
 				$.when(returnfurnituretypedata(building)).then
@@ -495,45 +646,45 @@
 <div id="container">
 	<h3>Courses Explorer</h3>
 	<form id="sectionexplorer">
-		<label> <font color="red">Section explorer</font></label>
+		<label> <font color="red">section explorer</font></label><br>
+		<label> Filter:you can choose one or many of following filters,once you choose value for the filter key,
+		choose the corresponding key name in Section Filter checkbox</label>
 		<div class="form-group">
 			<label for="department">Department:</label>
 			<select id="department"></select><br>
 			<label for="coursenumber">Course number:</label>
 			<select id="coursenumber"></select><br>
-		<!--	<textarea class="form-control" rows="1" id="coursenumber"></textarea>  !-->
 			<label for="instructor">Instructor:</label>
 		<select id="instructor"></select> <br>
-		<!--	<textarea class="form-control" rows="1" id="instructor"></textarea>   !-->
 			<label>Section Filter</label>
 			<input type="checkbox" name="getsection" value= "courses_dept" > Department</input>
-			<input type="checkbox" name="getsection" value="courses_instructor" >Instructor </input>
 			<input type="checkbox" name="getsection" value="courses_id" > Course Number</input>
+			<input type="checkbox" name="getsection" value="courses_instructor" >Instructor </input>
 			</div>
 			<button type="submit" class="btn btn-primary">Submit</button>
 	</form>
-	<br>
    <form id="courseexplore">
-	<label> <font color="red">Course explorer</font></label>
+	<label> <font color="red"> course explorer</font></label><br>
+	   <label> Filter:you can choose one or many of following filters,once you choose value for the filter key,
+		   choose the corresponding key name in Course Filter checkbox</label>
 	<div class="form-group">
 		<label for="department1">Department:</label>
 		<select id="department1"></select><br>
 		<label for="title">Title:</label><br>
 		<select id="title"></select><br>
-		<div class="form-group">
-			<label>Choosing Compare Key</label>
-			<input type="checkbox" name="getcoursebydept" value="courses_pass" > Courses Pass</input>
-			<input type="checkbox" name="getcoursebydept" value="courses_fail" > Courses Failing</input>
-			<input type="checkbox" name="getcoursebydept" value="courses_avg" > Courses avg</input>
-		</div>
 	<label for="sectionsize">Section size:</label>
 			<select id="sectionsizecompare">
 				<option value="GT"> > </option>
 				<option  value="EQ" > = </option>
 				<option  value="LT" > < </option>
 			</select>    <br>
-			<textarea class="form-control" rows="1" id="sectionsize"></textarea>
-
+		<textarea class="form-control" rows="1" id="sectionsize"></textarea>
+		<div class="form-group">
+			<label>Choosing Compare Key</label>
+			<input type="checkbox" name="getcoursebydept" value="courses_pass" > Courses Pass</input>
+			<input type="checkbox" name="getcoursebydept" value="courses_fail" > Courses Failing</input>
+			<input type="checkbox" name="getcoursebydept" value="courses_avg" > Courses avg</input>
+		</div>
 		</div>
         <div class="form-group">
             <!--  order    多选 !-->
@@ -556,15 +707,15 @@
 <div id="container1">
 	<h3>Rooms Explorer</h3>
 	<form id="queryForm1">
-		<!--  filter !-->
+		<label> Filter:you can choose one or many of following filters,once you choose value for the filter key,
+			choose the corresponding key name in Room Filter checkbox</label>
+		<label><font color="red">Warning:once you choose key building name, don't choose distance to filter,
+		vice versa</font></label>
 		<div class="form-group">
 			<label for="buildingname">Building Name:</label>
 			<select id="buildingname"></select><br>
-		<!--
-				<textarea class="form-control" rows="1" id="buildingname"></textarea>
-				!-->
-			<label for="roomnumber">Room Number:</label>
-			<select id="roomnumber"></select><br>
+		<!--	<label for="roomnumber">Room Number:</label>
+			<select id="roomnumber"></select><br>  !-->
 
 			<label for="roomtype">Room Type:</label>
 			<select id="roomtype"></select><br>
@@ -601,8 +752,8 @@
 		</div>
 
 		<div class="form-group">
-			<label>Choosing Filter</label>
-			<input type="checkbox" name="getroomfilter" value= "rooms_shortname" > Building Name</input><br>
+			<label>Room Filter</label>
+			<input type="checkbox" name="getroomfilter" value= "rooms_shortname" > Building Name</input>
 			<input type="checkbox" name="getroomfilter" value="rooms_seats" > Room Size </input>
 			<input type="checkbox" name="getroomfilter" value="rooms_type" > Room type </input>
 			<input type="checkbox" name="getroomfilter" value="rooms_furniture" > Furniture Type </input>
@@ -641,11 +792,11 @@
 
 
 	<form id="schedulingformbykey">
-	<label>filter by single keyword</label><br>
-	<label> department</label>
-	<select id="coursedept1"></select><br>
-	<label> building name</label>
-	<select id="buildingname3"></select><br>
+		<label>filter by single keyword</label><br>
+		<label> Distance: building within x meters of a chosen building</label>
+		<select id="coursedept1"></select><br>
+		<label> building name</label>
+		<select id="buildingname3"></select><br>
 	<!--	<h4>Location:</h4>
 		<label for="buildingname5"> building name</label>
 		<select id="buildingname5"></select><br>
@@ -653,17 +804,23 @@
 		<textarea class="form-control" rows="1" id="roomdistance2"></textarea>  !-->
 	<button type="submit" class="btn btn-primary">Submit</button>
 	</form>
+
+	<label> Schedule Quality: <label>
+	<div id="quality">
+	<label for="quality"> </label>
+	</div>
 </div>
 
 
 
 
+
 <div id="novelfunction">
-	<h3>  <b>  Render Charts for Useful Data </b></h3>
-	<br>
+	<h3> Charts Render</h3>
+	<h5> render charts for useful course&room data </h5>
 	<form id="datagathering1">
 		<h4> <font color="red">Department Info</font></h4>
-		<label> Choose department</label><br>
+		<label> Choose Department</label><br>
 		<select id="departmentchart1"></select><br>
 		<select id="coursechooses">
 			<option  value="course" >group by course</option>
@@ -672,16 +829,15 @@
 		<button type="submit" class="btn btn-primary">Submit</button>
 		</form>
 	<form id="datagathering3">
-		<label> Choose department</label><br>
+		<label> choose department</label><br>
 		<select id="departmentchart"></select><br>
-		<label> Choose course(coursename)</label><br>
+		<label> choose course(coursename)</label><br>
     <select id="coursechart"></select><br>
 		<button type="submit" class="btn btn-primary">Submit</button>
 </form>
-	<br>
 <form id="datagathering2">
-		<h4> <font color="red">Room Info</font></h4>
-		<label> Choose builing</label><br>
+		<h4><font color="red"> Room Info</font></h4>
+		<label> choose builing</label><br>
 		<select id="buildingchart"></select><br>
 
 		<select id="typechooses">
@@ -694,8 +850,13 @@
 </div>
 
 <div id="render">
-	<h3>Result</h3>
+	<h3>Result of explorer</h3>
 </div>
+
+<div id="render1">
+	<h3>Result of schedule</h3>
+</div>
+
 <div class="modal fade" id="errorModal" tabindex="-1" role="dialog">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
@@ -714,9 +875,18 @@
 </div>
 
 <div id="chart-container">
-	render chart here
+<h3>	Render chart here</h3>
 	</div>
 
 
+
+<!--
+<div id="googlemap"> </div>
+<script async defer
+		src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA2unPYnEp0F2gUmgTdNacSrr_qhpQDgPw&callback=initMap">
+</script>
+<div id="googlemap"> </div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+!-->
 </body>
 </html>
