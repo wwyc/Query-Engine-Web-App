@@ -1,9 +1,7 @@
 Explaination / Intructions on how to build and launch UI:
 ### (I) Course Explorer:
 
-#####Section Explorer
-
-- Procedure
+- Section Explorer
 
 Step 1)  Choose department of interest from drop down menu [Required]
 
@@ -13,7 +11,7 @@ Step 3)  Choose instructor from the drop down menu
 
 Step 4)  Select filter for results (any from department/instructor/number) [Required]
 
-#####Course Explorer
+- Course Explorer
 Step 1)
 
 
@@ -28,11 +26,11 @@ Step 1)
 
 ###(IV) Novel Function - Render Charts for Useful Data:
 
-#####Department Info:
+- Department Info:
 
 Step 1)
 
-#####Room Info:
+- Room Info:
 
 Step 1)  Choose Building of interest
 
