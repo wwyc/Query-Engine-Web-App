@@ -4,9 +4,9 @@ Explanation / Intructions on how to build and launch UI:
 1) Section explorer
 - Purpose: render a table of sections according to filter chosen by clients
 - Procedure:
-Step 1)  Client may select a value from one or more of the given drop down menus (Department/Course number/Instructor)
-Step 2)  Client must select the same Section Filters as chosen in Step 1 (Department/Course number/Instructor)
-Step 3)  Clicking submit will render corresponding requested data)
+- Step 1)  Client may select a value from one or more of the given drop down menus (Department/Course number/Instructor)
+- Step 2)  Client must select the same Section Filters as chosen in Step 1 (Department/Course number/Instructor)
+- Step 3)  Clicking submit will render corresponding requested data)
 
 2)Course explorer
 - Purpose:render a table of courses according to filter choose by clients
@@ -36,7 +36,7 @@ room number, room type, furniture type,distance
 ###(III) Room Scheduling:
 - Purpose: arrange a weekly schedule according to list of rooms and courses filtered by clients requirement
 - Procedure
-1)by typing a list of rooms shortname  and a list of courses name(eg: cpsc221) to arrange all these courses in all theses room in a schedule
+1)by typing a list of rooms shortname and a list of courses name(eg: cpsc221) to arrange all these courses in all theses room in a schedule
 2)by typing a list of department name, list of building name arrange all courses in those departments to rooms in those buildings 
 3)by choosing a department and 1) building name or 2)a list of building within x meters in given building to arrange course
 
