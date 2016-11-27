@@ -1,13 +1,12 @@
 Explanation / Intructions on how to build and launch UI:
 
 ### (I) Course Explorer:
-1Section explorer
+1) Section explorer
 - Purpose: render a table of sections according to filter chosen by clients
 - Procedure:
-client can choose one or two or all of the three filters to get sections information:
-department, course number(courses id), courses title
-(once you choose the department, course number and course title will render corresponding available course number and title in given 
-department)
+Step 1)  Client may select a value from one or more of the given drop down menus (Department/Course number/Instructor)
+Step 2)  Client must select the same Section Filters as chosen in Step 1 (Department/Course number/Instructor)
+Step 3)  Clicking submit will render corresponding requested data)
 
 2)Course explorer
 - Purpose:render a table of courses according to filter choose by clients
