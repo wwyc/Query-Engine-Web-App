@@ -28,8 +28,10 @@ Explaination / Intructions on how to build and launch UI:
 
 ###(IV) Novel Function - Render Charts for Useful Data:
 
-Department Info:
+#####Department Info:
 
-Room Info:
+#####Room Info:
+
 Step 1)  Choose Building of interest
+
 Step 2)  Choose one option from drop down menu:  room seat/room type/furniture type
