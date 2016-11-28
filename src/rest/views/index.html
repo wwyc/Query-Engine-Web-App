@@ -802,15 +802,19 @@
 	<label>Filter by building name and department(course) name ,and choose a subset</label><br>
 	<label> department name</label><br>
 	<a href='#' id='deselect-all1'>deselect all</a>
+	<a href='#' id='select-all1'>select all</a>
 	<select id="coursedept1"  multiple="multiple"  tabindex="4"></select><br>
 	<label> Course List</label><br>
 	<a href='#' id='deselect-all4'>deselect all</a>
+	<a href='#' id='select-all4'>select all</a>
 	<select id="courselist" multiple="multiple"> </select><br>
 	<label> building name</label><br>
 	<a href='#' id='deselect-all2'>deselect all</a>
+	<a href='#' id='select-all2'>select all</a>
 	<select id="buildingname3" multiple="multiple"></select><br>
 	<label> Room List</label><br>
 	<a href='#' id='deselect-all5'>deselect all</a>
+	<a href='#' id='select-all5'>select all</a>
 	<select id="roomlist" multiple="multiple" > </select><br>
 	<button type="submit" class="btn btn-primary">Submit</button>
 	</form>
@@ -819,9 +823,11 @@
 		<label>Filter by building name and department(course) name ,and choose a subset</label><br>
 		<label> department</label><br>
 		<a href='#' id='deselect-all3'>deselect all</a>
+		<a href='#' id='select-all3'>select all</a>
 		<select id="coursedept" multiple="multiple"></select><br>
 		<label> Course List</label><br>
 		<a href='#' id='deselect-all6'>deselect all</a>
+		<a href='#' id='select-all6'>deselect all</a>
 		<select id="courselist1"  multiple="multiple"> </select><br>
 		<h4>Distance: building within x meters of a chosen building</h4>
 		<label for="buildingname4"> building name </label>
@@ -830,13 +836,14 @@
 		<textarea class="form-control" rows="1" id="roomdistance1"></textarea>
 		<label> Room List</label><br>
 		<a href='#' id='deselect-all7'>deselect all</a>
+		<a href='#' id='select-all7'>select all</a>
 		<select id="roomlist1" multiple="multiple" > </select><br>
 		<button type="submit" class="btn btn-primary">Submit</button>
 	</form>
 
 
 
-	<label> Schedule Quality: <label>
+	<h3> Schedule Quality: <h3>
 	<div id="quality">
 	<label for="quality"> </label>
 	</div>
@@ -949,7 +956,7 @@
        console.log(jsonData.Table)
      console.log("jumps here")
 		var listItems
-		//var listItems = '<option selected="selected" value=" ">- Select -</option>';
+	 listItems = '<option selected="selected" value=" ">- Select -</option>';
 		for (var i = 0; i < jsonData.Table.length; i++) {
 			listItems += "<option value='" + jsonData.Table[i].courses_dept + "'>" + jsonData.Table[i].courses_dept + "</option>";
 			$('#coursedept1').multiSelect('addOption',{ value: jsonData.Table[i].courses_dept, text:jsonData.Table[i].courses_dept,
@@ -983,7 +990,7 @@
 		jsonData.Table=[]
 		jsonData.Table=data["result"]
 
-		var listItems
+		var listItems='<option selected="selected" value=" ">- Select -</option>';
 
 		for (var i = 0; i < jsonData.Table.length; i++)
 		{
@@ -1044,7 +1051,7 @@ $(document).ready(function() {
 		jsonData.Table=[]
 		jsonData.Table=data["result"]
 		console.log(jsonData.Table)
-		var listItems;
+		var listItems='<option selected="selected" value=" ">- Select -</option>';
 
 		for (var i = 0; i < jsonData.Table.length; i++) {
 			listItems += "<option value='" + jsonData.Table[i].courses_name + "'>" + jsonData.Table[i].courses_name  + "</option>";
@@ -1096,7 +1103,7 @@ $(document).ready(function() {
 		jsonData.Table=[]
 		jsonData.Table=data["result"]
 		console.log(jsonData.Table)
-		var listItems ;
+		var listItems='<option selected="selected" value=" ">- Select -</option>';
 		for (var i = 0; i < jsonData.Table.length; i++) {
 			$('#roomlist').multiSelect('addOption',{ value: jsonData.Table[i].rooms_name, text:jsonData.Table[i].rooms_name,
 				index: i+1, nested: 'optgroup_label' })
@@ -1142,7 +1149,7 @@ $(document).ready(function() {
 		console.log(jsonData.Table)
 		console.log("jumps here")
 		var listItems
-		//var listItems = '<option selected="selected" value=" ">- Select -</option>';
+		 listItems = '<option selected="selected" value=" ">- Select -</option>';
 		for (var i = 0; i < jsonData.Table.length; i++) {
 			listItems += "<option value='" + jsonData.Table[i].courses_dept + "'>" + jsonData.Table[i].courses_dept + "</option>";
 			$('#coursedept').multiSelect('addOption',{ value: jsonData.Table[i].courses_dept, text:jsonData.Table[i].courses_dept,
@@ -1198,7 +1205,7 @@ $(document).ready(function() {
 		jsonData.Table=[]
 		jsonData.Table=data["result"]
 		console.log(jsonData.Table)
-		var listItems;
+		var listItems='<option selected="selected" value=" ">- Select -</option>';;
 
 
 		for (var i = 0; i < jsonData.Table.length; i++) {
@@ -1302,7 +1309,7 @@ $(document).ready(function() {
 		console.log(jsonData.Table)
 		console.log("jumps here")
 		console.log(data)
-		var listItems ;
+		var listItems ='<option selected="selected" value=" ">- Select -</option>';
 		for (var i = 0; i < jsonData.Table.length; i++) {
 			$('#roomlist1').multiSelect('addOption',{ value: jsonData.Table[i].rooms_name, text:jsonData.Table[i].rooms_name,
 				index: i+1, nested: 'optgroup_label' })
@@ -1334,32 +1341,59 @@ $(document).ready(function() {
 		$('#coursedept1').multiSelect('deselect_all');
 		return false;
 	});
+	$('#select-all1').click(function(){
+		$('#coursedept1').multiSelect('select_all');
+		return false;
+	});
 
 	$('#deselect-all2').click(function(){
 		$('#buildingname3').multiSelect('deselect_all');
+		return false;
+	});
+	$('#select-all2').click(function(){
+		$('#buildingname3').multiSelect('select_all');
 		return false;
 	});
 	$('#deselect-all3').click(function(){
 		$('#coursedept').multiSelect('deselect_all');
 		return false;
 	});
+	$('#select-all3').click(function(){
+		$('#coursedept').multiSelect('select_all');
+		return false;
+	});
 	$('#deselect-all4').click(function(){
 		$('#courselist').multiSelect('deselect_all');
+		return false;
+	});
+	$('#select-all4').click(function(){
+		$('#courselist').multiSelect('select_all');
 		return false;
 	});
 	$('#deselect-all5').click(function(){
 		$('#roomlist').multiSelect('deselect_all');
 		return false;
 	});
+	$('#select-all5').click(function(){
+		$('#roomlist').multiSelect('select_all');
+		return false;
+	});
 	$('#deselect-all6').click(function(){
 		$('#courselist1').multiSelect('deselect_all');
+		return false;
+	});
+	$('#select-all6').click(function(){
+		$('#courselist1').multiSelect('select_all');
 		return false;
 	});
 	$('#deselect-all7').click(function(){
 		$('#roomlist1').multiSelect('deselect_all');
 		return false;
 	});
-
+	$('#select-all7').click(function(){
+		$('#roomlist1').multiSelect('select_all');
+		return false;
+	});
 	</script>
 
 
