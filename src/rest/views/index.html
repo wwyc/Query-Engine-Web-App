@@ -3,6 +3,7 @@
 	<meta charset="utf-8">
 	<link rel="stylesheet" href="./public/bootstrap.min.css">
 	<link rel="stylesheet" href="./public/main.css">
+	<link rel="stylesheet" href="./public/multi-select.css">
 <!--	<link rel="stylesheet" href="./public/chosen.css">
 	<link rel="stylesheet" href="./public/chosen.min.css">
 	<link rel="stylesheet" href="./public/style.css">
@@ -14,43 +15,10 @@
 		<script type="text/javascript" src="../public/fusioncharts-jquery-plugin.js"></script>
 
 	    <script type="text/javascript" src="http://static.fusioncharts.com/code/latest/fusioncharts.charts.js?cacheBust=8232"></script>
+	<script type="text/javascript" src="../public/jquery.multi-select.js"></script>
 
-<!--	<script type="text/javascript" src="../public/chosen.jquery.js"></script>
-	<script type="text/javascript" src="../public/chosen.jquery.min.js"></script>
-	<script type="text/javascript" src="../public/chosen.proto.min.js"></script>
-	<script type="text/javascript" src="../public/chosen.proto.js"></script>
-	<script src="../public/prism.js"></script>!-->
-	<!--
-
-		<script async defer
-			src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA2unPYnEp0F2gUmgTdNacSrr_qhpQDgPw&callback=initMap">
-	</script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-!-->
 	    <script type="text/javascript" src="http://static.fusioncharts.com/code/latest/themes/fusioncharts.theme.zune.js?cacheBust=8232"></script>
-
-
-<!--
-	<script  type="text/javascript" >
-
-		var config = {
-			'.chosen-select'           : {},
-			'.chosen-select-deselect'  : {allow_single_deselect:true},
-			'.chosen-select-no-single' : {disable_search_threshold:10},
-			'.chosen-select-no-results': {no_results_text:'Oops, nothing found!'},
-			'.chosen-select-width'     : {width:"95%"}
-		}
-		for (var selector in config) {
-			$(selector).chosen(config[selector]);
-		}
-		$(".chosen-select").chosen()
-
-	</script>  !-->
 	<script src="./public/main.js"></script>
-
-
-
-
 
 	<script type="text/javascript">
 
@@ -181,7 +149,6 @@
 			$("#buildingname").html(listItems)
 			$("#buildingname1").html(listItems)
 			$("#buildingname4").html(listItems)
-			$("#buildingname3").html(listItems)
 			$("#buildingchart").html(listItems)
 		}
 
@@ -202,8 +169,7 @@
 			$("#department1").html(listItems)
 			$("#departmentchart").html(listItems)
 			$("#departmentchart1").html(listItems)
-			$("#coursedept").html(listItems)
-			$("#coursedept1").html(listItems)
+
 		}
 
 		function dropdownroomtypefunction1(data)
@@ -289,7 +255,7 @@
 		(dropdowndeptfunction)
 		$.when(returnbuildingnamedata()).then
 		(dropdownbuildingfunction)
-       $.when(returnroomtypedata1()).
+     /*   $.when(returnroomtypedata1()).
 		then(dropdownroomtypefunction1)
 		$.when(returnfurnituretypedata1()).then
 		(dropdownroomfurniturefunction1)
@@ -298,7 +264,7 @@
 		$.when(returntitledata1()).then
 		(dropdowntitlefunction1)
 		$.when(returncoursenumberdata2()).then
-		(dropdowncoursenumberfunction1)
+		(dropdowncoursenumberfunction1)  */
 		</script>
 
 	<script type="text/javascript">
@@ -519,6 +485,23 @@
 
 	}
 
+	function dropdownbuildingfunction(data)
+	{
+
+		var jsonData={};
+		jsonData.Table=[]
+		jsonData.Table=data["result"]
+
+		var listItems = '<option selected="selected" value=" ">- Select -</option>';
+
+		for (var i = 0; i < jsonData.Table.length; i++)
+		{
+			listItems += "<option value='" + jsonData.Table[i].rooms_shortname+ "'>" + jsonData.Table[i].rooms_shortname + "</option>";
+		}
+
+			$("#buildingname3").html(listItems)
+
+	}
 
 
 
@@ -656,266 +639,8 @@
 
 		}
 
-
-
 	</script>
-	<script type="text/javascript">
-		$(document).ready(function() {
-		$("#coursedept1").change(function(){
-			var departmentlist=$("#coursedept1").val()
-			console.log(departmentlist)
-			$.when(returncoursenumberdata2(departmentlist)).
-			then(dropdowncoursenumberfunction2)
 
-		});
-	});
-
-		function returncoursenumberdata2(departmentlist){
-			console.log("jump to return")
-			var query
-			var deptwhere  = {"OR": []};
-			for (var a = 0; a < departmentlist.length; a++) {
-				deptwhere["OR"][a] = {"IS": {"courses_dept": departmentlist[a]}}
-			}
-			query=JSON.stringify({
-				"GET":"courses_name",
-				"WHERE":deptwhere,
-				"GROUP":["courses_name"],
-				"APPLY":[],
-				"ORDER":"courses_name",
-				"AS":"TABLE"
-			})
-
-			return $.ajax("/query", {type:"POST",
-						data: query, contentType: "application/json", dataType: "json"
-					}
-			);
-		}
-		function dropdowncoursenumberfunction2(data)
-		{
-			//console.log(jsonData.Table)
-			var jsonData={};
-			jsonData.Table=[]
-			jsonData.Table=data["result"]
-			console.log(jsonData.Table)
-			var listItems = '<option selected="selected" value=" ">- Select -</option>';
-
-			for (var i = 0; i < jsonData.Table.length; i++) {
-				listItems += "<option value='" + jsonData.Table[i].courses_name + "'>" + jsonData.Table[i].courses_name  + "</option>";
-			}
-			$("#courselist").html(listItems)
-		}
-
-
-		$(document).ready(function() {
-			$("#buildingname3").change(function(){
-				var buildinglist=$("#buildingname3").val()
-				console.log(buildinglist)
-				$.when(returnroomnumberdata2(buildinglist)).
-				then(dropdownroomnumberfunction2)
-
-			});
-		});
-
-		function returnroomnumberdata2(buildinglist){
-			console.log("jump to return")
-			var query
-			var roomwhere  = {"OR": []};
-			for (var a = 0; a < buildinglist.length; a++) {
-				roomwhere["OR"][a] = {"IS": {"rooms_shortname": buildinglist[a]}}
-			}
-			query=JSON.stringify({
-				"GET":"rooms_name",
-				"WHERE":roomwhere,
-				"GROUP":["rooms_name"],
-				"APPLY":[],
-				"ORDER":"rooms_name",
-				"AS":"TABLE"
-			})
-
-			return $.ajax("/query", {type:"POST",
-						data: query, contentType: "application/json", dataType: "json"
-					}
-			);
-		}
-		function dropdownroomnumberfunction2(data)
-		{
-			//console.log(jsonData.Table)
-			var jsonData={};
-			jsonData.Table=[]
-			jsonData.Table=data["result"]
-			console.log(jsonData.Table)
-			var listItems = '<option selected="selected" value=" ">- Select -</option>';
-			for (var i = 0; i < jsonData.Table.length; i++) {
-				listItems += "<option value='" + jsonData.Table[i].rooms_name + "'>" + jsonData.Table[i].rooms_name + "</option>";
-			}
-			$("#roomlist").html(listItems)
-		}
-
-
-	</script>
-<script type="text/javascript">
-	$(document).ready(function() {
-		$("#coursedept").change(function(){
-			var departmentlist=$("#coursedept").val()
-			console.log(departmentlist)
-			$.when(returncoursenumberdata3(departmentlist)).
-			then(dropdowncoursenumberfunction3)
-
-		});
-	});
-
-	function returncoursenumberdata3(departmentlist){
-		console.log("jump to return")
-		var query
-		var deptwhere  = {"OR": []};
-		for (var a = 0; a < departmentlist.length; a++) {
-			deptwhere["OR"][a] = {"IS": {"courses_dept": departmentlist[a]}}
-		}
-		query=JSON.stringify({
-			"GET":"courses_name",
-			"WHERE":deptwhere,
-			"GROUP":["courses_name"],
-			"APPLY":[],
-			"ORDER":"courses_name",
-			"AS":"TABLE"
-		})
-
-		return $.ajax("/query", {type:"POST",
-					data: query, contentType: "application/json", dataType: "json"
-				}
-		);
-	}
-	function dropdowncoursenumberfunction3(data)
-	{
-		//console.log(jsonData.Table)
-		var jsonData={};
-		jsonData.Table=[]
-		jsonData.Table=data["result"]
-		console.log(jsonData.Table)
-		var listItems = '<option selected="selected" value=" ">- Select -</option>';
-
-
-		for (var i = 0; i < jsonData.Table.length; i++) {
-			listItems += "<option value='" + jsonData.Table[i].courses_name + "'>" + jsonData.Table[i].courses_name  + "</option>";
-		}
-
-		$("#courselist1").html(listItems)
-	}
-
-
-	$(document).ready(function() {
-		$("#roomdistance1").on('input',function(){
-			console.log("jump in distance" )
-			var building=$("#buildingname4").val()
-			var distance=$("#roomdistance1").val()
-			console.log(building)
-			$.when(returnroomnumberdata3(building,distance)).
-			then(dropdownroomnumberfunction3)
-
-		});
-		$("#buildingname4").change(function(){
-			console.log("jump in distance" )
-			var building=$("#buildingname4").val()
-			var distance=$("#roomdistance1").val()
-			console.log(building)
-			$.when(returnroomnumberdata3(building,distance)).
-			then(dropdownroomnumberfunction3)
-		});
-	});
-
-	function returnroomnumberdata3(building,distance){
-		console.log("jump to return")
-		var   allbuildingquery = JSON.stringify({
-			"GET": ["rooms_name", "rooms_lat", "rooms_lon"],
-			"WHERE": {},
-			"AS": "TABLE"
-		});
-		var givenbuildingquery = JSON.stringify({
-			"GET": ["rooms_shortname", "buildingLat", "buildingLon"],
-			"WHERE": {"IS": {"rooms_shortname": building}},
-			"GROUP": ["rooms_shortname"],
-			"APPLY": [{"buildingLat": {"MAX": "rooms_lat"}}, {"buildingLon": {"MAX": "rooms_lon"}}],
-			"AS": "TABLE"
-		})
-
-		var roomlist=$.when(method1(),method2()).then(filterbuilding)
-		return roomlist
-
-		function method1() {
-			return $.ajax("/query", {type:"POST",
-				data: givenbuildingquery, contentType: "application/json", dataType: "json"}
-			);
-		}
-
-		function method2() {
-			console.log(allbuildingquery)
-			return $.ajax("/query", {type:"POST",
-				data: allbuildingquery, contentType: "application/json", dataType: "json"}
-			);
-		}
-		function filterbuilding(data1,data2){
-			var givenbuildinglat=data1[0]["result"][0]["buildingLat"]
-			console.log(givenbuildinglat)
-			var givenbuildinglon=data1[0]["result"][0]["buildingLon"]
-			console.log(givenbuildinglon)
-			var buildinglist=data2[0]["result"]
-
-
-			for(var i=0;i<buildinglist.length;i++)
-			{  var realdistance=getDistanceFromLatLon(givenbuildinglat,givenbuildinglon,buildinglist[i]["rooms_lat"],
-					buildinglist[i]["rooms_lon"])
-				if(realdistance>distance)
-				{
-					buildinglist.splice(i,1);
-					i--;
-				}
-			}
-			console.log("building length"+buildinglist.length)
-		var newbuildinglist=[]
-			for (var i=0;i<buildinglist.length;i++)
-			{
-				newbuildinglist[i]={}
-				newbuildinglist[i]["rooms_name"]=buildinglist[i]["rooms_name"]
-			}
-			console.log("buildinglist"+newbuildinglist)
-			return newbuildinglist;
-
-		}
-	}
-
-
-	function dropdownroomnumberfunction3(data)
-	{
-		//console.log(jsonData.Table)
-		var jsonData={};
-		jsonData.Table=[]
-		jsonData.Table=data
-		console.log(jsonData.Table)
-		console.log("jumps here")
-		console.log(data)
-		var listItems = '<option selected="selected" value=" ">- Select -</option>';
-		for (var i = 0; i < jsonData.Table.length; i++) {
-			listItems += "<option value='" + jsonData.Table[i].rooms_name + "'>" + jsonData.Table[i].rooms_name + "</option>";
-		}
-		$("#roomlist1").html(listItems)
-	}
-
-	function getDistanceFromLatLon(lat1,lon1,lat2,lon2) {
-
-		var R = 6371; // Radius of the earth in km
-		var dLat = (lat2-lat1)* (Math.PI/180);
-		var dLon = (lon2-lon1)* (Math.PI/180);
-		var a =
-				Math.sin(dLat/2) * Math.sin(dLat/2) +
-				Math.cos((lat1)* (Math.PI/180)) * Math.cos((lat2)*(Math.PI/180)) *
-				Math.sin(dLon/2) * Math.sin(dLon/2);
-		var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-		var d = R * c; // Distance in km
-		return d*1000;
-	}
-
-</script>
 
 	<title>
 	UBC Insight
@@ -1044,7 +769,6 @@
 			<select id="buildingname1"></select><br>
 			<label for="roomdistance"> distance (meters)</label>
 			<textarea class="form-control" rows="1" id="roomdistance"></textarea>
-
 		</div>
 
 		<div class="form-group">
@@ -1054,7 +778,6 @@
 				<option> UP </option>
 				<option> DOWN </option>
 			</select>    <br>
-			<!--  order    多选 !-->
 
 		</div>
 
@@ -1074,42 +797,39 @@
 
 <div id="roomscheduling">
 <h3> Room Scheduling</h3>
-	<form id="schedulingformbylists">
-		<label>Filter by building name and department(course) name ,and choose a subset</label><br>
-		<label> Course List(separated by comma)</label>
-		<textarea  class="form-control" rows="1" id="courselist2"> </textarea><br>
-		<label> Room List(seperated by comma)</label>
-		<textarea  class="form-control" rows="1" id="roomlist2" > </textarea><br>
-		<button type="submit" class="btn btn-primary">Submit</button>
-	</form>
-
 
 <form id="schedulingformbylist">
 	<label>Filter by building name and department(course) name ,and choose a subset</label><br>
-	<label> department name</label>
-
+	<label> department name</label><br>
+	<a href='#' id='deselect-all1'>deselect all</a>
 	<select id="coursedept1"  multiple="multiple"  tabindex="4"></select><br>
-	<label> Course List</label>
+	<label> Course List</label><br>
+	<a href='#' id='deselect-all4'>deselect all</a>
 	<select id="courselist" multiple="multiple"> </select><br>
-	<label> building name</label>
+	<label> building name</label><br>
+	<a href='#' id='deselect-all2'>deselect all</a>
 	<select id="buildingname3" multiple="multiple"></select><br>
-	<label> Room List</label>
+	<label> Room List</label><br>
+	<a href='#' id='deselect-all5'>deselect all</a>
 	<select id="roomlist" multiple="multiple" > </select><br>
 	<button type="submit" class="btn btn-primary">Submit</button>
 	</form>
 
 	<form id="schedulingformbykeys">
 		<label>Filter by building name and department(course) name ,and choose a subset</label><br>
-		<label> department</label>
+		<label> department</label><br>
+		<a href='#' id='deselect-all3'>deselect all</a>
 		<select id="coursedept" multiple="multiple"></select><br>
-		<label> Course List</label>
+		<label> Course List</label><br>
+		<a href='#' id='deselect-all6'>deselect all</a>
 		<select id="courselist1"  multiple="multiple"> </select><br>
 		<h4>Distance: building within x meters of a chosen building</h4>
 		<label for="buildingname4"> building name </label>
 		<select id="buildingname4"></select><br>
 		<label for="roomdistance1"> distance (meters)</label>
 		<textarea class="form-control" rows="1" id="roomdistance1"></textarea>
-		<label> Room List</label>
+		<label> Room List</label><br>
+		<a href='#' id='deselect-all7'>deselect all</a>
 		<select id="roomlist1" multiple="multiple" > </select><br>
 		<button type="submit" class="btn btn-primary">Submit</button>
 	</form>
@@ -1192,13 +912,456 @@
 
 
 
-<!--
-<div id="googlemap"> </div>
-<script async defer
-		src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA2unPYnEp0F2gUmgTdNacSrr_qhpQDgPw&callback=initMap">
+<script  type="text/javascript">
+
+	$('#coursedept1').multiSelect()
+	$('#coursedept1').multiSelect('addOption',{ value: " ", text:"Select" , index: 0, nested: 'optgroup_label' });
+    $.when(returndepartmentdata()).then(dropdowndeptfunction)
+	$('#buildingname3').multiSelect()
+	$('#buildingname3').multiSelect('addOption',{ value: " ", text:"Select" , index: 0, nested: 'optgroup_label' });
+	$.when(returnbuildingnamedata()).then(dropdownbuildingfunction)
+	$('#courselist').multiSelect()
+	$('#courselist').multiSelect('addOption',{ value: " ", text:"Select" , index: 0, nested: 'optgroup_label' });
+	$('#roomlist').multiSelect()
+	$('#roomlist').multiSelect('addOption',{ value: " ", text:"Select" , index: 0, nested: 'optgroup_label' });
+	function returndepartmentdata(){
+		console.log("jump to return new")
+		var query=JSON.stringify({
+			"GET":"courses_dept",
+			"WHERE":{},
+			"GROUP":["courses_dept"],
+			"APPLY":[],
+			"ORDER":"courses_dept",
+			"AS":"TABLE"
+		})
+		return $.ajax("/query", {type:"POST",
+					data: query, contentType: "application/json", dataType: "json"
+				}
+		);
+	}
+
+	function dropdowndeptfunction(data)
+	{
+		console.log("jump to return new123")
+		var jsonData={};
+		jsonData.Table=[]
+		jsonData.Table=data["result"]
+       console.log(jsonData.Table)
+     console.log("jumps here")
+		var listItems
+		//var listItems = '<option selected="selected" value=" ">- Select -</option>';
+		for (var i = 0; i < jsonData.Table.length; i++) {
+			listItems += "<option value='" + jsonData.Table[i].courses_dept + "'>" + jsonData.Table[i].courses_dept + "</option>";
+			$('#coursedept1').multiSelect('addOption',{ value: jsonData.Table[i].courses_dept, text:jsonData.Table[i].courses_dept,
+				index: i+1, nested: 'optgroup_label' })
+
+		}
+		$("#coursedept1").html(listItems)
+
+	}
+
+
+	function returnbuildingnamedata(){
+		console.log("jump to return")
+		var query=JSON.stringify({
+			"GET":"rooms_shortname",
+			"WHERE":{},
+			"GROUP":["rooms_shortname"],
+			"APPLY":[],
+			"ORDER":"rooms_shortname",
+			"AS":"TABLE"
+		})
+		return $.ajax("/query", {type:"POST",
+					data: query, contentType: "application/json", dataType: "json"
+				}
+		);
+	}
+	function dropdownbuildingfunction(data)
+	{
+
+		var jsonData={};
+		jsonData.Table=[]
+		jsonData.Table=data["result"]
+
+		var listItems
+
+		for (var i = 0; i < jsonData.Table.length; i++)
+		{
+			listItems += "<option value='" + jsonData.Table[i].rooms_shortname+ "'>" + jsonData.Table[i].rooms_shortname + "</option>";
+			$('#buildingname3').multiSelect('addOption',{ value: jsonData.Table[i].rooms_shortname, text:jsonData.Table[i].rooms_shortname,
+				index: i+1, nested: 'optgroup_label' })
+
+		}
+
+		$("#buildingname3").html(listItems)
+
+	}
+
+	</script>
+<script type="text/javascript">
+
+
+
+
+$(document).ready(function() {
+		$("#coursedept1").change(function(){
+			var departmentlist=	$("#coursedept1").val()
+			console.log(departmentlist)
+			$.when(returncoursenumberdata2(departmentlist)).
+			then(dropdowncoursenumberfunction2)
+		});
+	});
+
+	function returncoursenumberdata2(departmentlist){
+		console.log("jump to return")
+		var query
+		var deptwhere  = {"OR": []};
+		for (var a = 0; a < departmentlist.length; a++) {
+			deptwhere["OR"][a] = {"IS": {"courses_dept": departmentlist[a]}}
+		}
+		query=JSON.stringify({
+			"GET":"courses_name",
+			"WHERE":deptwhere,
+			"GROUP":["courses_name"],
+			"APPLY":[],
+			"ORDER":"courses_name",
+			"AS":"TABLE"
+		})
+
+		return $.ajax("/query", {type:"POST",
+					data: query, contentType: "application/json", dataType: "json"
+				}
+		);
+	}
+	function dropdowncoursenumberfunction2(data)
+	{
+		//console.log(jsonData.Table)
+
+		//$('#courselist').multiSelect()
+		//$('#courselist').multiSelect('addOption',{ value: " ", text:"Select" , index: 0, nested: 'optgroup_label' });
+		console.log(data)
+		var jsonData={};
+		jsonData.Table=[]
+		jsonData.Table=data["result"]
+		console.log(jsonData.Table)
+		var listItems;
+
+		for (var i = 0; i < jsonData.Table.length; i++) {
+			listItems += "<option value='" + jsonData.Table[i].courses_name + "'>" + jsonData.Table[i].courses_name  + "</option>";
+			$('#courselist').multiSelect('addOption',{ value: jsonData.Table[i].courses_name, text:jsonData.Table[i].courses_name,
+				index: i+1, nested: 'optgroup_label' })
+		}
+
+
+		$("#courselist").html(listItems)
+	}
+
+
+
+	$(document).ready(function() {
+		$("#buildingname3").change(function(){
+			var buildinglist=$("#buildingname3").val()
+			console.log(buildinglist)
+			$.when(returnroomnumberdata2(buildinglist)).
+			then(dropdownroomnumberfunction2)
+
+		});
+	});
+
+	function returnroomnumberdata2(buildinglist){
+		console.log("jump to return")
+		var query
+		var roomwhere  = {"OR": []};
+		for (var a = 0; a < buildinglist.length; a++) {
+			roomwhere["OR"][a] = {"IS": {"rooms_shortname": buildinglist[a]}}
+		}
+		query=JSON.stringify({
+			"GET":"rooms_name",
+			"WHERE":roomwhere,
+			"GROUP":["rooms_name"],
+			"APPLY":[],
+			"ORDER":"rooms_name",
+			"AS":"TABLE"
+		})
+
+		return $.ajax("/query", {type:"POST",
+					data: query, contentType: "application/json", dataType: "json"
+				}
+		);
+	}
+	function dropdownroomnumberfunction2(data)
+	{
+		//console.log(jsonData.Table)
+		var jsonData={};
+		jsonData.Table=[]
+		jsonData.Table=data["result"]
+		console.log(jsonData.Table)
+		var listItems ;
+		for (var i = 0; i < jsonData.Table.length; i++) {
+			$('#roomlist').multiSelect('addOption',{ value: jsonData.Table[i].rooms_name, text:jsonData.Table[i].rooms_name,
+				index: i+1, nested: 'optgroup_label' })
+			listItems += "<option value='" + jsonData.Table[i].rooms_name + "'>" + jsonData.Table[i].rooms_name + "</option>";
+		}
+		$("#roomlist").html(listItems)
+	}
+
+
 </script>
-<div id="googlemap"> </div>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-!-->
+
+<script  type="text/javascript">
+
+	$('#coursedept').multiSelect()
+	$('#coursedept').multiSelect('addOption',{ value: " ", text:"Select" , index: 0, nested: 'optgroup_label' });
+	$.when(returndepartmentdata()).then(dropdowndeptfunction)
+	$('#courselist1').multiSelect()
+	$('#courselist1').multiSelect('addOption',{ value: " ", text:"Select" , index: 0, nested: 'optgroup_label' });
+	$('#roomlist1').multiSelect()
+	$('#roomlist1').multiSelect('addOption',{ value: " ", text:"Select" , index: 0, nested: 'optgroup_label' });
+	function returndepartmentdata(){
+		console.log("jump to return new")
+		var query=JSON.stringify({
+			"GET":"courses_dept",
+			"WHERE":{},
+			"GROUP":["courses_dept"],
+			"APPLY":[],
+			"ORDER":"courses_dept",
+			"AS":"TABLE"
+		})
+		return $.ajax("/query", {type:"POST",
+					data: query, contentType: "application/json", dataType: "json"
+				}
+		);
+	}
+
+	function dropdowndeptfunction(data)
+	{
+		console.log("jump to return new123")
+		var jsonData={};
+		jsonData.Table=[]
+		jsonData.Table=data["result"]
+		console.log(jsonData.Table)
+		console.log("jumps here")
+		var listItems
+		//var listItems = '<option selected="selected" value=" ">- Select -</option>';
+		for (var i = 0; i < jsonData.Table.length; i++) {
+			listItems += "<option value='" + jsonData.Table[i].courses_dept + "'>" + jsonData.Table[i].courses_dept + "</option>";
+			$('#coursedept').multiSelect('addOption',{ value: jsonData.Table[i].courses_dept, text:jsonData.Table[i].courses_dept,
+				index: i+1, nested: 'optgroup_label' })
+
+		}
+		$("#coursedept").html(listItems)
+
+	}
+
+
+
+
+
+</script>
+<script type="text/javascript">
+
+	$(document).ready(function() {
+		$("#coursedept").change(function(){
+			var departmentlist=$("#coursedept").val()
+			console.log(departmentlist)
+			$.when(returncoursenumberdata3(departmentlist)).
+			then(dropdowncoursenumberfunction3)
+
+		});
+	});
+
+	function returncoursenumberdata3(departmentlist){
+		console.log("jump to return")
+		var query
+		var deptwhere  = {"OR": []};
+		for (var a = 0; a < departmentlist.length; a++) {
+			deptwhere["OR"][a] = {"IS": {"courses_dept": departmentlist[a]}}
+		}
+		query=JSON.stringify({
+			"GET":"courses_name",
+			"WHERE":deptwhere,
+			"GROUP":["courses_name"],
+			"APPLY":[],
+			"ORDER":"courses_name",
+			"AS":"TABLE"
+		})
+
+		return $.ajax("/query", {type:"POST",
+					data: query, contentType: "application/json", dataType: "json"
+				}
+		);
+	}
+	function dropdowncoursenumberfunction3(data)
+	{
+		//console.log(jsonData.Table)
+		var jsonData={};
+		jsonData.Table=[]
+		jsonData.Table=data["result"]
+		console.log(jsonData.Table)
+		var listItems;
+
+
+		for (var i = 0; i < jsonData.Table.length; i++) {
+
+			$('#courselist1').multiSelect('addOption',{ value: jsonData.Table[i].courses_name, text:jsonData.Table[i].courses_name,
+				index: i+1, nested: 'optgroup_label' })
+			listItems += "<option value='" + jsonData.Table[i].courses_name + "'>" + jsonData.Table[i].courses_name  + "</option>";
+		}
+
+		$("#courselist1").html(listItems)
+	}
+
+
+	$(document).ready(function() {
+		$("#roomdistance1").on('input',function(){
+			console.log("jump in distance" )
+			var building=$("#buildingname4").val()
+			var distance=$("#roomdistance1").val()
+			console.log(building)
+			$.when(returnroomnumberdata3(building,distance)).
+			then(dropdownroomnumberfunction3)
+
+		});
+		$("#buildingname4").change(function(){
+			console.log("jump in distance" )
+			var building=$("#buildingname4").val()
+			var distance=$("#roomdistance1").val()
+			console.log(building)
+			$.when(returnroomnumberdata3(building,distance)).
+			then(dropdownroomnumberfunction3)
+		});
+	});
+
+	function returnroomnumberdata3(building,distance){
+		console.log("jump to return")
+		var   allbuildingquery = JSON.stringify({
+			"GET": ["rooms_name", "rooms_lat", "rooms_lon"],
+			"WHERE": {},
+			"AS": "TABLE"
+		});
+		var givenbuildingquery = JSON.stringify({
+			"GET": ["rooms_shortname", "buildingLat", "buildingLon"],
+			"WHERE": {"IS": {"rooms_shortname": building}},
+			"GROUP": ["rooms_shortname"],
+			"APPLY": [{"buildingLat": {"MAX": "rooms_lat"}}, {"buildingLon": {"MAX": "rooms_lon"}}],
+			"AS": "TABLE"
+		})
+
+		var roomlist=$.when(method1(),method2()).then(filterbuilding)
+		return roomlist
+
+		function method1() {
+			return $.ajax("/query", {type:"POST",
+				data: givenbuildingquery, contentType: "application/json", dataType: "json"}
+			);
+		}
+
+		function method2() {
+			console.log(allbuildingquery)
+			return $.ajax("/query", {type:"POST",
+				data: allbuildingquery, contentType: "application/json", dataType: "json"}
+			);
+		}
+		function filterbuilding(data1,data2){
+			var givenbuildinglat=data1[0]["result"][0]["buildingLat"]
+			console.log(givenbuildinglat)
+			var givenbuildinglon=data1[0]["result"][0]["buildingLon"]
+			console.log(givenbuildinglon)
+			var buildinglist=data2[0]["result"]
+
+
+			for(var i=0;i<buildinglist.length;i++)
+			{  var realdistance=getDistanceFromLatLon(givenbuildinglat,givenbuildinglon,buildinglist[i]["rooms_lat"],
+					buildinglist[i]["rooms_lon"])
+				if(realdistance>distance)
+				{
+					buildinglist.splice(i,1);
+					i--;
+				}
+			}
+			console.log("building length"+buildinglist.length)
+			var newbuildinglist=[]
+			for (var i=0;i<buildinglist.length;i++)
+			{
+				newbuildinglist[i]={}
+				newbuildinglist[i]["rooms_name"]=buildinglist[i]["rooms_name"]
+			}
+			console.log("buildinglist"+newbuildinglist)
+			return newbuildinglist;
+
+		}
+	}
+
+
+	function dropdownroomnumberfunction3(data)
+	{
+		//console.log(jsonData.Table)
+		var jsonData={};
+		jsonData.Table=[]
+		jsonData.Table=data
+		console.log(jsonData.Table)
+		console.log("jumps here")
+		console.log(data)
+		var listItems ;
+		for (var i = 0; i < jsonData.Table.length; i++) {
+			$('#roomlist1').multiSelect('addOption',{ value: jsonData.Table[i].rooms_name, text:jsonData.Table[i].rooms_name,
+				index: i+1, nested: 'optgroup_label' })
+			listItems += "<option value='" + jsonData.Table[i].rooms_name + "'>" + jsonData.Table[i].rooms_name + "</option>";
+		}
+		$("#roomlist1").html(listItems)
+	}
+
+	function getDistanceFromLatLon(lat1,lon1,lat2,lon2) {
+
+		var R = 6371; // Radius of the earth in km
+		var dLat = (lat2-lat1)* (Math.PI/180);
+		var dLon = (lon2-lon1)* (Math.PI/180);
+		var a =
+				Math.sin(dLat/2) * Math.sin(dLat/2) +
+				Math.cos((lat1)* (Math.PI/180)) * Math.cos((lat2)*(Math.PI/180)) *
+				Math.sin(dLon/2) * Math.sin(dLon/2);
+		var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+		var d = R * c; // Distance in km
+		return d*1000;
+	}
+
+</script>
+<script text>
+	$('#coursedept1').multiSelect();
+	$('#buildingname3').multiSelect();
+	$('#coursedept').multiSelect();
+	$('#deselect-all1').click(function(){
+		$('#coursedept1').multiSelect('deselect_all');
+		return false;
+	});
+
+	$('#deselect-all2').click(function(){
+		$('#buildingname3').multiSelect('deselect_all');
+		return false;
+	});
+	$('#deselect-all3').click(function(){
+		$('#coursedept').multiSelect('deselect_all');
+		return false;
+	});
+	$('#deselect-all4').click(function(){
+		$('#courselist').multiSelect('deselect_all');
+		return false;
+	});
+	$('#deselect-all5').click(function(){
+		$('#roomlist').multiSelect('deselect_all');
+		return false;
+	});
+	$('#deselect-all6').click(function(){
+		$('#courselist1').multiSelect('deselect_all');
+		return false;
+	});
+	$('#deselect-all7').click(function(){
+		$('#roomlist1').multiSelect('deselect_all');
+		return false;
+	});
+
+	</script>
+
+
 </body>
 </html>
