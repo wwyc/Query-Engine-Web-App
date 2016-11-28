@@ -49,3 +49,18 @@ room number, room type, furniture type,distance
 (once you choose the department, course number will render corresponding available course number in a given 
 department)
 3) show a pie chart for list of rooms in a chosen building grouped by furniture type, room type or rooms seats(you can see the percentage component clearly)
+
+
+
+
+
+Reference:
+1.	
+http://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula
+2.	http://www.fusioncharts.com/jquery-charts/
+3.	https://jonlabelle.com/snippets/view/html/populate-select-options-with-json-and-jquery
+4.	http://stackoverflow.com/questions/34379664/google-maps-api-setting-up-callbacks-for-adding-markers-polyline
+
+
+
+
