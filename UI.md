@@ -36,9 +36,9 @@ room number, room type, furniture type,distance
 ###(III) Room Scheduling:
 - Purpose: arrange a weekly schedule according to list of rooms and courses filtered by clients requirement
 - Procedure
-1)by typing a list of rooms shortname and a list of courses name(eg: cpsc221) to arrange all these courses in all theses room in a schedule
+1)by typing a list of rooms shortname or filter rooms within x meters in given building and a list of dept name(eg: cpsc221) to arrange all these courses in all theses room in a schedule
 2)by typing a list of department name, list of building name arrange all courses in those departments to rooms in those buildings 
-3)by choosing a department and 1) building name or 2)a list of building within x meters in given building to arrange course
+3)by multiple choosing a department and 1) building name or 2)a list of building within x meters in given building to arrange course
 
 
 ###(IV) Novel Function - Render Charts for Useful Data:
